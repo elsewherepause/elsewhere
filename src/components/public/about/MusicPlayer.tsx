@@ -95,9 +95,10 @@ export default function MusicPlayer({ style }: { style?: React.CSSProperties }) 
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', ...style }}>
-      <audio 
-        ref={audioRef} 
+      <audio
+        ref={audioRef}
         src={currentTrack.src}
+        preload="metadata"
         onEnded={handleEnded}
       />
 

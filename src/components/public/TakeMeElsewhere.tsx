@@ -20,7 +20,7 @@ export default function TakeMeElsewhere({ destinations, className, style }: Prop
   }
 
   return (
-    <span onClick={go} className={className} style={{ cursor: 'pointer', ...style }}>
+    <span onClick={go} className={className} style={{ cursor: 'pointer', whiteSpace: 'nowrap', ...style }}>
       Take me elsewhere
     </span>
   )
