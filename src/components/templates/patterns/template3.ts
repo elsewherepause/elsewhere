@@ -5,7 +5,7 @@ export const PATTERNS: Pattern[] = [
     desc: 'Image left, text right',
     images: [{ field: 'image1', label: 'Image — left (648x416)' }],
     texts: [
-      { field: 'headline', label: 'Headline', multiline: false },
+      { field: 'headline', label: 'Headline', multiline: true },
       { field: 'body1', label: 'Body — intro line', multiline: true },
       { field: 'quote', label: 'Quote 1', multiline: true },
       { field: 'body2', label: 'Body — between quotes', multiline: true },
@@ -29,7 +29,7 @@ export const PATTERNS: Pattern[] = [
       { field: 'image2', label: 'Landscape (684x520)' },
     ],
     texts: [
-      { field: 'headline', label: 'Headline', multiline: false },
+      { field: 'headline', label: 'Headline', multiline: true },
       { field: 'body1', label: 'Body 1', multiline: true },
       { field: 'body2', label: 'Body 2', multiline: true },
       { field: 'quote', label: 'Quote', multiline: true },
@@ -43,7 +43,7 @@ export const PATTERNS: Pattern[] = [
       { field: 'image2', label: 'Portrait right (685x589)' },
     ],
     texts: [
-      { field: 'headline', label: 'Headline', multiline: false },
+      { field: 'headline', label: 'Headline', multiline: true },
       { field: 'body1', label: 'Body 1 — left column', multiline: true },
       { field: 'body2', label: 'Body 2 — right column', multiline: true },
       { field: 'body3', label: 'Body 3', multiline: true },
@@ -54,9 +54,9 @@ export const PATTERNS: Pattern[] = [
     desc: 'Two headlines + image',
     images: [{ field: 'image1', label: 'Landscape (469x334)' }],
     texts: [
-      { field: 'headline', label: 'Headline 1', multiline: false },
+      { field: 'headline', label: 'Headline 1', multiline: true },
       { field: 'body1', label: 'Body 1 — right column', multiline: true },
-      { field: 'headline2', label: 'Headline 2', multiline: false },
+      { field: 'headline2', label: 'Headline 2', multiline: true },
       { field: 'body2', label: 'Body 2 — right column', multiline: true },
       { field: 'body3', label: 'Body 3 — below image left', multiline: true },
       { field: 'body4', label: 'Body 4 — below image right', multiline: true },
@@ -69,7 +69,7 @@ export const PATTERNS: Pattern[] = [
       { field: 'image2', label: 'Small strip (469x178)' },
     ],
     texts: [
-      { field: 'headline', label: 'Headline', multiline: false },
+      { field: 'headline', label: 'Headline', multiline: true },
       { field: 'body1', label: 'Body 1 — right column', multiline: true },
       { field: 'body2', label: 'Body 2 — wide', multiline: true },
     ],
@@ -81,7 +81,7 @@ export const PATTERNS: Pattern[] = [
       { field: 'image2', label: 'Large landscape (688x589)' },
     ],
     texts: [
-      { field: 'headline', label: 'Headline', multiline: false },
+      { field: 'headline', label: 'Headline', multiline: true },
       { field: 'body1', label: 'Body 1 — left column', multiline: true },
       { field: 'body2', label: 'Body 2 — right column', multiline: true },
       { field: 'body3', label: 'Body 3 — left column', multiline: true },
@@ -94,7 +94,7 @@ export const PATTERNS: Pattern[] = [
     desc: 'Closing text',
     images: [],
     texts: [
-      { field: 'headline', label: 'Headline', multiline: false },
+      { field: 'headline', label: 'Headline', multiline: true },
       { field: 'body1', label: 'Body 1 — left column', multiline: true },
       { field: 'body2', label: 'Body 2 — right column', multiline: true },
       { field: 'body3', label: 'Body 3 — left column', multiline: true },

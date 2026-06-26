@@ -151,6 +151,7 @@ export default function TemplateEditor({ project, patterns, Layout, showTitleLig
   function wrapSelection(marker: string) {
     const el = lastFocusedRef.current
     if (!el) return
+    if (!(el instanceof HTMLTextAreaElement) && !el.dataset.formattable) return
     const start = el.selectionStart ?? 0
     const end = el.selectionEnd ?? 0
     const val = el.value
@@ -324,8 +325,8 @@ export default function TemplateEditor({ project, patterns, Layout, showTitleLig
                   </div>
                 )}
                 <div className="space-y-1">
-                  <label className="text-[10px] uppercase tracking-widest text-gray-400">{showTitleLight ? 'Title — bold part' : 'Title'}</label>
-                  <input value={(templateData.titleBold as string) || ''} onChange={e => setMeta('titleBold', e.target.value)} className={inputCls} placeholder="Project Title" />
+                  <label className="text-[10px] uppercase tracking-widest text-gray-400">Title</label>
+                  <input data-formattable="" value={(templateData.titleBold as string) || ''} onChange={e => setMeta('titleBold', e.target.value)} className={inputCls} placeholder="Project Title" />
                 </div>
                 <div className="space-y-1">
                   <label className="text-[10px] uppercase tracking-widest text-gray-400">Location</label>
