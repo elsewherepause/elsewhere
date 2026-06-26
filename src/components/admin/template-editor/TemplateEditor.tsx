@@ -357,14 +357,6 @@ export default function TemplateEditor({ project, patterns, Layout, showTitleLig
                     )}
                   </button>
                 </div>
-                <div className="space-y-1">
-                  <label className="text-[10px] uppercase tracking-widest text-gray-400">Next Project — Link text</label>
-                  <input value={(templateData.nextProjectTitle as string) || ''} onChange={e => setMeta('nextProjectTitle', e.target.value)} className={inputCls} placeholder="Next project title" />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[10px] uppercase tracking-widest text-gray-400">Next Project — Slug</label>
-                  <input value={(templateData.nextProjectSlug as string) || ''} onChange={e => setMeta('nextProjectSlug', e.target.value)} className={`${inputCls} font-mono text-xs`} placeholder="next-project-slug" />
-                </div>
               </div>
             )}
           </div>
