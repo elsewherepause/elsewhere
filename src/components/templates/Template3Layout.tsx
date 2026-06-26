@@ -190,6 +190,7 @@ export default function Template3Layout({
         position: 'absolute', left: l, top: t, width: w,
         fontFamily: 'var(--font-serif, DM Sans)', fontWeight: 500, fontSize: size,
         color: '#1c1c1c', textTransform: 'uppercase', lineHeight: 'normal',
+        whiteSpace: 'pre-wrap',
       }}>{children}</div>
     )
   }

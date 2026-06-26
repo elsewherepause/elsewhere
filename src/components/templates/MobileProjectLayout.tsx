@@ -138,7 +138,7 @@ export default function MobileProjectLayout({ data, patterns, nextProject, desti
                     <h2 style={{
                       fontFamily: 'var(--font-serif, DM Sans)', fontWeight: 500, fontSize: 18,
                       color: '#1c1c1c', textTransform: 'uppercase', lineHeight: 1.3,
-                      margin: '16px 0 12px',
+                      margin: '16px 0 12px', whiteSpace: 'pre-wrap',
                     }}>{headline}</h2>
                   )}
 
