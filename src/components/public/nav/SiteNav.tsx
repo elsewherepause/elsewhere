@@ -7,8 +7,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { getNavProjects } from '@/actions/nav.actions'
 
 const PAGE_LABELS: Record<string, string> = {
-  '/gallery': 'Gallery',
-  '/about': 'About Me',
+  '/gallery': 'Open Rolls',
+  '/about': 'The Author',
 }
 
 export default function SiteNav() {
@@ -54,15 +54,15 @@ export default function SiteNav() {
       aria-controls="site-menu"
     >
       Menu
-      <span style={{
-        display: 'inline-block',
-        width: 8,
-        height: 8,
-        border: '1px solid var(--color-ink)',
-        background: menuOpen ? 'var(--color-ink)' : 'transparent',
-        flexShrink: 0,
-        transition: 'background 0.2s',
-      }} aria-hidden="true" />
+      {!menuOpen && (
+        <span style={{
+          display: 'inline-block',
+          width: 8,
+          height: 8,
+          border: '1px solid var(--color-ink)',
+          flexShrink: 0,
+        }} aria-hidden="true" />
+      )}
     </button>
   )
 
@@ -71,13 +71,13 @@ export default function SiteNav() {
       <header className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-6 md:px-10 py-5 pointer-events-none">
         <Link
           href="/"
-          className="pointer-events-auto hover:opacity-60 transition-opacity"
+          className={`pointer-events-auto hover:opacity-60 transition-opacity ${menuOpen ? 'invisible' : ''}`}
         >
           <img src="/t1-wordmark.svg" alt=".elsewhere" className="h-[14px] md:h-[18px] w-auto block" />
         </Link>
 
         <div className="pointer-events-auto flex items-center gap-4 md:gap-10">
-          {label && (
+          {label && !menuOpen && (
             <span className="hidden md:inline" style={{
               fontFamily: 'var(--font-sans)',
               fontSize: 16,
@@ -109,25 +109,34 @@ export default function SiteNav() {
           >
             {/* Desktop layout */}
             <div
-              className="hidden md:flex absolute inset-0 pt-20 px-10 pb-10"
+              className="hidden md:block absolute inset-0 pt-20 px-10 pb-10"
               onClick={e => e.stopPropagation()}
             >
-              {/* Left column: MENU + STORIES list */}
-              <div className="flex-1">
-                <div className="flex items-center gap-10 mb-6">
-                  <span className="pointer-events-auto">{menuButton}</span>
+              {/* Top bar: MENU, STORIES column, nav links */}
+              <div className="absolute right-0 top-0 px-10 py-5 pointer-events-auto">
+                {/* Top line: MENU, STORIES, OPEN ROLLS, THE AUTHOR */}
+                <div className="flex items-baseline gap-10">
+                  {menuButton}
                   <h2 style={{
                     fontFamily: 'var(--font-sans)',
                     fontSize: 14,
-                    fontWeight: 700,
+                    fontWeight: isAbout ? 500 : 700,
                     textTransform: 'uppercase',
-                    color: 'var(--color-ink)',
+                    color: isAbout ? 'var(--color-ink-muted)' : 'var(--color-ink)',
                     letterSpacing: '0.05em',
                     margin: 0,
                   }}>Stories</h2>
+
+                  <div className="flex gap-6 text-[11px] uppercase tracking-[0.1em] font-sans items-baseline" style={{ paddingLeft: 80 }}>
+                    <Link href="/gallery" onClick={() => setMenuOpen(false)} className="cursor-pointer hover:opacity-70 transition-opacity no-underline text-[var(--color-ink-muted)] font-medium">Open Rolls</Link>
+                    <Link href="/about" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 cursor-pointer hover:opacity-70 transition-opacity no-underline" style={{ color: isAbout ? 'var(--color-ink)' : 'var(--color-ink-muted)', fontWeight: isAbout ? 700 : 500 }}>
+                      The Author <span className="w-1.5 h-1.5 bg-current"></span>
+                    </Link>
+                  </div>
                 </div>
 
-                <nav className="flex flex-col space-y-3 pl-[88px]">
+                {/* Stories list directly below heading */}
+                <nav className="flex flex-col space-y-3 mt-6" style={{ marginLeft: 85 }}>
                   {isLoading ? (
                     <p className="text-lg" style={{ fontFamily: 'var(--font-sans)', color: 'var(--color-ink-muted)' }}>
                       Loading stories...
@@ -156,14 +165,6 @@ export default function SiteNav() {
                     ))
                   )}
                 </nav>
-              </div>
-
-              {/* Right side: OPEN ROLLS + THE AUTHOR */}
-              <div className="flex items-start gap-6 text-[11px] uppercase tracking-[0.1em] font-sans pt-1">
-                <Link href="/gallery" onClick={() => setMenuOpen(false)} className="cursor-pointer hover:opacity-70 transition-opacity no-underline text-[var(--color-ink-muted)] font-medium">Open Rolls</Link>
-                <Link href="/about" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 cursor-pointer hover:opacity-70 transition-opacity no-underline" style={{ color: isAbout ? 'var(--color-ink)' : 'var(--color-ink-muted)', fontWeight: isAbout ? 700 : 500 }}>
-                  The Author <span className="w-1.5 h-1.5 bg-current"></span>
-                </Link>
               </div>
             </div>
 

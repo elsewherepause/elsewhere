@@ -116,13 +116,13 @@ export default function MusicPlayer({ style }: { style?: React.CSSProperties }) 
             src="/icons/vinyl-needle-new.svg"
             style={{
               position: 'absolute',
-              width: 50,
+              width: 60,
               height: 'auto',
-              top: -16,
-              right: 10,
+              top: 40,
+              right: 30,
               zIndex: 20,
-              transformOrigin: '70% 28%',
-              transform: isPlaying ? 'rotate(0deg)' : 'rotate(-20deg)',
+              transformOrigin: '80% 25%',
+              transform: isPlaying ? 'rotate(0deg)' : 'rotate(-25deg)',
               transition: 'transform 0.4s ease',
             }}
           />

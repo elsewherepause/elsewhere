@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 /* ─── Font stacks ───────────────────────────────────────────────────────────
    To swap fonts, change the values of --font-heading and --font-body here.
    Both are referenced throughout the codebase only via these variables.
