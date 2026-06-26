@@ -37,11 +37,8 @@ export default function SiteFooter({ nextProject, destinations = [] }: Props) {
 
       <div className="flex items-center justify-between px-6 md:px-20 mt-16">
         <div className="flex items-center gap-10 text-[var(--color-ink)]">
-          <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="hover:opacity-60 transition-opacity">
+          <a href="https://instagram.com/pause.elsewhere" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="hover:opacity-60 transition-opacity">
             <img src="/t1-instagram.svg" alt="Instagram" width={20} height={20} className="block" />
-          </a>
-          <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter / X" className="hover:opacity-60 transition-opacity">
-            <img src="/t1-twitter.svg" alt="X / Twitter" width={20} height={20} className="block" />
           </a>
         </div>
         <p className="text-base text-[var(--color-ink)]" style={{ fontFamily: 'var(--font-sans, Montserrat)' }}>@Copywrite</p>

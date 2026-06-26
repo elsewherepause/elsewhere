@@ -219,12 +219,9 @@ export default function AboutCanvas() {
 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, width: 1344 }}>
             <div style={{ display: 'flex', gap: 40, alignItems: 'center', flexShrink: 0 }}>
-              <div style={{ position: 'relative', flexShrink: 0, width: 20, height: 20 }}>
+              <a href="https://instagram.com/pause.elsewhere" target="_blank" rel="noopener noreferrer" style={{ position: 'relative', flexShrink: 0, width: 20, height: 20 }}>
                 <img alt="Instagram" style={{ display: 'block', position: 'absolute', inset: 0, maxWidth: 'none', width: '100%', height: '100%' }} src="/icons/instagram.svg" />
-              </div>
-              <div style={{ position: 'relative', flexShrink: 0, width: 20, height: 20 }}>
-                <img alt="Twitter / X" style={{ display: 'block', position: 'absolute', inset: 0, maxWidth: 'none', width: '100%', height: '100%' }} src="/icons/twitter.svg" />
-              </div>
+              </a>
             </div>
             <p style={{ lineHeight: 'normal', flexShrink: 0, fontSize: 16, color: '#000', whiteSpace: 'nowrap', fontWeight: 400, margin: 0, ...mont }}>
               @Copywrite
@@ -440,8 +437,9 @@ function MobileLayout() {
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 32 }}>
           <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
-            <img alt="Instagram" style={{ display: 'block', width: 18, height: 18 }} src="/icons/instagram.svg" />
-            <img alt="Twitter / X" style={{ display: 'block', width: 18, height: 18 }} src="/icons/twitter.svg" />
+            <a href="https://instagram.com/pause.elsewhere" target="_blank" rel="noopener noreferrer">
+              <img alt="Instagram" style={{ display: 'block', width: 18, height: 18 }} src="/icons/instagram.svg" />
+            </a>
           </div>
           <p style={{ fontSize: 12, color: '#000', fontWeight: 400, margin: 0, ...mont }}>
             @Copywrite

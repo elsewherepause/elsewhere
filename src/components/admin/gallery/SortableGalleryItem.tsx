@@ -108,30 +108,19 @@ export default function SortableGalleryItem({ item, onDeleted, onUpdated }: Prop
         <div className="border-t border-[var(--color-border)] p-4 space-y-4">
           <div className="space-y-1">
             <label className="block text-xs uppercase tracking-widest text-[var(--color-ink-muted)]">
-              Alt Text *
+              Title
             </label>
             <input
               className="field-input"
-              value={form.altText}
-              onChange={(e) => setForm((f) => ({ ...f, altText: e.target.value }))}
+              value={form.caption}
+              onChange={(e) => setForm((f) => ({ ...f, caption: e.target.value }))}
+              placeholder="Title shown next to the image"
             />
           </div>
 
           <div className="space-y-1">
             <label className="block text-xs uppercase tracking-widest text-[var(--color-ink-muted)]">
               Caption
-            </label>
-            <input
-              className="field-input"
-              value={form.caption}
-              onChange={(e) => setForm((f) => ({ ...f, caption: e.target.value }))}
-              placeholder="Short title shown next to the image"
-            />
-          </div>
-
-          <div className="space-y-1">
-            <label className="block text-xs uppercase tracking-widest text-[var(--color-ink-muted)]">
-              Description
             </label>
             <textarea
               className="field-input min-h-20"
@@ -145,12 +134,15 @@ export default function SortableGalleryItem({ item, onDeleted, onUpdated }: Prop
               <label className="block text-xs uppercase tracking-widest text-[var(--color-ink-muted)]">
                 Category
               </label>
-              <input
+              <select
                 className="field-input"
                 value={form.category}
                 onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
-                placeholder="e.g. Culture, Adventure"
-              />
+              >
+                <option value="">Select category</option>
+                <option value="Culture">Culture</option>
+                <option value="Adventure">Adventure</option>
+              </select>
             </div>
 
             <div className="space-y-1">
@@ -166,6 +158,17 @@ export default function SortableGalleryItem({ item, onDeleted, onUpdated }: Prop
                 <option value="VIDEO">Video</option>
               </select>
             </div>
+          </div>
+
+          <div className="space-y-1">
+            <label className="block text-xs uppercase tracking-widest text-[var(--color-ink-muted)]">
+              Alt Text (internal) *
+            </label>
+            <input
+              className="field-input"
+              value={form.altText}
+              onChange={(e) => setForm((f) => ({ ...f, altText: e.target.value }))}
+            />
           </div>
 
           <label className="flex items-center gap-2 text-xs uppercase tracking-widest text-[var(--color-ink-muted)]">

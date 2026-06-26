@@ -213,8 +213,9 @@ export default function MobileProjectLayout({ data, patterns, nextProject, desti
             <img src="/t1-wordmark.svg" alt=".elsewhere" className="w-full block mb-8" />
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-8">
-                <img src="/t1-instagram.svg" alt="Instagram" width={16} height={16} />
-                <img src="/t1-twitter.svg" alt="X" width={16} height={16} />
+                <a href="https://instagram.com/pause.elsewhere" target="_blank" rel="noopener noreferrer">
+                  <img src="/t1-instagram.svg" alt="Instagram" width={16} height={16} />
+                </a>
               </div>
               <span style={{ fontFamily: 'var(--font-sans, Montserrat)', fontSize: 13, color: '#000' }}>@Copywrite</span>
             </div>

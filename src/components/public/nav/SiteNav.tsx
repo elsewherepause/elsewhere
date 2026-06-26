@@ -31,6 +31,41 @@ export default function SiteNav() {
       })
   }, [])
 
+  const menuButton = (
+    <button
+      onClick={() => setMenuOpen((v) => !v)}
+      style={{
+        fontFamily: 'var(--font-sans)',
+        fontSize: 14,
+        fontWeight: menuOpen ? 700 : 500,
+        textTransform: 'uppercase',
+        color: 'var(--color-ink)',
+        letterSpacing: '0.01em',
+        background: 'none',
+        border: 'none',
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 6,
+        transition: 'font-weight 0.2s',
+      }}
+      aria-label="Toggle menu"
+      aria-expanded={menuOpen}
+      aria-controls="site-menu"
+    >
+      Menu
+      <span style={{
+        display: 'inline-block',
+        width: 8,
+        height: 8,
+        border: '1px solid var(--color-ink)',
+        background: menuOpen ? 'var(--color-ink)' : 'transparent',
+        flexShrink: 0,
+        transition: 'background 0.2s',
+      }} aria-hidden="true" />
+    </button>
+  )
+
   return (
     <>
       <header className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-6 md:px-10 py-5 pointer-events-none">
@@ -54,38 +89,10 @@ export default function SiteNav() {
               {label}
             </span>
           )}
-          <button
-            onClick={() => setMenuOpen((v) => !v)}
-            style={{
-              fontFamily: 'var(--font-sans)',
-              fontSize: 14,
-              fontWeight: menuOpen ? 700 : 500,
-              textTransform: 'uppercase',
-              color: 'var(--color-ink)',
-              letterSpacing: '0.01em',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              transition: 'font-weight 0.2s',
-            }}
-            aria-label="Toggle menu"
-            aria-expanded={menuOpen}
-            aria-controls="site-menu"
-          >
-            Menu
-            <span style={{
-              display: 'inline-block',
-              width: 8,
-              height: 8,
-              border: '1px solid var(--color-ink)',
-              background: menuOpen ? 'var(--color-ink)' : 'transparent',
-              flexShrink: 0,
-              transition: 'background 0.2s',
-            }} aria-hidden="true" />
-          </button>
+          {/* On mobile: always show here. On desktop: only show when menu is closed */}
+          <span className={menuOpen ? 'md:hidden' : ''}>
+            {menuButton}
+          </span>
         </div>
       </header>
 
@@ -100,8 +107,69 @@ export default function SiteNav() {
             id="site-menu"
             onClick={() => setMenuOpen(false)}
           >
+            {/* Desktop layout */}
             <div
-              className="absolute inset-0 md:left-auto md:right-0 md:max-w-md md:w-full pt-20 px-6 md:px-10 pb-10 h-full overflow-y-auto"
+              className="hidden md:flex absolute inset-0 pt-20 px-10 pb-10"
+              onClick={e => e.stopPropagation()}
+            >
+              {/* Left column: MENU + STORIES list */}
+              <div className="flex-1">
+                <div className="flex items-center gap-10 mb-6">
+                  <span className="pointer-events-auto">{menuButton}</span>
+                  <h2 style={{
+                    fontFamily: 'var(--font-sans)',
+                    fontSize: 14,
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    color: 'var(--color-ink)',
+                    letterSpacing: '0.05em',
+                    margin: 0,
+                  }}>Stories</h2>
+                </div>
+
+                <nav className="flex flex-col space-y-3 pl-[88px]">
+                  {isLoading ? (
+                    <p className="text-lg" style={{ fontFamily: 'var(--font-sans)', color: 'var(--color-ink-muted)' }}>
+                      Loading stories...
+                    </p>
+                  ) : stories.length === 0 ? (
+                    <p className="text-lg" style={{ fontFamily: 'var(--font-sans)', color: 'var(--color-ink-muted)' }}>
+                      No stories found.
+                    </p>
+                  ) : (
+                    stories.map((story) => (
+                      <Link
+                        key={story.slug}
+                        href={`/${story.slug}`}
+                        onClick={() => setMenuOpen(false)}
+                        className="hover:opacity-50 transition-opacity group flex items-center gap-3 text-lg"
+                        style={{
+                          fontFamily: 'var(--font-sans)',
+                          color: 'var(--color-ink-muted)',
+                          textDecoration: 'none',
+                          fontWeight: 400,
+                        }}
+                      >
+                        <span className="w-2 h-2 border border-current flex-shrink-0 group-hover:bg-current transition-colors"></span>
+                        <span className="truncate">{story.title}</span>
+                      </Link>
+                    ))
+                  )}
+                </nav>
+              </div>
+
+              {/* Right side: OPEN ROLLS + THE AUTHOR */}
+              <div className="flex items-start gap-6 text-[11px] uppercase tracking-[0.1em] font-sans pt-1">
+                <Link href="/gallery" onClick={() => setMenuOpen(false)} className="cursor-pointer hover:opacity-70 transition-opacity no-underline text-[var(--color-ink-muted)] font-medium">Open Rolls</Link>
+                <Link href="/about" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 cursor-pointer hover:opacity-70 transition-opacity no-underline" style={{ color: isAbout ? 'var(--color-ink)' : 'var(--color-ink-muted)', fontWeight: isAbout ? 700 : 500 }}>
+                  The Author <span className="w-1.5 h-1.5 bg-current"></span>
+                </Link>
+              </div>
+            </div>
+
+            {/* Mobile layout (unchanged) */}
+            <div
+              className="md:hidden absolute inset-0 pt-20 px-6 pb-10 h-full overflow-y-auto"
               onClick={e => e.stopPropagation()}
             >
               <div className="flex items-center justify-between mb-6">
@@ -115,7 +183,7 @@ export default function SiteNav() {
                   margin: 0,
                 }}>Stories</h2>
 
-                <div className="flex gap-4 md:gap-6 text-[10px] md:text-[11px] uppercase tracking-[0.1em] font-sans items-center">
+                <div className="flex gap-4 text-[10px] uppercase tracking-[0.1em] font-sans items-center">
                   <Link href="/gallery" onClick={() => setMenuOpen(false)} className="cursor-pointer hover:opacity-70 transition-opacity no-underline text-[var(--color-ink-muted)] font-medium">Open Rolls</Link>
                   <Link href="/about" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 cursor-pointer hover:opacity-70 transition-opacity no-underline" style={{ color: isAbout ? 'var(--color-ink)' : 'var(--color-ink-muted)', fontWeight: isAbout ? 700 : 500 }}>
                     The Author <span className="w-1.5 h-1.5 bg-current"></span>
@@ -125,11 +193,11 @@ export default function SiteNav() {
 
               <nav className="flex flex-col space-y-3">
                 {isLoading ? (
-                  <p className="text-base md:text-lg" style={{ fontFamily: 'var(--font-sans)', color: 'var(--color-ink-muted)' }}>
+                  <p className="text-base" style={{ fontFamily: 'var(--font-sans)', color: 'var(--color-ink-muted)' }}>
                     Loading stories...
                   </p>
                 ) : stories.length === 0 ? (
-                  <p className="text-base md:text-lg" style={{ fontFamily: 'var(--font-sans)', color: 'var(--color-ink-muted)' }}>
+                  <p className="text-base" style={{ fontFamily: 'var(--font-sans)', color: 'var(--color-ink-muted)' }}>
                     No stories found.
                   </p>
                 ) : (
@@ -138,7 +206,7 @@ export default function SiteNav() {
                       key={story.slug}
                       href={`/${story.slug}`}
                       onClick={() => setMenuOpen(false)}
-                      className="hover:opacity-50 transition-opacity group flex items-center gap-3 text-base md:text-lg"
+                      className="hover:opacity-50 transition-opacity group flex items-center gap-3 text-base"
                       style={{
                         fontFamily: 'var(--font-sans)',
                         color: 'var(--color-ink-muted)',

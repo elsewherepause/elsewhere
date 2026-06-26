@@ -43,8 +43,9 @@ export default function CanvasFooter({ footerY, markOffset, canvasWidth, nextPro
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
         <div style={{ display: 'flex', gap: 40, alignItems: 'center' }}>
-          <img src="/t1-instagram.svg" alt="Instagram" width={20} height={20} style={{ display: 'block' }} />
-          <img src="/t1-twitter.svg" alt="X / Twitter" width={20} height={20} style={{ display: 'block' }} />
+          <a href="https://instagram.com/pause.elsewhere" target="_blank" rel="noopener noreferrer">
+            <img src="/t1-instagram.svg" alt="Instagram" width={20} height={20} style={{ display: 'block' }} />
+          </a>
         </div>
         <span style={{ fontFamily: 'var(--font-sans, Montserrat)', fontWeight: 400, fontSize: 16, color: '#000' }}>
           @Copywrite

@@ -147,7 +147,7 @@ export default function NoteLayout({
         style={{ maxWidth: 640 }}
       >
         {headerImage && (
-          <div className="flex justify-center mb-4">
+          <div className="flex justify-center mb-6 md:mb-4">
             <div className="w-32 invisible" aria-hidden="true">
               <Image
                 src={headerImageUrl}
