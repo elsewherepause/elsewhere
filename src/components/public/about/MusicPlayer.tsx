@@ -109,8 +109,24 @@ export default function MusicPlayer({ style }: { style?: React.CSSProperties }) 
         alignItems: 'center', 
         width: 183
       }}>
-        <div style={{ height: 118, position: 'relative', width: 160 }}>
-          
+        <div style={{ height: 118, position: 'relative', width: 183 }}>
+
+          <img
+            alt=""
+            src="/icons/vinyl-needle-new.svg"
+            style={{
+              position: 'absolute',
+              width: 50,
+              height: 'auto',
+              top: -16,
+              right: 10,
+              zIndex: 20,
+              transformOrigin: '70% 28%',
+              transform: isPlaying ? 'rotate(0deg)' : 'rotate(-20deg)',
+              transition: 'transform 0.4s ease',
+            }}
+          />
+
           <div style={{ position: 'absolute', height: 117.958, left: 14.52, top: -0.14, width: 119.266, overflow: 'hidden' }}>
             <img 
               alt="Vinyl" 
@@ -121,9 +137,9 @@ export default function MusicPlayer({ style }: { style?: React.CSSProperties }) 
                 maxWidth: 'none', 
                 top: '-12.15%', 
                 width: '122.94%',
-                transition: 'transform 0.5s ease',
-              }} 
-              className={isPlaying ? "animate-[spin_4s_linear_infinite]" : ""}
+                animation: 'spin 4s linear infinite',
+                animationPlayState: isPlaying ? 'running' : 'paused',
+              }}
               src="/images/vinyl-record.png" 
             />
           </div>
