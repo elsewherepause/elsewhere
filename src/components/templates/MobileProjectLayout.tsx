@@ -55,7 +55,7 @@ export default function MobileProjectLayout({ data, patterns, nextProject, desti
       )}
 
       {/* Title */}
-      <div className="px-5 pt-6 pb-4">
+      <div className="px-6 pt-6 pb-4">
         <h1 style={{
           fontFamily: 'var(--font-serif, DM Sans)',
           fontSize: 28,
@@ -70,7 +70,7 @@ export default function MobileProjectLayout({ data, patterns, nextProject, desti
       </div>
 
       {/* Metadata */}
-      <div className="px-5 pb-4 flex flex-wrap gap-x-6 gap-y-1" style={{
+      <div className="px-6 pb-4 flex flex-wrap gap-x-6 gap-y-1" style={{
         fontFamily: 'var(--font-sans, Montserrat)', fontSize: 12, color: '#999',
       }}>
         {data.location && <span>Location: <span className="text-black">{data.location}</span></span>}
@@ -108,7 +108,7 @@ export default function MobileProjectLayout({ data, patterns, nextProject, desti
       ) : (
         <>
           {/* Sections */}
-          <div className="px-5 py-6">
+          <div className="px-6 py-6">
             {sections.map((s, i) => {
               const pat = patterns[i % patternCount]
               const num = String(i + 1).padStart(2, '0')
@@ -175,7 +175,7 @@ export default function MobileProjectLayout({ data, patterns, nextProject, desti
 
           {/* Section progress bar */}
           {sections.length > 0 && (
-            <div className="sticky bottom-0 bg-white border-t border-gray-100 px-5 py-3">
+            <div className="sticky bottom-0 bg-white border-t border-gray-100 px-6 py-3">
               <button
                 onClick={() => setSectionMenuOpen(v => !v)}
                 className="w-full flex items-center justify-center gap-3"
@@ -191,7 +191,7 @@ export default function MobileProjectLayout({ data, patterns, nextProject, desti
               </button>
 
               {sectionMenuOpen && (
-                <div className="absolute bottom-full left-0 right-0 bg-white border-t border-gray-100 px-5 py-4 shadow-lg max-h-60 overflow-y-auto">
+                <div className="absolute bottom-full left-0 right-0 bg-white border-t border-gray-100 px-6 py-4 shadow-lg max-h-60 overflow-y-auto">
                   {sections.map((s, i) => (
                     <button
                       key={i}

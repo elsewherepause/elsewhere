@@ -86,6 +86,8 @@ export default function HomeCanvas({ projects, destinations = [] }: { projects: 
       <div style={{
         width: CANVAS_W * scale,
         height: CANVAS_H * scale,
+        marginLeft: 24 - (80 * scale),
+        marginTop: -45 * scale,
       }}>
         <div style={{
           width: CANVAS_W,
@@ -95,45 +97,6 @@ export default function HomeCanvas({ projects, destinations = [] }: { projects: 
           transform: `scale(${scale})`,
           background: '#fff',
         }}>
-
-          {/* ── Filter bar ── */}
-          <div style={{ position: 'absolute', left: 80, top: 100, display: 'flex', alignItems: 'center', gap: 48 }}>
-            <p
-              onClick={() => setFilterOpen(v => !v)}
-              style={{
-                fontFamily: font, fontSize: 16, textTransform: 'uppercase', margin: 0,
-                cursor: 'pointer',
-                fontWeight: filterOpen ? 700 : 400,
-                color: filterOpen ? '#1c1c1c' : '#ccc',
-                transition: 'color 0.2s, font-weight 0.2s',
-              }}
-            >
-              filter
-            </p>
-
-            {filterOpen && (
-              <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
-                {CATEGORIES.map(cat => {
-                  const isActive = activeFilters.has(cat)
-                  return (
-                    <p
-                      key={cat}
-                      onClick={() => toggleFilter(cat)}
-                      style={{
-                        fontFamily: font, fontSize: 16, textTransform: 'uppercase', margin: 0,
-                        cursor: 'pointer',
-                        fontWeight: isActive ? 700 : 400,
-                        color: isActive ? '#1c1c1c' : '#ccc',
-                        transition: 'color 0.2s, font-weight 0.2s',
-                      }}
-                    >
-                      {cat}
-                    </p>
-                  )
-                })}
-              </div>
-            )}
-          </div>
 
           {/* ── Photo slots ── */}
           {SLOTS.map((slot, i) => {
@@ -170,6 +133,45 @@ export default function HomeCanvas({ projects, destinations = [] }: { projects: 
           })}
 
         </div>
+      </div>
+
+      {/* ── Filter bar (fixed) ── */}
+      <div style={{ position: 'fixed', left: 24, top: 80 * scale, display: 'flex', alignItems: 'center', gap: 24, zIndex: 10 }}>
+        <p
+          onClick={() => setFilterOpen(v => !v)}
+          style={{
+            fontFamily: font, fontSize: 14, textTransform: 'uppercase', margin: 0,
+            cursor: 'pointer',
+            fontWeight: filterOpen ? 700 : 400,
+            color: filterOpen ? '#1c1c1c' : '#ccc',
+            transition: 'color 0.2s, font-weight 0.2s',
+          }}
+        >
+          filter
+        </p>
+
+        {filterOpen && (
+          <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+            {CATEGORIES.map(cat => {
+              const isActive = activeFilters.has(cat)
+              return (
+                <p
+                  key={cat}
+                  onClick={() => toggleFilter(cat)}
+                  style={{
+                    fontFamily: font, fontSize: 14, textTransform: 'uppercase', margin: 0,
+                    cursor: 'pointer',
+                    fontWeight: isActive ? 700 : 400,
+                    color: isActive ? '#1c1c1c' : '#ccc',
+                    transition: 'color 0.2s, font-weight 0.2s',
+                  }}
+                >
+                  {cat}
+                </p>
+              )
+            })}
+          </div>
+        )}
       </div>
 
       {/* ── Take me elsewhere CTA (fixed center) ── */}
