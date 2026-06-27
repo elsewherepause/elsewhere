@@ -9,7 +9,24 @@ type Props = {
 export default function SiteFooter({ nextProject, destinations = [] }: Props) {
   return (
     <footer className="pt-24 pb-10">
-      <div className="relative mb-16 px-6 md:px-20" style={{ height: 20 }}>
+      {/* Mobile: stacked vertically */}
+      <div className="flex flex-col items-center gap-3 mb-16 px-6 md:hidden" style={{ fontFamily: 'var(--font-sans, Montserrat)', fontWeight: 700, fontSize: 14, color: '#ccc', textTransform: 'uppercase' }}>
+        <TakeMeElsewhere
+          destinations={destinations}
+          className="hover:opacity-60 transition-opacity"
+        />
+        {nextProject && (
+          <Link
+            href={`/${nextProject.slug}`}
+            className="flex items-center gap-1.5 hover:opacity-60 transition-opacity"
+            style={{ textDecoration: 'none', color: '#ccc' }}
+          >
+            Next project <span style={{ color: '#1c1c1c', fontSize: 8 }}>▶</span>
+          </Link>
+        )}
+      </div>
+      {/* Desktop: horizontal layout */}
+      <div className="relative mb-16 px-20 hidden md:block" style={{ height: 20 }}>
         <TakeMeElsewhere
           destinations={destinations}
           className="absolute left-1/2 -translate-x-1/2 top-0 hover:opacity-60 transition-opacity"
@@ -18,7 +35,7 @@ export default function SiteFooter({ nextProject, destinations = [] }: Props) {
         {nextProject && (
           <Link
             href={`/${nextProject.slug}`}
-            className="absolute right-6 md:right-20 top-0 flex items-center gap-1.5 hover:opacity-60 transition-opacity"
+            className="absolute right-20 top-0 flex items-center gap-1.5 hover:opacity-60 transition-opacity"
             style={{ textDecoration: 'none' }}
           >
             <span style={{ fontFamily: 'var(--font-sans, Montserrat)', fontWeight: 700, fontSize: 16, color: '#ccc', textTransform: 'uppercase' }}>

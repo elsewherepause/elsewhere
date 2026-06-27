@@ -7,18 +7,19 @@ import { renderInlineMarkdown } from '@/lib/utils/inline-markdown'
 import CanvasFooter from './CanvasFooter'
 import CanvasSidebar from './CanvasSidebar'
 import CanvasPhotosView from './CanvasPhotosView'
-
 export type Template4Data = TemplateData
 
 const FIELD_MAPS: Record<string, string>[] = [
-  { image1: 'sec1Image', headline: 'sec1Headline', body1: 'sec1Body1', quote: 'sec1Quote', body2: 'sec1Body2', quote2: 'sec1Quote2', body3: 'sec1Body3' },
-  { image1: 'sec2Image', image2: 'sec2ImageB', image3: 'sec2ImageC', image4: 'sec3ImageSmall', headline: 'sec2Headline', body1: 'sec2Body1', body2: 'sec2Body2', body3: 'sec2Body3' },
-  { image1: 'sec3Image', image2: 'sec3ImageB', headline: 'sec3Headline', body1: 'sec3Body1', body2: 'sec3Body2', quote: 'sec3Quote', body3: 'sec3Body3', body4: 'sec3Body4', body5: 'sec3Body5', body6: 'sec3Body6' },
-  { image1: 'sec4ImageTall', image2: 'sec4Image', headline: 'sec4Headline', body1: 'sec4Body1', body2: 'sec4Body2', body3: 'sec4Body3', quote: 'sec4Quote', body4: 'sec4Body4' },
-  { image1: 'sec5Image', headline: 'sec5Headline', body1: 'sec5Body1', body2: 'sec5Body2', body3: 'sec5Body3' },
-  { image1: 'sec6Image', image2: 'sec6ImageB', headline: 'sec6Headline', body1: 'sec6Body1' },
-  { image1: 'sec7Image', image2: 'sec7ImageWide', headline: 'sec7Headline', body1: 'sec7Body1', body2: 'sec7Body2', body3: 'sec7Body3' },
-  { headline: 'sec8Headline', body1: 'sec8Body1', body2: 'sec8Body2', body3: 'sec8Body3', body4: 'sec8Body4' },
+  { image1: 'sec1Image', headline: 'sec1Headline', body1: 'sec1Body1', body2: 'sec1Body2' },
+  { image1: 'sec2Image', image2: 'sec2ImageB', image3: 'sec2ImageC', headline: 'sec2Headline', body1: 'sec2Body1', body2: 'sec2Body2', body3: 'sec2Body3' },
+  { image1: 'sec3Image', image2: 'sec3ImageB', headline: 'sec3Headline', body1: 'sec3Body1', body3: 'sec3Body3', body5: 'sec3Body5' },
+  { image1: 'sec4ImageTall', image2: 'sec4Image', image3: 'sec4ImageC', headline: 'sec4Headline', body1: 'sec4Body1', body2: 'sec4Body2', body3: 'sec4Body3' },
+  { image1: 'sec5Image', image2: 'sec5ImageB', headline: 'sec5Headline', body1: 'sec5Body1', body2: 'sec5Body2' },
+  { image1: 'sec6Image', image2: 'sec6ImageB', headline: 'sec6Headline', body1: 'sec6Body1', body2: 'sec6Body2' },
+  { image1: 'sec7Image', headline: 'sec7Headline', body1: 'sec7Body1', body2: 'sec7Body2' },
+  { image1: 'sec9Image', image2: 'sec9ImageB', image3: 'sec9ImageC', headline: 'sec9Headline', body1: 'sec9Body1', body2: 'sec9Body2', body3: 'sec9Body3', body4: 'sec9Body4' },
+  { image1: 'sec10Image', image2: 'sec10ImageB', headline: 'sec10Headline', body1: 'sec10Body1', body2: 'sec10Body2', body3: 'sec10Body3' },
+  { image1: 'sec11Image', image2: 'sec11ImageB', headline: 'sec11Headline', body1: 'sec11Body1', body2: 'sec11Body2' },
 ]
 
 function sectionsToFlat(sections: Section[]): Record<string, string | undefined> {
@@ -34,10 +35,25 @@ function sectionsToFlat(sections: Section[]): Record<string, string | undefined>
   return flat
 }
 
+// ─── Canvas constants ─────────────────────────────────────────────────────────
+
 const W = 1504
-const H = 9200
-const SECTION_STARTS = [1009, 2037, 3694, 4247, 5478, 6277, 6749, 7734]
-const FOOTER_Y = 8288
+
+// Y where each pattern's topmost element begins
+const SECTION_STARTS = [1009, 1676, 2556, 3797, 5478, 6277, 6749, 8500, 9800, 10800]
+
+// Vertical slot height of each pattern
+const SECTION_HEIGHTS = [667, 801, 814, 873, 832, 823, 500, 1000, 900, 850]
+
+// Where content starts
+const CONTENT_TOP = 1009
+
+// Bottom of the deepest element in each pattern at offset=0
+const SECTION_CONTENT_BOTTOMS = [1566, 2477, 3270, 4670, 6280, 7030, 7129, 9760, 10600, 11650]
+
+const FOOTER_HEIGHT = 560
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 export default function Template4Layout({
   data: rawData,
@@ -50,19 +66,10 @@ export default function Template4Layout({
 }) {
   const flat = rawData.sections ? sectionsToFlat(rawData.sections) : {}
   const data = { ...rawData, ...flat } as Record<string, string | undefined>
-  const sections = rawData.sections ?? []
-  const sectionCount = isEditing
-    ? sections.length
-    : sections.filter(s => hasContent(s)).length
-
-  const allImageIds = [
-    data.sec1Image, data.sec2Image, data.sec2ImageB, data.sec2ImageC,
-    data.sec3ImageSmall, data.sec3Image, data.sec3ImageB,
-    data.sec4ImageTall, data.sec4Image, data.sec5Image,
-    data.sec6Image, data.sec6ImageB, data.sec7Image, data.sec7ImageWide,
-  ].filter((id): id is string => !!id)
-
-  const HEADER_END = 996
+  const rawSections = rawData.sections ?? []
+  const activeSections = isEditing
+    ? rawSections
+    : rawSections.filter(s => hasContent(s))
 
   const [scale, setScale] = useState(1)
   const [activeIdx, setActiveIdx] = useState(0)
@@ -70,26 +77,34 @@ export default function Template4Layout({
   const [viewMode, setViewMode] = useState<'story' | 'photos'>('story')
   const wrapperRef = useRef<HTMLDivElement>(null)
 
-  const SECTION_ENDS = [...SECTION_STARTS.slice(1), FOOTER_Y]
-  const lastSectionEnd = sectionCount > 0 ? SECTION_ENDS[sectionCount - 1] : HEADER_END
-  const storyH = lastSectionEnd + 560
-  const effectiveH = viewMode === 'photos' ? HEADER_END : storyH
+  // Cumulative Y offset per section index
+  function sectionOffset(i: number): number {
+    const pat = i % 10
+    let cumH = 0
+    for (let j = 0; j < i; j++) cumH += SECTION_HEIGHTS[j % 10]
+    return (CONTENT_TOP + cumH) - SECTION_STARTS[pat]
+  }
 
-  const SECTION_HEADINGS = [
-    data.sec1Headline?.slice(0, 50) || 'Section 01',
-    data.sec2Headline?.slice(0, 50) || 'Section 02',
-    data.sec3Headline?.slice(0, 50) || 'Section 03',
-    data.sec4Headline?.slice(0, 50) || 'Section 04',
-    data.sec5Headline?.slice(0, 50) || 'Section 05',
-    data.sec6Headline?.slice(0, 50) || 'Section 06',
-    data.sec7Headline?.slice(0, 50) || 'Section 07',
-    data.sec8Headline?.slice(0, 50) || 'Section 08',
-  ]
+  const lastIdx = activeSections.length - 1
+  const lastContentBottom = lastIdx >= 0
+    ? SECTION_CONTENT_BOTTOMS[lastIdx % 10] + sectionOffset(lastIdx)
+    : CONTENT_TOP
 
-  const sidebarSections = SECTION_STARTS.slice(0, sectionCount).map((y, i) => ({
-    scrollY: y,
-    headline: SECTION_HEADINGS[i],
-  }))
+  const allImageIds = activeSections.flatMap(s =>
+    [s.image1, s.image2, s.image3, s.image4].filter((id): id is string => !!id)
+  )
+
+  const HEADER_END = 996
+  const storyFooterY = lastContentBottom + 60
+  const storyCanvasH = storyFooterY + FOOTER_HEIGHT
+  const canvasH = viewMode === 'photos' ? HEADER_END : storyCanvasH
+  const footerY = storyFooterY
+
+  const sidebarSections = activeSections.map((s, i) => {
+    let cumH = 0
+    for (let j = 0; j < i; j++) cumH += SECTION_HEIGHTS[j % 10]
+    return { scrollY: CONTENT_TOP + cumH, headline: s.headline }
+  })
 
   const handleScrollTo = useCallback((y: number) => {
     if (!wrapperRef.current) return
@@ -116,10 +131,12 @@ export default function Template4Layout({
       if (!el) return
       const canvasTop = el.getBoundingClientRect().top
       const pivotY = (window.innerHeight * 0.4 - canvasTop) / scale
-      setSidebarVisible(pivotY >= SECTION_STARTS[0] && pivotY <= lastSectionEnd)
+      setSidebarVisible(pivotY >= CONTENT_TOP && pivotY <= lastContentBottom)
       let active = 0
-      for (let i = 0; i < SECTION_STARTS.length; i++) {
-        if (SECTION_STARTS[i] <= pivotY) active = i
+      for (let i = 0; i < activeSections.length; i++) {
+        let cumH = 0
+        for (let j = 0; j < i; j++) cumH += SECTION_HEIGHTS[j % 10]
+        if (CONTENT_TOP + cumH <= pivotY) active = i
       }
       setActiveIdx(active)
     }
@@ -132,35 +149,45 @@ export default function Template4Layout({
   const imgUrl = (id?: string) =>
     id && cloudName ? `https://res.cloudinary.com/${cloudName}/image/upload/q_auto,f_auto/${id}` : ''
 
-  function ImgBox({ id, si, field, l, t, w, h }: {
-    id?: string; si: string; field: string; l: number; t: number; w: number; h: number
+  function ImgBox({ id, si, field, l, t, w, h, cap }: {
+    id?: string; si: string; field: string; l: number; t: number; w: number; h: number; cap?: string
   }) {
     const url = imgUrl(id)
     return (
-      <div
-        style={{
-          position: 'absolute', left: l, top: t, width: w, height: h,
-          overflow: 'hidden', background: id ? undefined : '#e8e8e8',
-          cursor: isEditing ? 'pointer' : undefined,
-        }}
-        onClick={isEditing ? () => onImageSelect?.(si, field) : undefined}
-      >
-        {url && <img src={url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />}
-        {isEditing && (
-          <div
-            style={{
-              position: 'absolute', inset: 0,
-              background: url ? 'rgba(0,0,0,0)' : 'rgba(0,0,0,0.08)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 11, color: '#888', fontFamily: 'var(--font-sans, Montserrat)',
-            }}
-            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0,0,0,0.35)')}
-            onMouseLeave={e => (e.currentTarget.style.background = url ? 'rgba(0,0,0,0)' : 'rgba(0,0,0,0.08)')}
-          >
-            {url ? <span style={{ color: '#fff', fontSize: 11 }}>Change</span> : <span>+ Image</span>}
-          </div>
+      <>
+        <div
+          style={{
+            position: 'absolute', left: l, top: t, width: w, height: h,
+            overflow: 'hidden', background: id ? undefined : '#e8e8e8',
+            cursor: isEditing ? 'pointer' : undefined,
+          }}
+          onClick={isEditing ? () => onImageSelect?.(si, field) : undefined}
+        >
+          {url && <img src={url} alt={cap || ''} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />}
+          {isEditing && (
+            <div
+              style={{
+                position: 'absolute', inset: 0,
+                background: url ? 'rgba(0,0,0,0)' : 'rgba(0,0,0,0.08)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 11, color: '#888', fontFamily: 'var(--font-sans, Montserrat)',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0,0,0,0.35)')}
+              onMouseLeave={e => (e.currentTarget.style.background = url ? 'rgba(0,0,0,0)' : 'rgba(0,0,0,0.08)')}
+            >
+              {!url && '+ Image'}
+              {url && <span style={{ opacity: 0 }}>Change</span>}
+            </div>
+          )}
+        </div>
+        {isEditing && url && (
+          <span style={{
+            position: 'absolute', left: l + w - 38, top: t + 6,
+            background: 'rgba(255,255,255,0.85)', borderRadius: 4, padding: '2px 6px',
+            fontSize: 10, cursor: 'pointer', color: '#333', zIndex: 2,
+          }} onClick={() => onImageSelect?.(si, field)}>Change</span>
         )}
-      </div>
+      </>
     )
   }
 
@@ -168,8 +195,8 @@ export default function Template4Layout({
     return (
       <div style={{
         position: 'absolute', left: l, top: t,
-        fontFamily: 'var(--font-serif, DM Sans)', fontWeight: 400, fontSize: 28,
-        color: '#ccc', textTransform: 'uppercase',
+        fontFamily: 'var(--font-serif, DM Sans)', fontWeight: 400, fontSize: 22,
+        color: '#ccc', lineHeight: 'normal',
       }}>{n}</div>
     )
   }
@@ -187,18 +214,17 @@ export default function Template4Layout({
   }
 
   function P({ children, l, t, w = 220 }: { children?: string; l: number; t: number; w?: number }) {
-    if (!children) return null
     return (
       <div style={{
         position: 'absolute', left: l, top: t, width: w,
-        fontFamily: 'var(--font-sans, Montserrat)', fontWeight: 400, fontSize: 14,
-        color: '#505050', textAlign: 'justify', lineHeight: 'normal',
+        fontFamily: 'var(--font-sans, Montserrat)', fontWeight: 400,
+        fontSize: 14, color: '#505050', textAlign: 'justify', lineHeight: 'normal',
         whiteSpace: 'pre-wrap', overflowWrap: 'break-word',
-      }}>{renderInlineMarkdown(children)}</div>
+      }}>{renderInlineMarkdown(children || '')}</div>
     )
   }
 
-  function Quote({ children, l, t, w = 432 }: { children?: string; l: number; t: number; w?: number }) {
+  function Quote({ children, l, t, w = 220 }: { children?: string; l: number; t: number; w?: number }) {
     if (!children) return null
     return (
       <div style={{ position: 'absolute', left: l, top: t, width: w }}>
@@ -213,11 +239,133 @@ export default function Template4Layout({
     )
   }
 
+  // ─── Render sections ────────────────────────────────────────────────────────
+
+  function renderSection(s: Section, i: number) {
+    const off = sectionOffset(i)
+    const num = String(i + 1).padStart(2, '0')
+    const sk = String(i)
+    const pat = i % 10
+
+    switch (pat) {
+      case 0: return (
+        <React.Fragment key={i}>
+          <ImgBox id={s.image1} si={sk} field="image1" l={254} t={1012 + off} w={691} h={554} />
+          <SecNum n={num} l={1332} t={1009 + off} />
+          <H2 l={964} t={1239 + off} w={399}>{s.headline}</H2>
+          <P l={964} t={1364 + off} w={220}>{s.body1}</P>
+          <P l={1212} t={1364 + off} w={220}>{s.body2}</P>
+        </React.Fragment>
+      )
+      case 1: return (
+        <React.Fragment key={i}>
+          <ImgBox id={s.image1} si={sk} field="image1" l={252} t={1676 + off} w={463} h={454} />
+          <SecNum n={num} l={1320} t={1676 + off} />
+          <H2 l={730} t={1740 + off} w={466}>{s.headline}</H2>
+          <P l={730} t={1840 + off} w={300}>{s.body1}</P>
+          <P l={1050} t={1840 + off} w={300}>{s.body2}</P>
+          <ImgBox id={s.image3} si={sk} field="image3" l={1213} t={2025 + off} w={223} h={115} />
+          <ImgBox id={s.image2} si={sk} field="image2" l={733} t={2160 + off} w={462} h={317} />
+          <P l={1213} t={2170 + off} w={223}>{s.body3}</P>
+        </React.Fragment>
+      )
+      case 2: return (
+        <React.Fragment key={i}>
+          <ImgBox id={s.image1} si={sk} field="image1" l={254} t={2556 + off} w={331} h={671} />
+          <SecNum n={num} l={1051} t={2567 + off} />
+          <H2 l={621} t={2617 + off} w={453}>{s.headline}</H2>
+          <P l={621} t={2758 + off} w={224}>{s.body1}</P>
+          <ImgBox id={s.image2} si={sk} field="image2" l={1140} t={2758 + off} w={250} h={300} />
+          <P l={862} t={2758 + off} w={224}>{s.body3}</P>
+          <P l={1140} t={3070 + off} w={250}>{s.body5}</P>
+        </React.Fragment>
+      )
+      case 3: return (
+        <React.Fragment key={i}>
+          <ImgBox id={s.image1} si={sk} field="image1" l={254} t={3797 + off} w={400} h={380} />
+          <SecNum n={num} l={1100} t={3797 + off} />
+          <H2 l={700} t={3840 + off} w={480}>{s.headline}</H2>
+          <P l={700} t={4000 + off} w={220}>{s.body1}</P>
+          <P l={950} t={4000 + off} w={220}>{s.body2}</P>
+          <ImgBox id={s.image2} si={sk} field="image2" l={960} t={4200 + off} w={300} h={200} />
+          <ImgBox id={s.image3} si={sk} field="image3" l={254} t={4280 + off} w={420} h={200} />
+          <P l={960} t={4420 + off} w={250}>{s.body3}</P>
+        </React.Fragment>
+      )
+      case 4: return (
+        <React.Fragment key={i}>
+          <ImgBox id={s.image1} si={sk} field="image1" l={254} t={5478 + off} w={300} h={550} />
+          <SecNum n={num} l={1020} t={5520 + off} />
+          <H2 l={580} t={5520 + off} w={400}>{s.headline}</H2>
+          <P l={580} t={5650 + off} w={220}>{s.body1}</P>
+          <P l={820} t={5650 + off} w={220}>{s.body2}</P>
+          <ImgBox id={s.image2} si={sk} field="image2" l={1100} t={5780 + off} w={280} h={500} />
+        </React.Fragment>
+      )
+      case 5: return (
+        <React.Fragment key={i}>
+          <ImgBox id={s.image1} si={sk} field="image1" l={254} t={6277 + off} w={450} h={400} />
+          <SecNum n={num} l={1200} t={6277 + off} />
+          <H2 l={740} t={6320 + off} w={500}>{s.headline}</H2>
+          <P l={740} t={6460 + off} w={220}>{s.body1}</P>
+          <P l={990} t={6460 + off} w={220}>{s.body2}</P>
+          <ImgBox id={s.image2} si={sk} field="image2" l={740} t={6750 + off} w={500} h={280} />
+        </React.Fragment>
+      )
+      case 6: return (
+        <React.Fragment key={i}>
+          <ImgBox id={s.image1} si={sk} field="image1" l={254} t={6749 + off} w={530} h={380} />
+          <SecNum n={num} l={1200} t={6749 + off} />
+          <H2 l={820} t={6790 + off} w={500}>{s.headline}</H2>
+          <P l={820} t={6930 + off} w={220}>{s.body1}</P>
+          <P l={1070} t={6930 + off} w={220}>{s.body2}</P>
+        </React.Fragment>
+      )
+      case 7: return (
+        <React.Fragment key={i}>
+          <ImgBox id={s.image1} si={sk} field="image1" l={650} t={8500 + off} w={730} h={380} />
+          <SecNum n={num} l={560} t={8510 + off} />
+          <H2 l={254} t={8550 + off} w={380}>{s.headline}</H2>
+          <P l={254} t={8700 + off} w={180}>{s.body1}</P>
+          <P l={460} t={8700 + off} w={180}>{s.body2}</P>
+          <ImgBox id={s.image2} si={sk} field="image2" l={254} t={8950 + off} w={200} h={300} />
+          <P l={480} t={8960 + off} w={200}>{s.body3}</P>
+          <ImgBox id={s.image3} si={sk} field="image3" l={680} t={9100 + off} w={460} h={260} />
+          <P l={1180} t={9110 + off} w={200}>{s.body4}</P>
+        </React.Fragment>
+      )
+      case 8: return (
+        <React.Fragment key={i}>
+          <ImgBox id={s.image1} si={sk} field="image1" l={254} t={9800 + off} w={400} h={500} />
+          <SecNum n={num} l={1200} t={9800 + off} />
+          <H2 l={690} t={9840 + off} w={500}>{s.headline}</H2>
+          <P l={690} t={10000 + off} w={220}>{s.body1}</P>
+          <P l={940} t={10000 + off} w={220}>{s.body2}</P>
+          <ImgBox id={s.image2} si={sk} field="image2" l={820} t={10350 + off} w={300} h={250} />
+          <P l={1140} t={10350 + off} w={200}>{s.body3}</P>
+        </React.Fragment>
+      )
+      case 9: return (
+        <React.Fragment key={i}>
+          <ImgBox id={s.image1} si={sk} field="image1" l={254} t={10800 + off} w={400} h={550} />
+          <SecNum n={num} l={1200} t={10800 + off} />
+          <H2 l={690} t={10840 + off} w={550}>{s.headline}</H2>
+          <P l={690} t={11000 + off} w={220}>{s.body1}</P>
+          <P l={940} t={11000 + off} w={220}>{s.body2}</P>
+          <ImgBox id={s.image2} si={sk} field="image2" l={800} t={11350 + off} w={500} h={300} />
+        </React.Fragment>
+      )
+      default: return null
+    }
+  }
+
+  // ─── Render ─────────────────────────────────────────────────────────────────
+
   return (
     <>
-      <div ref={wrapperRef} style={{ width: '100%', height: effectiveH * scale, position: 'relative', overflow: 'hidden' }}>
+      <div ref={wrapperRef} style={{ width: '100%', height: canvasH * scale, position: 'relative', overflow: 'hidden' }}>
         <div style={{
-          width: W, height: effectiveH, position: 'relative', background: '#fff',
+          width: W, height: canvasH, position: 'relative', background: '#fff',
           transform: `scale(${scale})`, transformOrigin: 'top left',
           fontFamily: 'var(--font-sans, Montserrat)',
         }}>
@@ -234,18 +382,18 @@ export default function Template4Layout({
           {/* ━━ HERO */}
           <ImgBox id={data.heroImage} si="hero" field="heroImage" l={80} t={197} w={1352} h={671} />
 
-          {/* ━━ METADATA */}
+          {/* ━━ METADATA BAR */}
           <div style={{
             position: 'absolute', left: 80, top: 879, width: 795,
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            fontFamily: 'var(--font-sans, Montserrat)', fontWeight: 400, fontSize: 16,
+            fontFamily: 'var(--font-sans, Montserrat)', fontWeight: 400, fontSize: 16, lineHeight: 'normal',
           }}>
-            <div style={{ display: 'flex', gap: 8 }}>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
               <span style={{ color: '#ccc' }}>Location:</span>
               <span style={{ color: '#000' }}>{data.location || ''}</span>
             </div>
             <span style={{ color: '#ccc' }}>{data.coordinates || ''}</span>
-            <div style={{ display: 'flex', gap: 11 }}>
+            <div style={{ display: 'flex', gap: 11, alignItems: 'center' }}>
               <span style={{ color: '#ccc' }}>Camera -</span>
               <span style={{ color: '#000' }}>{data.camera || ''}</span>
             </div>
@@ -256,107 +404,25 @@ export default function Template4Layout({
             position: 'absolute', left: 0, top: 921, width: W,
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, height: 75,
           }}>
-            <span
-              onClick={() => setViewMode('photos')}
-              style={{ fontFamily: 'var(--font-sans, Montserrat)', fontWeight: 800, fontSize: 14, textTransform: 'uppercase', color: viewMode === 'photos' ? '#1c1c1c' : '#ccc', cursor: 'pointer' }}
-            >Photos</span>
+            <span onClick={() => setViewMode('photos')} style={{
+              fontFamily: 'var(--font-sans, Montserrat)', fontWeight: 800, fontSize: 14,
+              textTransform: 'uppercase', cursor: 'pointer',
+              color: viewMode === 'photos' ? '#1c1c1c' : '#ccc',
+            }}>Photos</span>
             <div style={{ height: 31, width: 1, background: '#1c1c1c' }} />
-            <span
-              onClick={() => setViewMode('story')}
-              style={{ fontFamily: 'var(--font-sans, Montserrat)', fontWeight: 800, fontSize: 14, textTransform: 'uppercase', color: viewMode === 'story' ? '#1c1c1c' : '#ccc', cursor: 'pointer' }}
-            >Story</span>
+            <span onClick={() => setViewMode('story')} style={{
+              fontFamily: 'var(--font-sans, Montserrat)', fontWeight: 800, fontSize: 14,
+              textTransform: 'uppercase', cursor: 'pointer',
+              color: viewMode === 'story' ? '#1c1c1c' : '#ccc',
+            }}>Story</span>
           </div>
 
+          {/* ━━ STORY CONTENT */}
           {viewMode === 'story' && (
             <>
-              {/* ━━━━ SECTION 1 — image left, text right */}
-              {sectionCount > 0 && <>
-              <ImgBox id={data.sec1Image} si="0" field="image1" l={254} t={1012} w={691} h={554} />
-              <SecNum n="01" l={1332} t={1009} />
-              <H2 l={964.33} t={1239.12} w={398.58}>{data.sec1Headline}</H2>
-              <P l={964.33} t={1364.48} w={220}>{data.sec1Body1}</P>
-              <P l={1212.49} t={1364.48} w={220}>{data.sec1Body2}</P>
-              </>}
-              {/* ━━━━ SECTION 2 — images + text */}
-              {sectionCount > 1 && <>
-              <ImgBox id={data.sec2Image} si="1" field="image1" l={252} t={1676} w={463} h={454} />
-              <SecNum n="02" l={1320} t={1676} />
-              <H2 l={730} t={1740} w={466}>{data.sec2Headline}</H2>
-              <P l={730} t={1840} w={300}>{data.sec2Body1}</P>
-              <P l={1050} t={1840} w={300}>{data.sec2Body2}</P>
-              <ImgBox id={data.sec2ImageC} si="1" field="image3" l={1213} t={2025} w={223} h={115} />
-              <ImgBox id={data.sec2ImageB} si="1" field="image2" l={733} t={2160} w={462} h={317} />
-              <P l={1213} t={2170} w={223}>{data.sec2Body3}</P>
-              </>}
-
-              {/* ━━━━ SECTION 3 — landscape + text */}
-              {sectionCount > 2 && <>
-              <ImgBox id={data.sec3Image} si="2" field="image1" l={254} t={2556} w={331} h={671} />
-              <SecNum n="03" l={1051} t={2567.13} />
-              <H2 l={621} t={2617.37} w={452.64}>{data.sec3Headline}</H2>
-              <P l={621} t={2758.5} w={224}>{data.sec3Body1}</P>
-              <P l={621} t={2989.73} w={224}>{data.sec3Body2}</P>
-              <Quote l={1086} t={3096.73} w={324}>{data.sec3Quote}</Quote>
-              <P l={862} t={2757.5} w={224}>{data.sec3Body3}</P>
-              <P l={862} t={2900} w={224}>{data.sec3Body4}</P>
-              </>}
-
-              {/* ━━━━ SECTION 4 — two portraits + text */}
-              {sectionCount > 3 && <>
-              <ImgBox id={data.sec4ImageTall} si="3" field="image1" l={248} t={4197} w={499} h={616} />
-              <SecNum n="04" l={1181} t={4247} />
-              <H2 l={763} t={4247} w={308}>{data.sec4Headline}</H2>
-              <P l={763} t={4323} w={220}>{data.sec4Body1}</P>
-              <P l={1011} t={4323} w={220}>{data.sec4Body2}</P>
-              <P l={763} t={4533} w={392}>{data.sec4Body3}</P>
-              <Quote l={1086} t={3096.73} w={324}>{data.sec4Quote}</Quote>
-              <P l={862} t={2873.73} w={224}>{data.sec4Body4}</P>
-              <ImgBox id={data.sec4Image} si="3" field="image2" l={744} t={4852} w={685} h={589} />
-              </>}
-
-              {/* ━━━━ SECTION 5 — headline + image + text */}
-              {sectionCount > 4 && <>
-              <SecNum n="05" l={679} t={5478} />
-              <H2 l={259} t={5514} w={347}>{data.sec5Headline}</H2>
-              <P l={259} t={5589} w={220}>{data.sec5Body1}</P>
-              <P l={498} t={5589} w={220}>{data.sec5Body2}</P>
-              <P l={259} t={5684} w={220}>{data.sec5Body3}</P>
-              <ImgBox id={data.sec5Image} si="4" field="image1" l={258} t={5901} w={469} h={334} />
-              </>}
-
-              {/* ━━━━ SECTION 6 — portrait + strip + text */}
-              {sectionCount > 5 && <>
-              <SecNum n="06" l={1070} t={6277} />
-              <ImgBox id={data.sec6Image} si="5" field="image1" l={1132} t={6277} w={293} h={456} />
-              <H2 l={884} t={6326} w={220}>{data.sec6Headline}</H2>
-              <P l={884} t={6396} w={220}>{data.sec6Body1}</P>
-              <ImgBox id={data.sec6ImageB} si="5" field="image2" l={258} t={6555} w={469} h={178} />
-              </>}
-
-              {/* ━━━━ SECTION 7 — portrait + wide + text */}
-              {sectionCount > 6 && <>
-              <SecNum n="07" l={689} t={6749} />
-              <P l={884} t={6579} w={220}>{data.sec7Body3}</P>
-              <H2 l={260} t={6789} w={467}>{data.sec7Headline}</H2>
-              <ImgBox id={data.sec7Image} si="6" field="image1" l={1132} t={6830} w={293} h={262} />
-              <P l={260} t={6830} w={220}>{data.sec7Body1}</P>
-              <P l={499} t={6830} w={220}>{data.sec7Body2}</P>
-              <ImgBox id={data.sec7ImageWide} si="6" field="image2" l={259} t={7584} w={688} h={589} />
-              </>}
-
-              {/* ━━━━ SECTION 8 — closing text */}
-              {sectionCount > 7 && <>
-              <SecNum n="08" l={1387} t={7734} />
-              <H2 l={958} t={7777} w={421}>{data.sec8Headline}</H2>
-              <P l={958} t={7864} w={220}>{data.sec8Body1}</P>
-              <P l={1201} t={7864} w={220}>{data.sec8Body2}</P>
-              <P l={958} t={7998} w={220}>{data.sec8Body3}</P>
-              <P l={1201} t={8032} w={220}>{data.sec8Body4}</P>
-              </>}
-
-              {/* ━━ FOOTER */}
+              {activeSections.map((s, i) => renderSection(s, i))}
               <CanvasFooter
-                footerY={lastSectionEnd + 60}
+                footerY={footerY}
                 markOffset={136}
                 canvasWidth={W}
                 nextProjectSlug={data.nextProjectSlug}
@@ -369,10 +435,13 @@ export default function Template4Layout({
       </div>
 
       {viewMode === 'photos' && (
-        <CanvasPhotosView imageIds={allImageIds} nextProject={data.nextProjectSlug ? { slug: data.nextProjectSlug, title: '' } : null} destinations={(rawData as Record<string, unknown>).destinations as { slug: string }[] ?? []} />
+        <CanvasPhotosView
+          imageIds={allImageIds}
+          nextProject={data.nextProjectSlug ? { slug: data.nextProjectSlug, title: '' } : null}
+          destinations={(rawData as Record<string, unknown>).destinations as { slug: string }[] ?? []}
+        />
       )}
 
-      {/* ━━ SIDEBAR */}
       {!isEditing && viewMode === 'story' && (
         <CanvasSidebar
           visible={sidebarVisible}

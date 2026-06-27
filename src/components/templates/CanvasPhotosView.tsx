@@ -15,7 +15,7 @@ export default function CanvasPhotosView({ imageIds, nextProject, destinations =
 
   return (
     <>
-      <div className="px-4 py-6 md:px-[200px] md:py-[60px] md:pb-[80px]">
+      <div className="px-6 py-6 md:px-[250px] md:py-[80px] md:pb-[100px]">
         {filtered.map((id, i) => {
           const url = cloudName
             ? `https://res.cloudinary.com/${cloudName}/image/upload/w_900,h_600,c_fill,q_auto,f_auto/${id}`
@@ -25,9 +25,9 @@ export default function CanvasPhotosView({ imageIds, nextProject, destinations =
               key={`${id}-${i}`}
               style={{
                 position: 'sticky',
-                top: 20,
+                top: 60,
                 zIndex: i,
-                marginBottom: 20,
+                marginBottom: 60,
               }}
             >
               {url && (
@@ -36,7 +36,8 @@ export default function CanvasPhotosView({ imageIds, nextProject, destinations =
                   alt=""
                   style={{
                     width: '100%',
-                    height: 'auto',
+                    maxHeight: 'calc(100vh - 120px)',
+                    objectFit: 'cover',
                     display: 'block',
                     borderRadius: 12,
                     boxShadow: '0 8px 30px rgba(0,0,0,0.18)',

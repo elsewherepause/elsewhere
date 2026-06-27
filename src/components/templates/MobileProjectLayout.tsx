@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { Section, TemplateData, Pattern } from '@/components/admin/template-editor/shared'
 import { renderInlineMarkdown } from '@/lib/utils/inline-markdown'
 import CanvasPhotosView from './CanvasPhotosView'
+import SiteFooter from '@/components/public/SiteFooter'
 
 type Props = {
   data: Partial<TemplateData>
@@ -15,6 +16,21 @@ type Props = {
 export default function MobileProjectLayout({ data, patterns, nextProject, destinations = [] }: Props) {
   const [viewMode, setViewMode] = useState<'story' | 'photos'>('story')
   const [sectionMenuOpen, setSectionMenuOpen] = useState(false)
+  const [activeSection, setActiveSection] = useState(0)
+
+  useEffect(() => {
+    const onScroll = () => {
+      const sections = document.querySelectorAll('[id^="mobile-section-"]')
+      let active = 0
+      sections.forEach((el, i) => {
+        const rect = el.getBoundingClientRect()
+        if (rect.top < window.innerHeight * 0.5) active = i
+      })
+      setActiveSection(active)
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
   const imgUrl = (id?: string) =>
@@ -171,7 +187,7 @@ export default function MobileProjectLayout({ data, patterns, nextProject, desti
                 <span style={{
                   width: 8, height: 8, background: '#1c1c1c', display: 'inline-block',
                 }} />
-                <span>Section 01 of {String(sections.length).padStart(2, '0')}</span>
+                <span>Section {String(activeSection + 1).padStart(2, '0')} of {String(sections.length).padStart(2, '0')}</span>
               </button>
 
               {sectionMenuOpen && (
@@ -198,28 +214,7 @@ export default function MobileProjectLayout({ data, patterns, nextProject, desti
             </div>
           )}
 
-          {/* Footer */}
-          <div className="px-5 py-8">
-            <div className="flex flex-col items-center gap-3 mb-8" style={{
-              fontFamily: 'var(--font-sans, Montserrat)', fontWeight: 700, fontSize: 14, color: '#ccc', textTransform: 'uppercase',
-            }}>
-              <span>Take me elsewhere</span>
-              {nextProject && (
-                <a href={`/${nextProject.slug}`} className="flex items-center gap-1" style={{ textDecoration: 'none', color: '#ccc' }}>
-                  Next project <span style={{ color: '#1c1c1c', fontSize: 8 }}>▶</span>
-                </a>
-              )}
-            </div>
-            <img src="/t1-wordmark.svg" alt=".elsewhere" className="w-full block mb-8" />
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-8">
-                <a href="https://instagram.com/pause.elsewhere" target="_blank" rel="noopener noreferrer">
-                  <img src="/t1-instagram.svg" alt="Instagram" width={16} height={16} />
-                </a>
-              </div>
-              <span style={{ fontFamily: 'var(--font-sans, Montserrat)', fontSize: 13, color: '#000' }}>@Copywrite</span>
-            </div>
-          </div>
+          <SiteFooter nextProject={nextProject} destinations={destinations} />
         </>
       )}
     </div>
