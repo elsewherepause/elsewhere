@@ -15,17 +15,17 @@ export type Template1Data = TemplateData
 const W = 1512
 
 // Y where each pattern's topmost element begins (absolute in the original 8900px canvas)
-const SECTION_STARTS = [1012, 1587, 2062, 3280, 3923, 4548, 5193, 6038, 6471, 7152, 7823]
+const SECTION_STARTS = [1012, 1587, 2702, 3280, 3923, 4548, 5193, 6038, 6471, 7152, 7823]
 
 // Vertical slot height of each pattern (start[i+1] - start[i]; last pattern ends at footer y=8357)
-const SECTION_HEIGHTS = [575, 475, 1218, 643, 625, 645, 845, 433, 681, 671, 534]
+const SECTION_HEIGHTS = [575, 1100, 660, 643, 625, 645, 845, 433, 681, 671, 534]
 
 // Where content starts (top of first pattern's slot)
 const CONTENT_TOP = 1012
 
 // Bottom of the deepest element (image + caption, or text) in each pattern at offset=0
 // Used to place the footer below the actual last element, not just the slot boundary
-const SECTION_CONTENT_BOTTOMS = [1560, 2300, 3250, 3860, 4520, 5160, 6030, 6410, 7070, 7740, 8320]
+const SECTION_CONTENT_BOTTOMS = [1560, 2650, 3250, 3860, 4520, 5160, 6030, 6410, 7070, 7740, 8320]
 
 // Footer internal offsets relative to footer start y (original positions: 8357, 8555, 8797)
 const F_NAV  = 0    // "Take me elsewhere" row
@@ -250,21 +250,21 @@ export default function Template1Layout({ data, isEditing, onImageSelect }: Prop
           <Num n={num} l={923} t={1587 + off} />
           <ImgBox id={s.image1} sk={sk} field="image1" cap={s.caption1} l={253} t={1604 + off} w={469} h={311} />
           <ImgBox id={s.image2} sk={sk} field="image2" cap={s.caption2} l={996} t={1916 + off} w={193} h={354} />
+          <P l={1212} t={1916 + off}>{s.body3}</P>
+          <ImgBox id={s.image3} sk={sk} field="image3" cap={s.caption3} l={254} t={2062 + off} w={494} h={575} />
+          <P l={766} t={2380 + off}>{s.body2}</P>
+          <ImgBox id={s.image4} sk={sk} field="image4" cap={s.caption4} l={996} t={2283 + off} w={193} h={354} />
           <H2 l={738} t={1651 + off}>{s.headline}</H2>
           <P l={738} t={1720 + off}>{s.body1}</P>
-          <P l={1212} t={1916 + off}>{s.body3}</P>
         </React.Fragment>
       )
       case 2: return (
         <React.Fragment key={i}>
           <Num n={num} l={686} t={2898 + off} />
-          <ImgBox id={s.image1} sk={sk} field="image1" cap={s.caption1} l={254} t={2062 + off} w={494} h={575} />
-          <ImgBox id={s.image2} sk={sk} field="image2" cap={s.caption2} l={996} t={2283 + off} w={193} h={354} />
-          <ImgBox id={s.image3} sk={sk} field="image3" cap={s.caption3} l={748} t={2702 + off} w={684} h={520} />
+          <ImgBox id={s.image1} sk={sk} field="image1" cap={s.caption1} l={748} t={2702 + off} w={684} h={520} />
           <H2 l={254} t={2953 + off} w={421}>{s.headline}</H2>
           <P l={254} t={3038 + off}>{s.body1}</P>
           <P l={503} t={3038 + off}>{s.body2}</P>
-          <P l={766} t={2380 + off}>{s.body4}</P>
         </React.Fragment>
       )
       case 3: return (
@@ -368,21 +368,11 @@ export default function Template1Layout({ data, isEditing, onImageSelect }: Prop
         {/* ━━━ TITLE ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
         <div style={{
           position: 'absolute', left: 80, top: 139,
-          fontFamily: 'var(--font-serif, DM Sans)', fontSize: 40,
+          fontFamily: 'var(--font-serif, DM Sans)', fontWeight: 400, fontSize: 40,
           color: '#000', textTransform: 'uppercase', lineHeight: 1.15,
           whiteSpace: 'nowrap',
         }}>
-          {(() => {
-            const title = d?.titleBold || 'Project Title';
-            const splitIdx = title.indexOf(',');
-            if (splitIdx === -1) return <span style={{ fontWeight: 700 }}>{title}</span>;
-            return (
-              <>
-                <span style={{ fontWeight: 700 }}>{title.substring(0, splitIdx + 1)}</span>
-                <span style={{ fontWeight: 400 }}>{title.substring(splitIdx + 1)}</span>
-              </>
-            );
-          })()}
+          {renderInlineMarkdown(d?.titleBold || 'Project Title')}
         </div>
 
         {/* ━━━ HERO IMAGE — 1352 × 671 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}

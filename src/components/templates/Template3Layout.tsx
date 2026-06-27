@@ -237,10 +237,10 @@ export default function Template3Layout({
           {/* ━━ TITLE ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
           <div style={{
             position: 'absolute', left: 80, top: 139,
-            fontFamily: 'var(--font-serif, DM Sans)', fontWeight: 700, fontSize: 40,
+            fontFamily: 'var(--font-serif, DM Sans)', fontWeight: 400, fontSize: 40,
             color: '#000', textTransform: 'uppercase', lineHeight: 1.15, whiteSpace: 'nowrap',
           }}>
-            {data.titleBold || 'Project Title'}
+            {renderInlineMarkdown(data.titleBold || 'Project Title')}
           </div>
 
           {/* ━━ HERO IMAGE ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}

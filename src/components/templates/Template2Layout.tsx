@@ -246,14 +246,7 @@ export default function Template2Layout({
             fontFamily: 'var(--font-serif, DM Sans)', fontSize: 40,
             color: '#000', textTransform: 'uppercase', lineHeight: 1.15, whiteSpace: 'nowrap',
           }}>
-            {(data.titleLight || data.titleBold) ? (
-              <>
-                <span style={{ fontWeight: 400 }}>{data.titleLight || ''}</span>
-                <span style={{ fontWeight: 700 }}>{data.titleBold || ''}</span>
-              </>
-            ) : (
-              <span style={{ fontWeight: 700, color: '#ccc' }}>Project Title</span>
-            )}
+            {renderInlineMarkdown(data.titleBold || 'Project Title')}
           </div>
 
           {/* ━━ HERO IMAGE ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}

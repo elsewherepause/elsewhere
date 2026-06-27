@@ -43,13 +43,13 @@ export default function MobileProjectLayout({ data, patterns, nextProject, desti
         <h1 style={{
           fontFamily: 'var(--font-serif, DM Sans)',
           fontSize: 28,
-          fontWeight: 700,
+          fontWeight: 400,
           textTransform: 'uppercase',
           color: '#000',
           lineHeight: 1.15,
           margin: 0,
         }}>
-          {data.titleBold || 'Project Title'}
+          {renderInlineMarkdown(data.titleBold || 'Project Title')}
         </h1>
       </div>
 
