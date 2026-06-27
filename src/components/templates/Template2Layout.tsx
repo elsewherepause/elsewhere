@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { type Section, type TemplateData } from '@/components/admin/template-editor/shared'
+import { hasContent, type Section, type TemplateData } from '@/components/admin/template-editor/shared'
 import { renderInlineMarkdown } from '@/lib/utils/inline-markdown'
 import CanvasFooter from './CanvasFooter'
 import CanvasSidebar from './CanvasSidebar'
@@ -58,7 +58,10 @@ export default function Template2Layout({
 }) {
   const flat = rawData.sections ? sectionsToFlat(rawData.sections) : {}
   const data = { ...rawData, ...flat } as Record<string, string | undefined>
-  const sectionCount = rawData.sections?.length ?? 0
+  const sections = rawData.sections ?? []
+  const sectionCount = isEditing
+    ? sections.length
+    : sections.filter(s => hasContent(s)).length
   const [scale, setScale] = useState(1)
   const [activeIdx, setActiveIdx] = useState(0)
   const [sidebarVisible, setSidebarVisible] = useState(false)
@@ -83,7 +86,10 @@ export default function Template2Layout({
   ].filter((id): id is string => !!id)
 
   const HEADER_END = 996
-  const effectiveH = viewMode === 'photos' ? HEADER_END : H
+  const SECTION_ENDS = [...SECTION_STARTS.slice(1), FOOTER_Y]
+  const lastSectionEnd = sectionCount > 0 ? SECTION_ENDS[sectionCount - 1] : HEADER_END
+  const storyH = lastSectionEnd + 560
+  const effectiveH = viewMode === 'photos' ? HEADER_END : storyH
 
   const handleScrollTo = useCallback((y: number) => {
     if (isEditing && wrapperRef.current) {
@@ -93,7 +99,7 @@ export default function Template2Layout({
     }
   }, [isEditing, scale])
 
-  const sidebarSections = SECTION_STARTS.map((y, i) => ({
+  const sidebarSections = SECTION_STARTS.slice(0, sectionCount).map((y, i) => ({
     scrollY: y,
     headline: SECTION_HEADINGS[i],
   }))
@@ -117,7 +123,7 @@ export default function Template2Layout({
       if (!el) return
       const canvasTop = el.getBoundingClientRect().top
       const pivotY = (window.innerHeight * 0.4 - canvasTop) / scale
-      setSidebarVisible(pivotY >= SECTION_STARTS[0] && pivotY <= FOOTER_Y)
+      setSidebarVisible(pivotY >= SECTION_STARTS[0] && pivotY <= lastSectionEnd)
       let active = 0
       for (let i = 0; i < SECTION_STARTS.length; i++) {
         if (SECTION_STARTS[i] <= pivotY) active = i
@@ -386,7 +392,7 @@ export default function Template2Layout({
 
           {/* ━━ FOOTER ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
           <CanvasFooter
-            footerY={FOOTER_Y + F_NAV}
+            footerY={lastSectionEnd + 60 + F_NAV}
             markOffset={F_MARK}
             canvasWidth={W}
             nextProjectSlug={data.nextProjectSlug}
