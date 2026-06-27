@@ -44,7 +44,7 @@ export default function MobileProjectLayout({ data, patterns, nextProject, desti
   )
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white pt-16">
       {/* Hero */}
       {data.heroImage && (
         <img
