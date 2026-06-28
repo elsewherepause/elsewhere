@@ -11,14 +11,14 @@ export type Template2Data = TemplateData
 
 // Field mappings: section index → flat key mappings
 const FIELD_MAPS: Record<string, string>[] = [
-  { image1: 'sec1Image', headline: 'sec1Headline', quote: 'sec1Quote', body1: 'sec1Body1', body2: 'sec1Body2', body3: 'sec1Body3', quote2: 'sec1Quote2' },
+  { image1: 'sec1Image', headline: 'sec1Headline', body1: 'sec1Body1', body3: 'sec1Body3' },
   { image1: 'sec2Image1', image2: 'sec2Image2', image3: 'sec2Image3', image4: 'sec2Image4', headline: 'sec2Headline', body1: 'sec2Body1', body2: 'sec2Body2', body3: 'sec2Body3', quote: 'sec2Quote', body4: 'sec2Body4' },
-  { image1: 'sec3Image', headline: 'sec3Headline', body1: 'sec3Body1', body2: 'sec3Body2', quote: 'sec3Quote', body3: 'sec3Body3' },
-  { image1: 'sec4Image', headline: 'sec4Headline', quote: 'sec4Quote', body1: 'sec4Body1', body2: 'sec4Body2', body3: 'sec4Body3', body4: 'sec4Body4' },
-  { image1: 'sec5Image', image2: 'sec5Image2', headline: 'sec5Headline', body1: 'sec5Body1', quote: 'sec5Quote', body2: 'sec5Body2', body3: 'sec5Body3' },
-  { image1: 'sec6Image', image2: 'sec6Image2', headline: 'sec6Headline', body1: 'sec6Body1', body2: 'sec6Body2' },
+  { image1: 'sec3Image', headline: 'sec3Headline', body1: 'sec3Body1', body2: 'sec3Body2', body3: 'sec3Body3' },
+  { image1: 'sec4Image', headline: 'sec4Headline', body1: 'sec4Body1', body2: 'sec4Body2', body3: 'sec4Body3', body4: 'sec4Body4' },
+  { image1: 'sec5Image', image2: 'sec5Image2', headline: 'sec5Headline', body1: 'sec5Body1', body2: 'sec5Body2' },
+  { image1: 'sec6Image', image2: 'sec6Image2', headline: 'sec6Headline', body1: 'sec6Body1' },
   { image1: 'sec7Image', headline: 'sec7Headline', body1: 'sec7Body1', body2: 'sec7Body2' },
-  { image1: 'sec8Image', headline: 'sec8Headline', body1: 'sec8Body1', body2: 'sec8Body2', body3: 'sec8Body3', body4: 'sec8Body4' },
+  { image1: 'sec8Image', headline: 'sec8Headline', body1: 'sec8Body1', body3: 'sec8Body3' },
 ]
 
 function sectionsToFlat(sections: Section[]): Record<string, string | undefined> {
@@ -34,16 +34,18 @@ function sectionsToFlat(sections: Section[]): Record<string, string | undefined>
   return flat
 }
 
-// ─── Canvas constants (W=1512, H=7446) ───────────────────────────────────────
+// ─── Canvas constants ─────────────────────────────────────────────────────────
 
 const W = 1512
-const H = 7600
 
-const SECTION_STARTS = [1009, 1559, 2794, 3696, 4263, 5062, 5340, 5964]
+const SECTION_STARTS = [1009, 1559, 2773, 3387, 4042, 5062, 5340, 5964]
+const SECTION_HEIGHTS = [550, 1124, 639, 622, 979, 278, 656, 730]
+const CONTENT_TOP = 1009
+const SECTION_CONTENT_BOTTOMS = [1575, 2683, 3412, 4009, 5021, 5878, 5766, 6394]
 
-const FOOTER_Y = 7042
 const F_NAV = 0
 const F_MARK = 200
+const FOOTER_HEIGHT = 560
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -58,51 +60,50 @@ export default function Template2Layout({
 }) {
   const flat = rawData.sections ? sectionsToFlat(rawData.sections) : {}
   const data = { ...rawData, ...flat } as Record<string, string | undefined>
-  const sections = rawData.sections ?? []
-  const sectionCount = isEditing
-    ? sections.length
-    : sections.filter(s => hasContent(s)).length
+  const rawSections = rawData.sections ?? []
+  const activeSections = isEditing
+    ? rawSections
+    : rawSections.filter(s => hasContent(s))
+
   const [scale, setScale] = useState(1)
   const [activeIdx, setActiveIdx] = useState(0)
   const [sidebarVisible, setSidebarVisible] = useState(false)
   const [viewMode, setViewMode] = useState<'story' | 'photos'>('story')
   const wrapperRef = useRef<HTMLDivElement>(null)
 
-  const SECTION_HEADINGS = [
-    data.sec1Headline?.slice(0, 50) || 'Section 01',
-    data.sec2Headline?.slice(0, 50) || 'Section 02',
-    data.sec3Headline?.slice(0, 50) || 'Section 03',
-    data.sec4Headline?.slice(0, 50) || 'Section 04',
-    data.sec5Headline?.slice(0, 50) || 'Section 05',
-    data.sec6Headline?.slice(0, 50) || 'Section 06',
-    data.sec7Headline?.slice(0, 50) || 'Section 07',
-    data.sec8Headline?.slice(0, 50) || 'Section 08',
-  ]
+  function sectionOffset(i: number): number {
+    const pat = i % 8
+    let cumH = 0
+    for (let j = 0; j < i; j++) cumH += SECTION_HEIGHTS[j % 8]
+    return (CONTENT_TOP + cumH) - SECTION_STARTS[pat]
+  }
 
-  const allImageIds = [
-    data.sec1Image, data.sec2Image1, data.sec2Image2, data.sec2Image3, data.sec2Image4,
-    data.sec3Image, data.sec4Image, data.sec5Image, data.sec5Image2,
-    data.sec6Image, data.sec6Image2, data.sec7Image, data.sec8Image,
-  ].filter((id): id is string => !!id)
+  const lastIdx = activeSections.length - 1
+  const lastContentBottom = lastIdx >= 0
+    ? SECTION_CONTENT_BOTTOMS[lastIdx % 8] + sectionOffset(lastIdx)
+    : CONTENT_TOP
+
+  const allImageIds = activeSections.flatMap(s =>
+    [s.image1, s.image2, s.image3, s.image4].filter((id): id is string => !!id)
+  )
 
   const HEADER_END = 996
-  const SECTION_ENDS = [...SECTION_STARTS.slice(1), FOOTER_Y]
-  const lastSectionEnd = sectionCount > 0 ? SECTION_ENDS[sectionCount - 1] : HEADER_END
-  const storyH = lastSectionEnd + 560
-  const effectiveH = viewMode === 'photos' ? HEADER_END : storyH
+  const storyFooterY = lastContentBottom + 60
+  const storyCanvasH = storyFooterY + FOOTER_HEIGHT
+  const canvasH = viewMode === 'photos' ? HEADER_END : storyCanvasH
+  const footerY = storyFooterY
 
   const handleScrollTo = useCallback((y: number) => {
-    if (isEditing && wrapperRef.current) {
-      wrapperRef.current.scrollTo({ top: y * scale, behavior: 'smooth' })
-    } else {
-      window.scrollTo({ top: y * scale, behavior: 'smooth' })
-    }
-  }, [isEditing, scale])
+    if (!wrapperRef.current) return
+    const wrapperTop = wrapperRef.current.getBoundingClientRect().top + window.scrollY
+    window.scrollTo({ top: wrapperTop + y * scale, behavior: 'smooth' })
+  }, [scale])
 
-  const sidebarSections = SECTION_STARTS.slice(0, sectionCount).map((y, i) => ({
-    scrollY: y,
-    headline: SECTION_HEADINGS[i],
-  }))
+  const sidebarSections = activeSections.map((s, i) => {
+    let cumH = 0
+    for (let j = 0; j < i; j++) cumH += SECTION_HEIGHTS[j % 8]
+    return { scrollY: CONTENT_TOP + cumH, headline: s.headline }
+  })
 
   useEffect(() => {
     const update = () => {
@@ -123,10 +124,12 @@ export default function Template2Layout({
       if (!el) return
       const canvasTop = el.getBoundingClientRect().top
       const pivotY = (window.innerHeight * 0.4 - canvasTop) / scale
-      setSidebarVisible(pivotY >= SECTION_STARTS[0] && pivotY <= lastSectionEnd)
+      setSidebarVisible(pivotY >= CONTENT_TOP && pivotY <= lastContentBottom)
       let active = 0
-      for (let i = 0; i < SECTION_STARTS.length; i++) {
-        if (SECTION_STARTS[i] <= pivotY) active = i
+      for (let i = 0; i < activeSections.length; i++) {
+        let cumH = 0
+        for (let j = 0; j < i; j++) cumH += SECTION_HEIGHTS[j % 8]
+        if (CONTENT_TOP + cumH <= pivotY) active = i
       }
       setActiveIdx(active)
     }
@@ -238,10 +241,10 @@ export default function Template2Layout({
     <>
       <div
         ref={wrapperRef}
-        style={{ width: '100%', height: effectiveH * scale, position: 'relative', overflow: 'hidden' }}
+        style={{ width: '100%', height: canvasH * scale, position: 'relative', overflow: 'hidden' }}
       >
         <div style={{
-          width: W, height: effectiveH, position: 'relative', background: '#fff',
+          width: W, height: canvasH, position: 'relative', background: '#fff',
           transform: `scale(${scale})`, transformOrigin: 'top left',
           fontFamily: 'var(--font-sans, Montserrat)',
         }}>
@@ -301,103 +304,109 @@ export default function Template2Layout({
 
           {viewMode === 'story' && (
             <>
-          {sectionCount > 0 && <>
-          <ImgBox id={data.sec1Image} si="0" field="image1" l={259} t={1009} w={648} h={416} />
-          <SecNum n="01" l={1359} t={1009} />
-          <div style={{ position: 'absolute', left: 928, top: 1050, width: 432, display: 'flex', flexDirection: 'column', gap: 24 }}>
-            <H2 w={432}>{data.sec1Headline}</H2>
-            <P w={432}>{data.sec1Body1}</P>
-            <Quote w={432}>{data.sec1Quote}</Quote>
-            <P w={432}>{data.sec1Body2}</P>
-            <Quote w={432}>{data.sec1Quote2}</Quote>
-          </div>
-          <div style={{ position: 'absolute', left: 928, top: 1425, width: 220 }}>
-            <P w={220}>{data.sec1Body3}</P>
-          </div>
-          </>}
+              {activeSections.map((s, i) => {
+                const off = sectionOffset(i)
+                const num = String(i + 1).padStart(2, '0')
+                const sk = String(i)
+                const pat = i % 8
+                switch (pat) {
+                  case 0: return (
+                    <React.Fragment key={i}>
+                      <ImgBox id={s.image1} si={sk} field="image1" l={259} t={1009 + off} w={648} h={416} />
+                      <SecNum n={num} l={1359} t={1009 + off} />
+                      <div style={{ position: 'absolute', left: 928, top: 1050 + off, width: 432, display: 'flex', flexDirection: 'column', gap: 24 }}>
+                        <H2 w={432}>{s.headline}</H2>
+                        <P w={432}>{s.body1}</P>
+                      </div>
+                      <div style={{ position: 'absolute', left: 928, top: 1425 + off, width: 220 }}>
+                        <P w={220}>{s.body3}</P>
+                      </div>
+                    </React.Fragment>
+                  )
+                  case 1: return (
+                    <React.Fragment key={i}>
+                      <ImgBox id={s.image1} si={sk} field="image1" l={253} t={1569 + off} w={695} h={492} />
+                      <SecNum n={num} l={1350} t={1560 + off} />
+                      <H2 l={961} t={1697 + off} w={215}>{s.headline}</H2>
+                      <P l={961} t={1766 + off} w={220}>{s.body1}</P>
+                      <ImgBox id={s.image3} si={sk} field="image3" l={1234} t={1962 + off} w={193} h={354} />
+                      <P l={963} t={1962 + off} w={220}>{s.body2}</P>
+                      <ImgBox id={s.image2} si={sk} field="image2" l={253} t={2108 + off} w={487} h={575} />
+                      <ImgBox id={s.image4} si={sk} field="image4" l={991} t={2328 + off} w={193} h={354} />
+                      <P l={754} t={2480 + off} w={220}>{s.body3}</P>
+                    </React.Fragment>
+                  )
+                  case 2: return (
+                    <React.Fragment key={i}>
+                      <SecNum n={num} l={683} t={2885 + off} />
+                      <H2 l={253} t={2940 + off} w={448}>{s.headline}</H2>
+                      <P l={253} t={3018 + off} w={220}>{s.body1}</P>
+                      <div style={{ position: 'absolute', left: 253, top: 3111 + off, width: 432 }}>
+                        <P w={432}>{s.body2}</P>
+                      </div>
+                      <P l={463} t={3262 + off} w={220}>{s.body3}</P>
+                      <ImgBox id={s.image1} si={sk} field="image1" l={745} t={2773 + off} w={684} h={520} />
+                    </React.Fragment>
+                  )
+                  case 3: return (
+                    <React.Fragment key={i}>
+                      <ImgBox id={s.image1} si={sk} field="image1" l={248} t={3387 + off} w={499} h={616} />
+                      <H2 l={763} t={3438 + off} w={308}>{s.headline}</H2>
+                      <SecNum n={num} l={1181} t={3438 + off} />
+                      <P l={763} t={3513 + off} w={220}>{s.body1}</P>
+                      <P l={1012} t={3513 + off} w={220}>{s.body2}</P>
+                      <P l={763} t={3723 + off} w={458}>{s.body3}</P>
+                      <P l={1012} t={3859 + off} w={220}>{s.body4}</P>
+                    </React.Fragment>
+                  )
+                  case 4: return (
+                    <React.Fragment key={i}>
+                      <SecNum n={num} l={679} t={4264 + off} />
+                      <H2 l={259} t={4299 + off} w={347}>{s.headline}</H2>
+                      <P l={259} t={4375 + off} w={220}>{s.body1}</P>
+                      <P l={498} t={4375 + off} w={220}>{s.body2}</P>
+                      <ImgBox id={s.image1} si={sk} field="image1" l={744} t={4042 + off} w={685} h={589} />
+                      <ImgBox id={s.image2} si={sk} field="image2" l={259} t={4687 + off} w={469} h={334} />
+                    </React.Fragment>
+                  )
+                  case 5: return (
+                    <React.Fragment key={i}>
+                      <ImgBox id={s.image1} si={sk} field="image1" l={1132} t={5063 + off} w={293} h={456} />
+                      <SecNum n={num} l={1075} t={5063 + off} />
+                      <H2 l={884} t={5111 + off} w={220}>{s.headline}</H2>
+                      <P l={884} t={5182 + off} w={220}>{s.body1}</P>
+                      <ImgBox id={s.image2} si={sk} field="image2" l={1132} t={5616 + off} w={293} h={262} />
+                    </React.Fragment>
+                  )
+                  case 6: return (
+                    <React.Fragment key={i}>
+                      <ImgBox id={s.image1} si={sk} field="image1" l={259} t={5341 + off} w={469} h={178} />
+                      <SecNum n={num} l={689} t={5535 + off} />
+                      <H2 l={259} t={5574 + off} w={467}>{s.headline}</H2>
+                      <P l={259} t={5616 + off} w={220}>{s.body1}</P>
+                      <P l={498} t={5616 + off} w={220}>{s.body2}</P>
+                    </React.Fragment>
+                  )
+                  case 7: return (
+                    <React.Fragment key={i}>
+                      <ImgBox id={s.image1} si={sk} field="image1" l={259} t={5965 + off} w={688} h={589} />
+                      <SecNum n={num} l={1388} t={6115 + off} />
+                      <H2 l={958} t={6158 + off} w={421}>{s.headline}</H2>
+                      <P l={958} t={6244 + off} w={220}>{s.body1}</P>
+                      <P l={1201} t={6244 + off} w={220}>{s.body3}</P>
+                    </React.Fragment>
+                  )
+                  default: return null
+                }
+              })}
 
-          {sectionCount > 1 && <>
-          <ImgBox id={data.sec2Image1} si="1" field="image1" l={253} t={1569} w={695} h={492} />
-          <SecNum n="02" l={1350} t={1560} />
-          <H2 l={961} t={1697} w={215}>{data.sec2Headline}</H2>
-          <P l={961} t={1766} w={220}>{data.sec2Body1}</P>
-          <ImgBox id={data.sec2Image3} si="1" field="image3" l={1234} t={1962} w={193} h={354} />
-          <P l={963} t={1962} w={220}>{data.sec2Body2}</P>
-          <ImgBox id={data.sec2Image2} si="1" field="image2" l={253} t={2108} w={487} h={575} />
-          <ImgBox id={data.sec2Image4} si="1" field="image4" l={991} t={2328} w={193} h={354} />
-          <P l={754} t={2480} w={220}>{data.sec2Body3}</P>
-          </>}
-
-          {sectionCount > 2 && <>
-          <SecNum n="03" l={683} t={2885} />
-          <H2 l={253} t={2940} w={448}>{data.sec3Headline}</H2>
-          <P l={253} t={3018} w={220}>{data.sec3Body1}</P>
-          <div style={{ position: 'absolute', left: 253, top: 3111, width: 432, display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <P w={432}>{data.sec3Body2}</P>
-            <Quote w={432}>{data.sec3Quote}</Quote>
-          </div>
-          <P l={463} t={3262} w={220}>{data.sec3Body3}</P>
-          <ImgBox id={data.sec3Image} si="2" field="image1" l={745} t={2773} w={684} h={520} />
-          </>}
-
-          {sectionCount > 3 && <>
-          <ImgBox id={data.sec4Image} si="3" field="image1" l={248} t={3387} w={499} h={616} />
-          <H2 l={763} t={3438} w={308}>{data.sec4Headline}</H2>
-          <SecNum n="04" l={1181} t={3438} />
-          <P l={763} t={3513} w={220}>{data.sec4Body1}</P>
-          <P l={1012} t={3513} w={220}>{data.sec4Body2}</P>
-          <div style={{ position: 'absolute', left: 763, top: 3723, width: 458, display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <P w={458}>{data.sec4Body3}</P>
-            <Quote w={458}>{data.sec4Quote}</Quote>
-          </div>
-          <P l={1012} t={3859} w={220}>{data.sec4Body4}</P>
-          </>}
-
-          {sectionCount > 4 && <>
-          <SecNum n="05" l={678.6} t={4263.62} />
-          <H2 l={258.58} t={4299.32} w={347.31}>{data.sec5Headline}</H2>
-          <P l={258.58} t={4375} w={220}>{data.sec5Body1}</P>
-          <P l={497.6} t={4375} w={220}>{data.sec5Body2}</P>
-          <P l={258.58} t={4469.83} w={220}>{data.sec5Body3}</P>
-          <ImgBox id={data.sec5Image} si="4" field="image1" l={744} t={4042.16} w={685} h={589} />
-          <ImgBox id={data.sec5Image2} si="4" field="image2" l={258.58} t={4686.66} w={469} h={334} />
-          </>}
-
-          {sectionCount > 5 && <>
-          <ImgBox id={data.sec6Image} si="5" field="image1" l={1132} t={5062.66} w={293} h={456} />
-          <SecNum n="06" l={1075} t={5062.66} />
-          <H2 l={884.36} t={5111.17} w={220}>{data.sec6Headline}</H2>
-          <P l={884.36} t={5181.68} w={220}>{data.sec6Body1}</P>
-          <P l={884.36} t={5364.66} w={220}>{data.sec6Body2}</P>
-          <ImgBox id={data.sec6Image2} si="5" field="image2" l={1132} t={5615.92} w={293} h={262} />
-          </>}
-
-          {sectionCount > 6 && <>
-          <ImgBox id={data.sec7Image} si="6" field="image1" l={258.58} t={5340.66} w={469} h={178} />
-          <SecNum n="07" l={688.58} t={5534.99} />
-          <H2 l={259.42} t={5574.21} w={467.34}>{data.sec7Headline}</H2>
-          <P l={259.42} t={5615.92} w={220}>{data.sec7Body1}</P>
-          <P l={498.44} t={5615.92} w={220}>{data.sec7Body2}</P>
-          </>}
-
-          {sectionCount > 7 && <>
-          <ImgBox id={data.sec8Image} si="7" field="image1" l={259.42} t={5964.66} w={688} h={589} />
-          <SecNum n="08" l={1387.58} t={6115.21} />
-          <H2 l={958.42} t={6158.06} w={420.93}>{data.sec8Headline}</H2>
-          <P l={958.42} t={6244.3} w={220}>{data.sec8Body1}</P>
-          <P l={958.42} t={6378.61} w={220}>{data.sec8Body2}</P>
-          <P l={1200.92} t={6244.3} w={220}>{data.sec8Body3}</P>
-          <P l={1200.92} t={6413.11} w={220}>{data.sec8Body4}</P>
-          </>}
-
-          {/* ━━ FOOTER ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-          <CanvasFooter
-            footerY={lastSectionEnd + 60 + F_NAV}
-            markOffset={F_MARK}
-            canvasWidth={W}
-            nextProjectSlug={data.nextProjectSlug}
-            destinations={(rawData as Record<string, unknown>).destinations as { slug: string }[] ?? []}
-          />
+              <CanvasFooter
+                footerY={footerY + F_NAV}
+                markOffset={F_MARK}
+                canvasWidth={W}
+                nextProjectSlug={data.nextProjectSlug}
+                destinations={(rawData as Record<string, unknown>).destinations as { slug: string }[] ?? []}
+              />
             </>
           )}
 

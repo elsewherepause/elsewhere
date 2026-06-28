@@ -6,11 +6,8 @@ export const PATTERNS: Pattern[] = [
     images: [{ field: 'image1', label: 'Image — left (648x416)' }],
     texts: [
       { field: 'headline', label: 'Headline', multiline: true },
-      { field: 'quote', label: 'Quote', multiline: true },
-      { field: 'body1', label: 'Body — left column', multiline: true },
-      { field: 'body2', label: 'Body — right column', multiline: true },
-      { field: 'body3', label: 'Body — footer line', multiline: true },
-      { field: 'quote2', label: 'Quote 2', multiline: true },
+      { field: 'body1', label: 'Body 1', multiline: true },
+      { field: 'body3', label: 'Body 2', multiline: true },
     ],
   },
   {
@@ -35,16 +32,14 @@ export const PATTERNS: Pattern[] = [
       { field: 'headline', label: 'Headline', multiline: true },
       { field: 'body1', label: 'Body 1', multiline: true },
       { field: 'body2', label: 'Body 2', multiline: true },
-      { field: 'quote', label: 'Quote', multiline: true },
       { field: 'body3', label: 'Body 3', multiline: true },
     ],
   },
   {
-    desc: 'Image left, quotes',
+    desc: 'Image left, text right',
     images: [{ field: 'image1', label: 'Image — left (499x616)' }],
     texts: [
       { field: 'headline', label: 'Headline', multiline: true },
-      { field: 'quote', label: 'Quote', multiline: true },
       { field: 'body1', label: 'Body 1', multiline: true },
       { field: 'body2', label: 'Body 2', multiline: true },
       { field: 'body3', label: 'Body 3', multiline: true },
@@ -61,7 +56,6 @@ export const PATTERNS: Pattern[] = [
       { field: 'headline', label: 'Headline', multiline: true },
       { field: 'body1', label: 'Body 1', multiline: true },
       { field: 'body2', label: 'Body 2', multiline: true },
-      { field: 'body3', label: 'Body 3', multiline: true },
     ],
   },
   {
@@ -72,8 +66,7 @@ export const PATTERNS: Pattern[] = [
     ],
     texts: [
       { field: 'headline', label: 'Headline', multiline: true },
-      { field: 'body1', label: 'Body 1', multiline: true },
-      { field: 'body2', label: 'Body 2', multiline: true },
+      { field: 'body1', label: 'Body', multiline: true },
     ],
   },
   {
@@ -86,14 +79,12 @@ export const PATTERNS: Pattern[] = [
     ],
   },
   {
-    desc: 'Large landscape + 4 body blocks',
+    desc: 'Large landscape + 3 body blocks',
     images: [{ field: 'image1', label: 'Landscape — left (688x589)' }],
     texts: [
       { field: 'headline', label: 'Headline', multiline: true },
-      { field: 'body1', label: 'Body 1', multiline: true },
-      { field: 'body2', label: 'Body 2', multiline: true },
-      { field: 'body3', label: 'Body 3', multiline: true },
-      { field: 'body4', label: 'Body 4', multiline: true },
+      { field: 'body1', label: 'Body — left column', multiline: true },
+      { field: 'body3', label: 'Body — right column', multiline: true },
     ],
   },
 ]

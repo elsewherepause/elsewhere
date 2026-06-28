@@ -87,6 +87,7 @@ export default function MediaUploader({ onUploaded }: Props) {
       >
         {uploading ? `Uploading… ${progress}%` : 'Upload'}
       </label>
+      <span className="text-[10px] text-[var(--color-ink-muted)] ml-2">Max 10 MB</span>
     </div>
   )
 }
