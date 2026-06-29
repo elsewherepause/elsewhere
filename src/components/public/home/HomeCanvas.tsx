@@ -4,11 +4,10 @@ import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import Link from 'next/link'
 import TakeMeElsewhere from '@/components/public/TakeMeElsewhere'
 
-const CANVAS_W = 3200
 const CANVAS_H = 900
 const CLOUD = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
 
-const SLOTS = [
+const SLOT_PATTERN = [
   { l: 80,    t: 160, w: 280, h: 140 },
   { l: 80,    t: 440, w: 260, h: 260 },
   { l: 480,   t: 560, w: 190, h: 260 },
@@ -21,6 +20,23 @@ const SLOTS = [
   { l: 2450,  t: 520, w: 320, h: 230 },
   { l: 2850,  t: 150, w: 250, h: 240 },
 ]
+const PATTERN_WIDTH = 3100
+
+function buildSlots(count: number) {
+  const slots = []
+  for (let i = 0; i < count; i++) {
+    const cycle = Math.floor(i / SLOT_PATTERN.length)
+    const pattern = SLOT_PATTERN[i % SLOT_PATTERN.length]
+    slots.push({ ...pattern, l: pattern.l + cycle * PATTERN_WIDTH })
+  }
+  return slots
+}
+
+function computeCanvasWidth(slots: { l: number; w: number }[]) {
+  if (slots.length === 0) return 1200
+  const last = slots.reduce((a, b) => (a.l + a.w > b.l + b.w ? a : b))
+  return last.l + last.w + 250
+}
 
 const CATEGORIES = ['CULTURE', 'ADVENTURE'] as const
 type Category = typeof CATEGORIES[number]
@@ -75,6 +91,9 @@ export default function HomeCanvas({ projects, destinations = [] }: { projects: 
     return projects.filter(p => p.category && activeFilters.has(p.category))
   }, [projects, activeFilters])
 
+  const slots = useMemo(() => buildSlots(filtered.length), [filtered.length])
+  const canvasW = useMemo(() => computeCanvasWidth(slots), [slots])
+
   const font = 'Montserrat, sans-serif'
 
   return (
@@ -84,13 +103,13 @@ export default function HomeCanvas({ projects, destinations = [] }: { projects: 
       style={{ WebkitOverflowScrolling: 'touch' }}
     >
       <div style={{
-        width: CANVAS_W * scale,
+        width: canvasW * scale,
         height: CANVAS_H * scale,
         marginLeft: 24 - (80 * scale),
         marginTop: -45 * scale,
       }}>
         <div style={{
-          width: CANVAS_W,
+          width: canvasW,
           height: CANVAS_H,
           position: 'relative',
           transformOrigin: 'top left',
@@ -99,7 +118,7 @@ export default function HomeCanvas({ projects, destinations = [] }: { projects: 
         }}>
 
           {/* ── Photo slots ── */}
-          {SLOTS.map((slot, i) => {
+          {slots.map((slot, i) => {
             const project = filtered[i]
             if (!project) return null
 
