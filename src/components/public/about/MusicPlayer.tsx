@@ -183,13 +183,13 @@ export default function MusicPlayer({ style }: { style?: React.CSSProperties }) 
   }, []);
 
   useEffect(() => {
-    if (audioRef.current && isPlaying) {
-      const playPromise = audioRef.current.play();
-      if (playPromise !== undefined) {
-        playPromise.catch(error => console.error("Audio playback interrupted or failed:", error));
+    if (audioRef.current) {
+      audioRef.current.load();
+      if (isPlaying) {
+        audioRef.current.play().catch(error => console.error("Audio playback interrupted or failed:", error));
       }
     }
-  }, [currentTrackIndex, isPlaying]);
+  }, [currentTrackIndex]);
 
   const togglePlay = () => {
     if (!audioRef.current) return;
