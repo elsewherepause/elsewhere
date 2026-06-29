@@ -28,6 +28,131 @@ const playlist = [
     artist: 'Led Zeppelin',
     src: '/audio/Kashmir (Live_ O2 Arena, London - December 10, 2007)_128k.mp3'
   },
+  {
+    title: 'La Femme d\'Argent',
+    artist: 'AIR . Moon Safari',
+    src: '/audio/AIR - La femme d\'argent (from Moon Safari - Official Audio).mp3'
+  },
+  {
+    title: 'Let The Music Play',
+    artist: 'Barry White',
+    src: '/audio/Barry White - Let The Music Play (Official Music Video).mp3'
+  },
+  {
+    title: 'Turn The Page (Live)',
+    artist: 'Bob Seger . Cobo Hall 1975',
+    src: '/audio/Bob Seger & The Silver Bullet Band - Turn The Page (Live At Cobo Hall, Detroit  1975).mp3'
+  },
+  {
+    title: 'Boogie Wonderland',
+    artist: 'Earth, Wind & Fire',
+    src: '/audio/Boogie Wonderland (Single Version).mp3'
+  },
+  {
+    title: 'Breathe (In the Air)',
+    artist: 'Pink Floyd . Dark Side of the Moon',
+    src: '/audio/Breathe (In the Air).mp3'
+  },
+  {
+    title: 'Do I Wanna Know?',
+    artist: 'Arctic Monkeys . AM',
+    src: '/audio/Do I Wanna Know.mp3'
+  },
+  {
+    title: 'Dracula',
+    artist: 'Rob Zombie',
+    src: '/audio/Dracula.mp3'
+  },
+  {
+    title: 'Everything In Its Right Place',
+    artist: 'Radiohead . Kid A',
+    src: '/audio/Everything In Its Right Place.mp3'
+  },
+  {
+    title: 'Get Up (Sex Machine)',
+    artist: 'James Brown',
+    src: '/audio/Get Up I Feel Like Being A Sex Machine.mp3'
+  },
+  {
+    title: 'Hurt',
+    artist: 'Johnny Cash',
+    src: '/audio/Hurt.mp3'
+  },
+  {
+    title: 'I Heard It Through The Grapevine',
+    artist: 'Marvin Gaye',
+    src: '/audio/I Heard It Through The Grapevine.mp3'
+  },
+  {
+    title: 'It\'s No Good',
+    artist: 'Depeche Mode . Ultra',
+    src: '/audio/It\'s No Good.mp3'
+  },
+  {
+    title: 'Ladies Night',
+    artist: 'Kool & The Gang',
+    src: '/audio/Ladies Night.mp3'
+  },
+  {
+    title: 'Mama, I\'m Coming Home',
+    artist: 'Ozzy Osbourne',
+    src: '/audio/OZZY OSBOURNE - Mama, I\'m Coming Home (Official Video).mp3'
+  },
+  {
+    title: 'No More Tears',
+    artist: 'Ozzy Osbourne',
+    src: '/audio/OZZY OSBOURNE - No More Tears (Official Video).mp3'
+  },
+  {
+    title: 'Ordinary World',
+    artist: 'Duran Duran',
+    src: '/audio/Ordinary World.mp3'
+  },
+  {
+    title: 'Personal Jesus',
+    artist: 'Depeche Mode',
+    src: '/audio/Personal Jesus.mp3'
+  },
+  {
+    title: 'Glory Box (Live at Roseland)',
+    artist: 'Portishead',
+    src: '/audio/Portishead Glory Box Live At Roseland NY ( Best Audio).mp3'
+  },
+  {
+    title: 'Precious',
+    artist: 'Depeche Mode',
+    src: '/audio/Precious.mp3'
+  },
+  {
+    title: 'Riders on the Storm',
+    artist: 'The Doors . L.A. Woman',
+    src: '/audio/Riders on the Storm.mp3'
+  },
+  {
+    title: 'Signed, Sealed, Delivered',
+    artist: 'Stevie Wonder',
+    src: '/audio/Signed, Sealed, Delivered (I\'m Yours).mp3'
+  },
+  {
+    title: 'Suzie Q',
+    artist: 'Creedence Clearwater Revival',
+    src: '/audio/Suzie Q.mp3'
+  },
+  {
+    title: 'Sweet Pain',
+    artist: 'Kiss',
+    src: '/audio/Sweet Pain.mp3'
+  },
+  {
+    title: 'The Less I Know The Better',
+    artist: 'Tame Impala . Currents',
+    src: '/audio/The Less I Know The Better.mp3'
+  },
+  {
+    title: 'Us and Them',
+    artist: 'Pink Floyd . Dark Side of the Moon',
+    src: '/audio/Us and Them.mp3'
+  },
 ];
 
 export default function MusicPlayer({ style }: { style?: React.CSSProperties }) {
