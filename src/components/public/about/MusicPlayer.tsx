@@ -246,6 +246,7 @@ export default function MusicPlayer({ style }: { style?: React.CSSProperties }) 
               top: 40,
               right: 30,
               zIndex: 20,
+              pointerEvents: 'none',
               transformOrigin: '80% 25%',
               transform: isPlaying ? 'rotate(0deg)' : 'rotate(-25deg)',
               transition: 'transform 0.4s ease',
