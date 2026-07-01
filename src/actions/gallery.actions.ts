@@ -7,7 +7,7 @@ import { z } from 'zod'
 import type { GalleryMediaType } from '@prisma/client'
 
 const GalleryImageSchema = z.object({
-  altText: z.string().min(1),
+  altText: z.string().optional().nullable(),
   caption: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
   category: z.string().optional().nullable(),
@@ -36,7 +36,7 @@ export async function createGalleryImage(imageId: string) {
   const item = await prisma.galleryImage.create({
     data: {
       imageId,
-      altText: '',
+      altText: null,
       order: (last?.order ?? -1) + 1,
     },
     include: { image: true },
@@ -54,7 +54,7 @@ export async function updateGalleryImage(id: string, data: GalleryImageInput) {
   await prisma.galleryImage.update({
     where: { id },
     data: {
-      altText: parsed.altText,
+      altText: parsed.altText?.trim() || null,
       caption: parsed.caption?.trim() || null,
       description: parsed.description?.trim() || null,
       category: parsed.category?.trim() || null,

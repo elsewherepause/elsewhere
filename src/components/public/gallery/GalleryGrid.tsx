@@ -1,12 +1,16 @@
+'use client'
+
+import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { cloudinaryUrl, cloudinaryVideoUrl, cloudinaryVideoThumbnail } from '@/lib/utils/cloudinary-url'
 import type { GalleryMediaType } from '@prisma/client'
 import type { Note } from '@/actions/note.actions'
+import GalleryLightbox from './GalleryLightbox'
 
 export type GalleryItemData = {
   id: string
-  altText: string
+  altText: string | null
   caption: string | null
   description: string | null
   mediaType: GalleryMediaType
@@ -59,13 +63,14 @@ function EditorialText({
   desc,
   align = "left",
 }: {
-  title: string
+  title?: string | null
   desc?: string | null
   align?: "left" | "right"
 }) {
+  if (!title && !desc) return null
   return (
     <div className={`flex flex-col gap-1 ${align === "right" ? "items-end" : "items-start"}`}>
-      <EditorialTitle align={align}>{title}</EditorialTitle>
+      {title && <EditorialTitle align={align}>{title}</EditorialTitle>}
       {desc && (
         <p className={`font-sans text-sm md:text-base font-normal text-[var(--color-ink-muted)] leading-normal max-w-[360px] ${align === "right" ? "text-right" : "text-left"}`}>
           {desc}
@@ -101,19 +106,20 @@ function MusicWidget() {
   )
 }
 
-function renderImage(item: GalleryItemData, aspectClass: string) {
+function renderImage(item: GalleryItemData, aspectClass: string, onOpen: (item: GalleryItemData) => void) {
   if (item.mediaType === 'VIDEO') {
     return (
-      <div className={`relative w-full ${aspectClass} group`}>
+      <div
+        className={`relative w-full ${aspectClass} group cursor-pointer`}
+        onClick={() => onOpen(item)}
+      >
         <video
           src={cloudinaryVideoUrl(item.image.cloudinaryId, { quality: 'auto' })}
           poster={cloudinaryVideoThumbnail(item.image.cloudinaryId, { width: 1200 })}
           muted
           loop
           playsInline
-          className="absolute inset-0 w-full h-full object-cover"
-          onMouseEnter={e => (e.target as HTMLVideoElement).play()}
-          onMouseLeave={e => { const v = e.target as HTMLVideoElement; v.pause(); v.currentTime = 0 }}
+          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
         />
         <span className="absolute top-3 left-3 text-[11px] uppercase tracking-widest text-white bg-black/50 px-2 py-1 pointer-events-none">
           Video
@@ -123,7 +129,10 @@ function renderImage(item: GalleryItemData, aspectClass: string) {
   }
 
   return (
-    <div className={`relative w-full ${aspectClass}`}>
+    <div
+      className={`relative w-full ${aspectClass} cursor-pointer`}
+      onClick={() => onOpen(item)}
+    >
       <Image
         src={cloudinaryUrl(item.image.cloudinaryId, { width: 1200, crop: 'fill' })}
         alt={item.altText || ''}
@@ -140,11 +149,13 @@ function GalleryGroup({
   note1,
   note2,
   gIndex,
+  onOpen,
 }: {
   groupItems: GalleryItemData[]
   note1?: Note
   note2?: Note
   gIndex: number
+  onOpen: (item: GalleryItemData) => void
 }) {
   const flip = gIndex % 2 === 1
   const img0 = groupItems[0]
@@ -165,11 +176,11 @@ function GalleryGroup({
             <ArticleNote note={note1} align={flip ? 'right' : 'left'} />
           </div>
           <div className="col-span-12 md:col-span-3 md:col-start-5">
-            {renderImage(img0, 'aspect-[274/376]')}
+            {renderImage(img0, 'aspect-[274/376]', onOpen)}
           </div>
           <div className={`col-span-12 md:col-span-4 md:col-start-9 md:pt-10 ${flip ? 'md:col-start-1 md:row-start-1' : ''}`}>
             <EditorialText
-              title={img0.caption || 'Lorem ipsum'}
+              title={img0.caption}
               desc={img0.description}
               align={flip ? 'right' : 'left'}
             />
@@ -182,19 +193,19 @@ function GalleryGroup({
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-start">
           {img1 && (
             <div className="col-span-12 md:col-span-3 md:col-start-1">
-              {renderImage(img1, 'aspect-[288/395]')}
+              {renderImage(img1, 'aspect-[288/395]', onOpen)}
             </div>
           )}
           <div className="col-span-12 md:col-span-5 md:col-start-4 flex flex-col justify-start md:pt-6">
-            {img1 && (
+            {img1?.caption && (
               <EditorialTitle align="right">
-                {img1.caption || 'Lorem ipsum dolor sit amet consectetur.'}
+                {img1.caption}
               </EditorialTitle>
             )}
           </div>
           {img2 && (
             <div className="col-span-12 md:col-span-3 md:col-start-10">
-              {renderImage(img2, 'aspect-[288/395]')}
+              {renderImage(img2, 'aspect-[288/395]', onOpen)}
               {gIndex === 0 && (
                 <div className="hidden xl:block mt-4">
                   <MusicWidget />
@@ -205,29 +216,18 @@ function GalleryGroup({
         </div>
       )}
 
-      {/* Row 3: Decorative Text block centered */}
-      {groupItems.length > 2 && (
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-          <div className="md:col-span-5 md:col-start-4">
-            <EditorialText
-              title="Lorem ipsum dolor sit amet consectetur."
-              desc="Lorem ipsum dolor sit amet consectetur. dolor sit amet consectetur."
-              align="left"
-            />
-          </div>
-        </div>
-      )}
-
       {/* Row 4: Title left + landscape right */}
       {img3 && (
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-center">
-          <div className="col-span-12 md:col-span-3 md:col-start-2">
-            <EditorialTitle align="right">
-              {img3.caption || 'Lorem ipsum dolor sit amet consectetur.'}
-            </EditorialTitle>
-          </div>
+          {img3.caption && (
+            <div className="col-span-12 md:col-span-3 md:col-start-2">
+              <EditorialTitle align="right">
+                {img3.caption}
+              </EditorialTitle>
+            </div>
+          )}
           <div className="col-span-12 md:col-span-6 md:col-start-7">
-            {renderImage(img3, 'aspect-[520/298]')}
+            {renderImage(img3, 'aspect-[520/298]', onOpen)}
           </div>
         </div>
       )}
@@ -237,13 +237,13 @@ function GalleryGroup({
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-start">
           {img4 && (
             <div className="col-span-12 md:col-span-5 md:col-start-1">
-              {renderImage(img4, 'aspect-[520/298]')}
+              {renderImage(img4, 'aspect-[520/298]', onOpen)}
             </div>
           )}
           <div className="col-span-12 md:col-span-3 md:col-start-7 md:pt-2">
             {img4 && (
               <EditorialText
-                title={img4.caption || 'Lorem ipsum dolor sit amet consectetur.'}
+                title={img4.caption}
                 desc={img4.description}
                 align="left"
               />
@@ -253,7 +253,7 @@ function GalleryGroup({
             <div className="col-span-12 md:col-span-3 md:col-start-10">
               <ArticleNote note={note2} align="right" />
               <div className="mt-4">
-                {renderImage(img5, 'aspect-[288/395]')}
+                {renderImage(img5, 'aspect-[288/395]', onOpen)}
               </div>
             </div>
           )}
@@ -265,10 +265,10 @@ function GalleryGroup({
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-start">
           {img6 && (
             <div className="col-span-12 md:col-span-5 md:col-start-1 flex flex-col gap-6">
-              {renderImage(img6, 'aspect-[469/240]')}
+              {renderImage(img6, 'aspect-[469/240]', onOpen)}
               <div className="flex justify-end">
                 <EditorialText
-                  title={img6.caption || 'Lorem ipsum dolor sit amet consectetur.'}
+                  title={img6.caption}
                   desc={img6.description}
                   align="right"
                 />
@@ -277,16 +277,18 @@ function GalleryGroup({
           )}
           {img7 && (
             <div className="col-span-12 md:col-span-5 md:col-start-8 md:mt-20">
-              <EditorialTitle align="left">
-                {img7.caption || 'Lorem ipsum dolor sit amet consectetur.'}
-              </EditorialTitle>
+              {img7.caption && (
+                <EditorialTitle align="left">
+                  {img7.caption}
+                </EditorialTitle>
+              )}
               <div className="mt-4">
-                {renderImage(img7, 'aspect-[520/298]')}
+                {renderImage(img7, 'aspect-[520/298]', onOpen)}
               </div>
               {img7.description && (
                 <div className="mt-4 flex justify-end">
                   <EditorialText
-                    title={img7.caption || 'Lorem ipsum'}
+                    title={img7.caption}
                     desc={img7.description}
                     align="right"
                   />
@@ -301,6 +303,8 @@ function GalleryGroup({
 }
 
 export default function GalleryGrid({ items, notes = [] }: { items: GalleryItemData[]; notes?: Note[] }) {
+  const [lightboxItem, setLightboxItem] = useState<GalleryItemData | null>(null)
+
   if (items.length === 0) {
     return (
       <div className="py-24 text-center">
@@ -316,20 +320,27 @@ export default function GalleryGrid({ items, notes = [] }: { items: GalleryItemD
   }
 
   return (
-    <div className="space-y-24 md:space-y-36 lg:space-y-48 pb-24">
-      {groups.map((groupItems, gIndex) => {
-        const note1 = notes[gIndex * 2]
-        const note2 = notes[gIndex * 2 + 1]
-        return (
-          <GalleryGroup
-            key={gIndex}
-            groupItems={groupItems}
-            note1={note1}
-            note2={note2}
-            gIndex={gIndex}
-          />
-        )
-      })}
-    </div>
+    <>
+      <div className="space-y-24 md:space-y-36 lg:space-y-48 pb-24">
+        {groups.map((groupItems, gIndex) => {
+          const note1 = notes[gIndex * 2]
+          const note2 = notes[gIndex * 2 + 1]
+          return (
+            <GalleryGroup
+              key={gIndex}
+              groupItems={groupItems}
+              note1={note1}
+              note2={note2}
+              gIndex={gIndex}
+              onOpen={setLightboxItem}
+            />
+          )
+        })}
+      </div>
+
+      {lightboxItem && (
+        <GalleryLightbox item={lightboxItem} onClose={() => setLightboxItem(null)} />
+      )}
+    </>
   )
 }

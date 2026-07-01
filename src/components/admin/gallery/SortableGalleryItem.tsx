@@ -20,7 +20,7 @@ export default function SortableGalleryItem({ item, onDeleted, onUpdated }: Prop
   const [expanded, setExpanded] = useState(false)
   const [saving, startSave] = useTransition()
   const [form, setForm] = useState({
-    altText: item.altText,
+    altText: item.altText ?? '',
     caption: item.caption ?? '',
     description: item.description ?? '',
     category: item.category ?? '',
@@ -68,7 +68,7 @@ export default function SortableGalleryItem({ item, onDeleted, onUpdated }: Prop
             src={item.mediaType === 'VIDEO'
               ? cloudinaryVideoThumbnail(item.image.cloudinaryId, { width: 100, height: 100 })
               : cloudinaryUrl(item.image.cloudinaryId, { width: 100, height: 100, crop: 'fill' })}
-            alt={item.altText}
+            alt={item.altText ?? ''}
             fill
             className="object-cover"
             sizes="48px"
@@ -162,11 +162,11 @@ export default function SortableGalleryItem({ item, onDeleted, onUpdated }: Prop
 
           <div className="space-y-1">
             <label className="block text-xs uppercase tracking-widest text-[var(--color-ink-muted)]">
-              Alt Text (internal) *
+              Alt Text (internal)
             </label>
             <input
               className="field-input"
-              value={form.altText}
+              value={form.altText ?? ''}
               onChange={(e) => setForm((f) => ({ ...f, altText: e.target.value }))}
             />
           </div>
@@ -182,7 +182,7 @@ export default function SortableGalleryItem({ item, onDeleted, onUpdated }: Prop
 
           <button
             onClick={handleSave}
-            disabled={saving || !form.altText.trim()}
+            disabled={saving}
             className="px-4 py-1.5 bg-[var(--color-ink)] text-[var(--color-paper)] text-xs uppercase tracking-widest hover:opacity-80 transition-opacity disabled:opacity-40"
           >
             {saving ? 'Saving…' : 'Save'}

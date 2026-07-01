@@ -130,7 +130,7 @@ model GalleryImage {
   imageId     String
   image       MediaAsset @relation("GalleryImageAsset", fields: [imageId], references: [id], onDelete: Cascade)
 
-  altText     String
+  altText     String?
   caption     String?
   description String?  @db.Text
   category    String?
