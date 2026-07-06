@@ -39,8 +39,6 @@ export default function CanvasPhotosView({ imageIds, nextProject, destinations =
                     maxHeight: 'calc(100vh - 120px)',
                     objectFit: 'cover',
                     display: 'block',
-                    borderRadius: 12,
-                    boxShadow: '0 8px 30px rgba(0,0,0,0.18)',
                   }}
                 />
               )}

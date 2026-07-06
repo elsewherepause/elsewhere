@@ -1,5 +1,5 @@
-import Link from 'next/link'
-import TakeMeElsewhere from './TakeMeElsewhere'
+import FooterNav from './FooterNav'
+import FooterBase from './FooterBase'
 
 type Props = {
   nextProject?: { slug: string; title: string } | null
@@ -9,57 +9,8 @@ type Props = {
 export default function SiteFooter({ nextProject, destinations = [] }: Props) {
   return (
     <footer className="pt-24 pb-10">
-      {/* Mobile: stacked vertically */}
-      <div className="flex flex-col items-center gap-3 mb-16 px-6 md:hidden" style={{ fontFamily: 'var(--font-sans, Montserrat)', fontWeight: 700, fontSize: 14, color: '#ccc', textTransform: 'uppercase' }}>
-        <TakeMeElsewhere
-          destinations={destinations}
-          className="hover:opacity-60 transition-opacity"
-        />
-        {nextProject && (
-          <Link
-            href={`/${nextProject.slug}`}
-            className="flex items-center gap-1.5 hover:opacity-60 transition-opacity"
-            style={{ textDecoration: 'none', color: '#ccc' }}
-          >
-            Next project <span style={{ color: '#1c1c1c', fontSize: 8 }}>▶</span>
-          </Link>
-        )}
-      </div>
-      {/* Desktop: horizontal layout */}
-      <div className="relative mb-16 px-20 hidden md:block" style={{ height: 20 }}>
-        <TakeMeElsewhere
-          destinations={destinations}
-          className="absolute left-1/2 -translate-x-1/2 top-0 hover:opacity-60 transition-opacity"
-          style={{ fontFamily: 'var(--font-sans, Montserrat)', fontWeight: 700, fontSize: 16, color: '#ccc', textTransform: 'uppercase' }}
-        />
-        {nextProject && (
-          <Link
-            href={`/${nextProject.slug}`}
-            className="absolute right-20 top-0 flex items-center gap-1.5 hover:opacity-60 transition-opacity"
-            style={{ textDecoration: 'none' }}
-          >
-            <span style={{ fontFamily: 'var(--font-sans, Montserrat)', fontWeight: 700, fontSize: 16, color: '#ccc', textTransform: 'uppercase' }}>
-              Next project
-            </span>
-            <span style={{ color: '#1c1c1c', fontSize: 10 }}>▶</span>
-          </Link>
-        )}
-      </div>
-
-      <img
-        src="/t1-wordmark.svg"
-        alt=".elsewhere"
-        className="w-full block"
-      />
-
-      <div className="flex items-center justify-between px-6 md:px-20 mt-16">
-        <div className="flex items-center gap-10 text-[var(--color-ink)]">
-          <a href="https://instagram.com/pause.elsewhere" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="hover:opacity-60 transition-opacity">
-            <img src="/t1-instagram.svg" alt="Instagram" width={20} height={20} className="block" />
-          </a>
-        </div>
-        <p className="text-base text-[var(--color-ink)]" style={{ fontFamily: 'var(--font-sans, Montserrat)' }}>@Copyright</p>
-      </div>
+      <FooterNav nextProject={nextProject} destinations={destinations} />
+      <FooterBase rowClassName="flex items-center justify-between px-6 md:px-20 mt-16" />
     </footer>
   )
 }

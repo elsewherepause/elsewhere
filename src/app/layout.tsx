@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     default: '.elsewhere',
     template: '%s — .elsewhere',
   },
-  description: 'Editorial photography and storytelling.',
+  description: 'Cultural + Narrative Design',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

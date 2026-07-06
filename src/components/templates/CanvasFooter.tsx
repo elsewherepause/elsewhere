@@ -1,6 +1,7 @@
 'use client'
 
 import TakeMeElsewhere from '@/components/public/TakeMeElsewhere'
+import FooterBase from '@/components/public/FooterBase'
 
 type Props = {
   footerY: number
@@ -32,24 +33,11 @@ export default function CanvasFooter({ footerY, markOffset, canvasWidth, nextPro
         </a>
       )}
 
-      <img
-        src="/t1-wordmark.svg"
-        alt=".elsewhere"
-        style={{ position: 'absolute', left: 0, top: footerY + markOffset, width: canvasWidth, height: 242, display: 'block' }}
-      />
-
-      <div style={{
-        position: 'absolute', left: 88, top: footerY + markOffset + 290, width: canvasWidth - 176,
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      }}>
-        <div style={{ display: 'flex', gap: 40, alignItems: 'center' }}>
-          <a href="https://instagram.com/pause.elsewhere" target="_blank" rel="noopener noreferrer">
-            <img src="/t1-instagram.svg" alt="Instagram" width={20} height={20} style={{ display: 'block' }} />
-          </a>
-        </div>
-        <span style={{ fontFamily: 'var(--font-sans, Montserrat)', fontWeight: 400, fontSize: 16, color: '#000' }}>
-          @Copyright
-        </span>
+      <div style={{ position: 'absolute', left: 0, top: footerY + markOffset, width: canvasWidth }}>
+        <FooterBase
+          wordmarkHeight={242}
+          rowStyle={{ marginTop: 48, paddingLeft: 88, paddingRight: 88 }}
+        />
       </div>
     </>
   )

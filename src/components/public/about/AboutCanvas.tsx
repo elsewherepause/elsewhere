@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import ContactForm from './ContactForm'
+import FooterBase from '@/components/public/FooterBase'
 
 const W = 1512
 const H = 5080
@@ -183,50 +184,8 @@ export default function AboutCanvas() {
         </div>
 
         {/* ── .elsewhere footer wordmark ── */}
-        <div style={{ position: 'absolute', left: 0, top: 4700, width: W, display: 'flex', flexDirection: 'column', gap: 64, alignItems: 'center', paddingBottom: 52 }}>
-          <div style={{ height: 241.71, position: 'relative', flexShrink: 0, width: '100%' }}>
-            <div style={{ position: 'absolute', height: 179.461, left: 1337.16, top: 62.25, width: 174.839 }}>
-              <img alt="" style={{ display: 'block', position: 'absolute', inset: 0, maxWidth: 'none', width: '100%', height: '100%' }} src="/footer/e.svg" />
-            </div>
-            <div style={{ position: 'absolute', height: 172.176, left: 1221.26, top: 64.56, width: 109.597 }}>
-              <img alt="" style={{ display: 'block', position: 'absolute', inset: 0, maxWidth: 'none', width: '100%', height: '100%' }} src="/footer/r.svg" />
-            </div>
-            <div style={{ position: 'absolute', height: 179.461, left: 1028.37, top: 62.25, width: 174.839 }}>
-              <img alt="" style={{ display: 'block', position: 'absolute', inset: 0, maxWidth: 'none', width: '100%', height: '100%' }} src="/footer/e.svg" />
-            </div>
-            <div style={{ position: 'absolute', height: 236.742, left: 847.15, top: 0, width: 164.23 }}>
-              <img alt="" style={{ display: 'block', position: 'absolute', inset: 0, maxWidth: 'none', width: '100%', height: '100%' }} src="/footer/h.svg" />
-            </div>
-            <div style={{ position: 'absolute', height: 169.527, left: 574.25, top: 67.22, width: 260.251 }}>
-              <img alt="" style={{ display: 'block', position: 'absolute', inset: 0, maxWidth: 'none', width: '100%', height: '100%' }} src="/footer/w.svg" />
-            </div>
-            <div style={{ position: 'absolute', height: 179.461, left: 415.05, top: 61.59, width: 151.648 }}>
-              <img alt="" style={{ display: 'block', position: 'absolute', inset: 0, maxWidth: 'none', width: '100%', height: '100%' }} src="/footer/e-mid.svg" />
-            </div>
-            <div style={{ position: 'absolute', height: 179.461, left: 262.06, top: 61.92, width: 135.092 }}>
-              <img alt="" style={{ display: 'block', position: 'absolute', inset: 0, maxWidth: 'none', width: '100%', height: '100%' }} src="/footer/s.svg" />
-            </div>
-            <div style={{ position: 'absolute', height: 236.742, left: 217.07, top: 0, width: 20.529 }}>
-              <img alt="" style={{ display: 'block', position: 'absolute', inset: 0, maxWidth: 'none', width: '100%', height: '100%' }} src="/footer/l.svg" />
-            </div>
-            <div style={{ position: 'absolute', height: 179.461, left: 38.99, top: 61.59, width: 151.648 }}>
-              <img alt="" style={{ display: 'block', position: 'absolute', inset: 0, maxWidth: 'none', width: '100%', height: '100%' }} src="/footer/e-left.svg" />
-            </div>
-            <div style={{ position: 'absolute', height: 28.806, left: 0, top: 207.94, width: 25.164 }}>
-              <img alt="" style={{ display: 'block', position: 'absolute', inset: 0, maxWidth: 'none', width: '100%', height: '100%' }} src="/footer/period.svg" />
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, width: 1344 }}>
-            <div style={{ display: 'flex', gap: 40, alignItems: 'center', flexShrink: 0 }}>
-              <a href="https://instagram.com/pause.elsewhere" target="_blank" rel="noopener noreferrer" style={{ position: 'relative', flexShrink: 0, width: 20, height: 20 }}>
-                <img alt="Instagram" style={{ display: 'block', position: 'absolute', inset: 0, maxWidth: 'none', width: '100%', height: '100%' }} src="/icons/instagram.svg" />
-              </a>
-            </div>
-            <p style={{ lineHeight: 'normal', flexShrink: 0, fontSize: 16, color: '#000', whiteSpace: 'nowrap', fontWeight: 400, margin: 0, ...mont }}>
-              @Copyright
-            </p>
-          </div>
+        <div style={{ position: 'absolute', left: 0, top: 4700, width: W, paddingBottom: 52 }}>
+          <FooterBase rowStyle={{ marginTop: 48, paddingLeft: 88, paddingRight: 88 }} />
         </div>
 
       </div>
@@ -401,50 +360,8 @@ function MobileLayout() {
       </div>
 
       {/* ── Footer wordmark ── */}
-      <div style={{ marginTop: gap + 16, padding: `0 ${px}px`, paddingBottom: 32 }}>
-        <div style={{ width: '100%', aspectRatio: `${W / 241.71}`, position: 'relative' }}>
-          <div style={{ position: 'absolute', height: '74.24%', left: '88.4%', top: '25.77%', width: '11.56%' }}>
-            <img alt="" style={{ display: 'block', width: '100%', height: '100%' }} src="/footer/e.svg" />
-          </div>
-          <div style={{ position: 'absolute', height: '71.22%', left: '80.77%', top: '26.72%', width: '7.25%' }}>
-            <img alt="" style={{ display: 'block', width: '100%', height: '100%' }} src="/footer/r.svg" />
-          </div>
-          <div style={{ position: 'absolute', height: '74.24%', left: '68%', top: '25.77%', width: '11.56%' }}>
-            <img alt="" style={{ display: 'block', width: '100%', height: '100%' }} src="/footer/e.svg" />
-          </div>
-          <div style={{ position: 'absolute', height: '97.94%', left: '56.03%', top: 0, width: '10.86%' }}>
-            <img alt="" style={{ display: 'block', width: '100%', height: '100%' }} src="/footer/h.svg" />
-          </div>
-          <div style={{ position: 'absolute', height: '70.13%', left: '37.98%', top: '27.81%', width: '17.21%' }}>
-            <img alt="" style={{ display: 'block', width: '100%', height: '100%' }} src="/footer/w.svg" />
-          </div>
-          <div style={{ position: 'absolute', height: '74.24%', left: '27.45%', top: '25.49%', width: '10.03%' }}>
-            <img alt="" style={{ display: 'block', width: '100%', height: '100%' }} src="/footer/e-mid.svg" />
-          </div>
-          <div style={{ position: 'absolute', height: '74.24%', left: '17.33%', top: '25.62%', width: '8.93%' }}>
-            <img alt="" style={{ display: 'block', width: '100%', height: '100%' }} src="/footer/s.svg" />
-          </div>
-          <div style={{ position: 'absolute', height: '97.94%', left: '14.35%', top: 0, width: '1.36%' }}>
-            <img alt="" style={{ display: 'block', width: '100%', height: '100%' }} src="/footer/l.svg" />
-          </div>
-          <div style={{ position: 'absolute', height: '74.24%', left: '2.58%', top: '25.49%', width: '10.03%' }}>
-            <img alt="" style={{ display: 'block', width: '100%', height: '100%' }} src="/footer/e-left.svg" />
-          </div>
-          <div style={{ position: 'absolute', height: '11.92%', left: 0, top: '86.02%', width: '1.66%' }}>
-            <img alt="" style={{ display: 'block', width: '100%', height: '100%' }} src="/footer/period.svg" />
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 32 }}>
-          <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
-            <a href="https://instagram.com/pause.elsewhere" target="_blank" rel="noopener noreferrer">
-              <img alt="Instagram" style={{ display: 'block', width: 18, height: 18 }} src="/icons/instagram.svg" />
-            </a>
-          </div>
-          <p style={{ fontSize: 12, color: '#000', fontWeight: 400, margin: 0, ...mont }}>
-            @Copyright
-          </p>
-        </div>
+      <div style={{ marginTop: gap + 16, paddingBottom: 32 }}>
+        <FooterBase rowStyle={{ marginTop: 24, paddingLeft: px, paddingRight: px }} />
       </div>
 
     </div>
