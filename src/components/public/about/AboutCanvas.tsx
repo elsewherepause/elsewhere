@@ -224,7 +224,7 @@ export default function AboutCanvas() {
               </a>
             </div>
             <p style={{ lineHeight: 'normal', flexShrink: 0, fontSize: 16, color: '#000', whiteSpace: 'nowrap', fontWeight: 400, margin: 0, ...mont }}>
-              @Copywrite
+              @Copyright
             </p>
           </div>
         </div>
@@ -442,7 +442,7 @@ function MobileLayout() {
             </a>
           </div>
           <p style={{ fontSize: 12, color: '#000', fontWeight: 400, margin: 0, ...mont }}>
-            @Copywrite
+            @Copyright
           </p>
         </div>
       </div>

@@ -48,7 +48,7 @@ export default function CanvasFooter({ footerY, markOffset, canvasWidth, nextPro
           </a>
         </div>
         <span style={{ fontFamily: 'var(--font-sans, Montserrat)', fontWeight: 400, fontSize: 16, color: '#000' }}>
-          @Copywrite
+          @Copyright
         </span>
       </div>
     </>

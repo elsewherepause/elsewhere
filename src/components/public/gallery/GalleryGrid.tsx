@@ -80,32 +80,6 @@ function EditorialText({
   )
 }
 
-function MusicWidget() {
-  return (
-    <div className="mt-4 flex flex-col items-center gap-1">
-      <svg width="160" height="118" viewBox="0 0 160 118" fill="none" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
-        <rect x="14.5156" y="-0.142334" width="119.266" height="117.958" fill="url(#mw-pattern)"/>
-        <path d="M31.5597 59.8796L39.0391 55.2682V64.4911L31.5597 59.8796Z" fill="white"/>
-        <path d="M29.8419 55.2682H32.1992V64.4911H29.8419V55.2682Z" fill="white"/>
-        <path d="M78.5896 59.8796L69.707 54.4031V65.3562L78.5896 59.8796Z" fill="white"/>
-        <path d="M116.738 59.8796L109.259 55.2682V64.4911L116.738 59.8796Z" fill="white"/>
-        <path d="M118.456 55.2682H116.099V64.4911H118.456V55.2682Z" fill="white"/>
-        <path d="M155.523 45.172C157.037 39.7107 153.838 34.0558 148.376 32.5415C142.915 31.0271 137.26 34.2267 135.746 39.688C134.232 45.1493 137.431 50.8042 142.892 52.3185C148.354 53.8329 154.009 50.6333 155.523 45.172Z" fill="#848484"/>
-        <path d="M139.368 50.8182C134.744 47.3643 133.793 40.7926 137.247 36.1688C140.701 31.5451 147.272 30.5929 151.896 34.0468C156.52 37.5007 157.472 44.0725 154.018 48.6965C150.564 53.3205 143.992 54.2721 139.368 50.8182ZM151.65 34.3765C147.208 31.0586 140.895 31.9728 137.576 36.4151C134.258 40.8575 135.172 47.1707 139.614 50.4887C144.057 53.807 150.37 52.8926 153.688 48.4504C157.006 44.008 156.092 37.6948 151.65 34.3765Z" fill="#231F20"/>
-        <path d="M151.075 49.3991C154.924 46.3947 155.608 40.8392 152.604 36.9905C149.599 33.1418 144.044 32.4574 140.195 35.4617C136.347 38.466 135.662 44.0215 138.666 47.8702C141.671 51.7189 147.226 52.4034 151.075 49.3991Z" fill="#231F20"/>
-        <path d="M146.759 50.2128C151.056 49.5904 154.035 45.6025 153.412 41.3055C152.79 37.0085 148.802 34.0296 144.505 34.6519C140.208 35.2743 137.229 39.2622 137.851 43.5592C138.474 47.8562 142.462 50.8351 146.759 50.2128Z" fill="#848484"/>
-        <path d="M103.382 86.1582L100.603 84.0828L108.787 73.1268C109.336 72.3917 110.123 71.869 111.013 71.6473L122.891 68.6884C123.801 68.4617 124.602 67.9204 125.152 67.1607L149.645 33.3252C150.377 32.3105 151.799 32.0926 152.801 32.8416C153.799 33.5866 153.997 35.0019 153.243 35.9926L127.034 70.4923C126.485 71.2141 125.707 71.7271 124.827 71.946L112.899 74.9176C112.009 75.1394 111.222 75.662 110.673 76.3972L103.382 86.1582Z" fill="#848484"/>
-        <path d="M95.9147 96.8728L92.2528 94.1376C91.2792 93.4105 91.0777 92.0189 91.8048 91.0454L98.5021 82.0796C99.2292 81.1061 100.621 80.9046 101.594 81.6317L105.256 84.367C106.23 85.0941 106.431 86.4856 105.704 87.4591L99.0068 96.4249C98.2797 97.3985 96.8882 97.6002 95.9147 96.8728Z" fill="#474747"/>
-        <path d="M148.941 48.6214C152.358 46.7952 153.647 42.5448 151.821 39.128C149.995 35.7111 145.744 34.4216 142.327 36.2478C138.911 38.074 137.621 42.3243 139.447 45.7412C141.273 49.1581 145.524 50.4476 148.941 48.6214Z" fill="black"/>
-      </svg>
-      <div className="flex flex-col items-center gap-0.5">
-        <span className="font-sans text-[11px] uppercase text-[var(--color-ink)] text-center">Angel (feat. horace andy)</span>
-        <span className="font-sans text-[11px] text-[var(--color-ink-muted)] text-center">Massive Attack . Mezzanine</span>
-      </div>
-    </div>
-  )
-}
-
 function renderImage(item: GalleryItemData, aspectClass: string, onOpen: (item: GalleryItemData) => void) {
   if (item.mediaType === 'VIDEO') {
     return (
@@ -188,44 +162,38 @@ function GalleryGroup({
         </div>
       )}
 
-      {/* Row 2: Portrait left + title + portrait right */}
+      {/* Row 2: image | text | text | image */}
       {(img1 || img2) && (
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-8 items-start">
           {img1 && (
-            <div className="col-span-12 md:col-span-3 md:col-start-1">
+            <div>
               {renderImage(img1, 'aspect-[288/395]', onOpen)}
             </div>
           )}
-          <div className="col-span-12 md:col-span-5 md:col-start-4 flex flex-col justify-start md:pt-6">
-            {img1?.caption && (
-              <EditorialTitle align="right">
-                {img1.caption}
-              </EditorialTitle>
+          {img1 && (
+            <div className="md:self-end">
+              <EditorialText title={img1.caption} desc={img1.description} align="left" />
+            </div>
+          )}
+          <div>
+            {img2 && (
+              <EditorialText title={img2.caption} desc={img2.description} align="left" />
             )}
           </div>
           {img2 && (
-            <div className="col-span-12 md:col-span-3 md:col-start-10">
+            <div>
               {renderImage(img2, 'aspect-[288/395]', onOpen)}
-              {gIndex === 0 && (
-                <div className="hidden xl:block mt-4">
-                  <MusicWidget />
-                </div>
-              )}
             </div>
           )}
         </div>
       )}
 
-      {/* Row 4: Title left + landscape right */}
+      {/* Row 4: Caption left (adjacent) + landscape right */}
       {img3 && (
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-center">
-          {img3.caption && (
-            <div className="col-span-12 md:col-span-3 md:col-start-2">
-              <EditorialTitle align="right">
-                {img3.caption}
-              </EditorialTitle>
-            </div>
-          )}
+          <div className="col-span-12 md:col-span-3 md:col-start-4">
+            <EditorialText title={img3.caption} desc={img3.description} align="right" />
+          </div>
           <div className="col-span-12 md:col-span-6 md:col-start-7">
             {renderImage(img3, 'aspect-[520/298]', onOpen)}
           </div>
