@@ -58,7 +58,7 @@ export default function SiteFooter({ nextProject, destinations = [] }: Props) {
             <img src="/t1-instagram.svg" alt="Instagram" width={20} height={20} className="block" />
           </a>
         </div>
-        <p className="text-base text-[var(--color-ink)]" style={{ fontFamily: 'var(--font-sans, Montserrat)' }}>@Copywrite</p>
+        <p className="text-base text-[var(--color-ink)]" style={{ fontFamily: 'var(--font-sans, Montserrat)' }}>@Copyright</p>
       </div>
     </footer>
   )
