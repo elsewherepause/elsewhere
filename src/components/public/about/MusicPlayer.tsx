@@ -156,20 +156,35 @@ const playlist = [
 ];
 
 export default function MusicPlayer({ style }: { style?: React.CSSProperties }) {
-  const [currentTrackIndex, setCurrentTrackIndex] = useState(() => Math.floor(Math.random() * playlist.length));
+  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const isFirstTrackEffect = useRef(true);
+  const autoplayPending = useRef(false);
 
   useEffect(() => {
-    setMounted(true);
-    const tryAutoplay = () => {
-      if (!audioRef.current) return;
-      audioRef.current.play().then(() => {
+    autoplayPending.current = true;
+    setCurrentTrackIndex(Math.floor(Math.random() * playlist.length));
+  }, []);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (isFirstTrackEffect.current) {
+      isFirstTrackEffect.current = false;
+      return;
+    }
+
+    audio.load();
+
+    if (autoplayPending.current) {
+      autoplayPending.current = false;
+      audio.play().then(() => {
         setIsPlaying(true);
       }).catch(() => {
         const resume = () => {
-          audioRef.current?.play().then(() => setIsPlaying(true)).catch(() => {});
+          audio.play().then(() => setIsPlaying(true)).catch(() => {});
           document.removeEventListener('click', resume);
           document.removeEventListener('keydown', resume);
           document.removeEventListener('scroll', resume);
@@ -178,16 +193,8 @@ export default function MusicPlayer({ style }: { style?: React.CSSProperties }) 
         document.addEventListener('keydown', resume, { once: true });
         document.addEventListener('scroll', resume, { once: true });
       });
-    };
-    tryAutoplay();
-  }, []);
-
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.load();
-      if (isPlaying) {
-        audioRef.current.play().catch(error => console.error("Audio playback interrupted or failed:", error));
-      }
+    } else if (isPlaying) {
+      audio.play().catch(console.error);
     }
   }, [currentTrackIndex]);
 
@@ -327,10 +334,10 @@ export default function MusicPlayer({ style }: { style?: React.CSSProperties }) 
 
         <div style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: 12, color: '#1c1c1c', display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'center', width: '100%', whiteSpace: 'nowrap', fontWeight: 400, marginTop: 4 }}>
           <p style={{ textTransform: 'uppercase', margin: 0, maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {mounted ? currentTrack.title : 'Angel (feat. Horace Andy)'}
+            {currentTrack.title}
           </p>
           <p style={{ margin: 0, maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', color: '#666' }}>
-            {mounted ? currentTrack.artist : 'Massive Attack . Mezzanine'}
+            {currentTrack.artist}
           </p>
         </div>
       </div>

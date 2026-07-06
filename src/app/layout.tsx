@@ -22,6 +22,11 @@ export const metadata: Metadata = {
     template: '%s — .elsewhere',
   },
   description: 'Cultural + Narrative Design',
+  icons: {
+    icon: '/icon.jpeg',
+    shortcut: '/icon.jpeg',
+    apple: '/apple-icon.jpeg',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
