@@ -22,17 +22,19 @@ export default async function HomePage() {
 
   const mapped: HomeProject[] = projects.map((p) => {
     let heroImageId: string | null = null
+    let homepageHeroAdjust: HomeProject['homepageHeroAdjust'] = null
 
     if (p.templateData) {
       const data = typeof p.templateData === 'string'
         ? JSON.parse(p.templateData)
         : p.templateData as Record<string, unknown>
       heroImageId = (data.heroImage as string | undefined) ?? p.heroImage?.cloudinaryId ?? null
+      homepageHeroAdjust = (data.homepageHeroAdjust as HomeProject['homepageHeroAdjust']) ?? null
     } else {
       heroImageId = p.heroImage?.cloudinaryId ?? null
     }
 
-    return { slug: p.slug, title: p.title, heroImageId, category: p.category }
+    return { slug: p.slug, title: p.title, heroImageId, homepageHeroAdjust, category: p.category }
   })
 
   const destinations = await getAllDestinations()

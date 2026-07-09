@@ -6,7 +6,8 @@ import { PATTERNS } from '@/components/templates/patterns/template1'
 import type { Project, MediaAsset } from '@prisma/client'
 
 type FullProject = Project & { heroImage: MediaAsset | null; ogImage: MediaAsset | null }
+type Slot = { w: number; h: number }
 
-export default function Template1Editor({ project }: { project: FullProject }) {
-  return <TemplateEditor project={project} patterns={PATTERNS} Layout={Template1Layout} />
+export default function Template1Editor({ project, homepageSlot }: { project: FullProject; homepageSlot?: Slot | null }) {
+  return <TemplateEditor project={project} patterns={PATTERNS} Layout={Template1Layout} homepageSlot={homepageSlot} />
 }

@@ -4,13 +4,129 @@ import { useState, useRef, useTransition, type ComponentType } from 'react'
 import Link from 'next/link'
 import { updateProject, publishProject, unpublishProject } from '@/actions/project.actions'
 import MediaPicker from '@/components/admin/media/MediaPicker'
+import { SLOT_PATTERN } from '@/lib/homepage-slots'
 import type { Project, MediaAsset } from '@prisma/client'
-import { inputCls, textareaCls, hasContent, type Section, type TemplateData, type Pattern } from './shared'
+import { inputCls, textareaCls, hasContent, type ImageAdjust, type Section, type TemplateData, type Pattern, DEFAULT_ADJUST } from './shared'
 
 type FullProject = Project & { heroImage: MediaAsset | null; ogImage: MediaAsset | null }
 
+function ImageAdjustControl({
+  cloudName, imageId, label, adj, onPick, onAdjust, cropSlots,
+}: {
+  cloudName: string
+  imageId?: string
+  label: string
+  adj: ImageAdjust
+  onPick: () => void
+  onAdjust: (adj: ImageAdjust) => void
+  cropSlots?: { w: number; h: number }[]
+}) {
+  const thumbRef = useRef<HTMLDivElement>(null)
+  const url = imageId ? `https://res.cloudinary.com/${cloudName}/image/upload/w_240,q_auto,f_auto/${imageId}` : ''
+
+  function handleMouseDown(e: React.MouseEvent) {
+    e.preventDefault()
+    const startX = e.clientX, startY = e.clientY
+    let moved = false
+
+    function onMove(me: MouseEvent) {
+      if (!moved && (Math.abs(me.clientX - startX) > 4 || Math.abs(me.clientY - startY) > 4)) moved = true
+      if (moved && thumbRef.current) {
+        const rect = thumbRef.current.getBoundingClientRect()
+        const x = Math.round(Math.max(0, Math.min(100, ((me.clientX - rect.left) / rect.width) * 100)))
+        const y = Math.round(Math.max(0, Math.min(100, ((me.clientY - rect.top) / rect.height) * 100)))
+        onAdjust({ ...adj, x, y })
+      }
+    }
+    function onUp() {
+      if (!moved) onPick()
+      document.removeEventListener('mousemove', onMove)
+      document.removeEventListener('mouseup', onUp)
+    }
+    document.addEventListener('mousemove', onMove)
+    document.addEventListener('mouseup', onUp)
+  }
+
+  return (
+    <div className="space-y-1">
+      <label className="text-[10px] uppercase tracking-widest text-gray-400">{label}</label>
+      <div
+        ref={thumbRef}
+        className="w-full relative overflow-hidden border border-dashed border-gray-200 bg-gray-50"
+        style={{ aspectRatio: '16/9', cursor: url ? 'crosshair' : 'pointer' }}
+        onMouseDown={url ? handleMouseDown : undefined}
+        onClick={!url ? onPick : undefined}
+      >
+        {url ? (
+          <>
+            <img
+              src={url} alt=""
+              draggable={false}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: `${adj.x}% ${adj.y}%`, display: 'block', userSelect: 'none', pointerEvents: 'none' }}
+            />
+            {cropSlots && (() => {
+              const T = 16 / 9
+              return cropSlots.map((slot, idx) => {
+                const R = slot.w / slot.h
+                const cropW = R >= T ? 100 : (R / T) * 100
+                const cropH = R >= T ? (T / R) * 100 : 100
+                return (
+                  <div key={idx} style={{
+                    position: 'absolute',
+                    left: `${adj.x - cropW / 2}%`,
+                    top: `${adj.y - cropH / 2}%`,
+                    width: `${cropW}%`,
+                    height: `${cropH}%`,
+                    border: '1px dashed rgba(255,255,255,0.55)',
+                    boxShadow: 'inset 0 0 0 0.5px rgba(0,0,0,0.3), 0 0 0 0.5px rgba(0,0,0,0.3)',
+                    pointerEvents: 'none',
+                  }} />
+                )
+              })
+            })()}
+            <div style={{ position: 'absolute', left: `${adj.x}%`, top: `${adj.y}%`, transform: 'translate(-50%,-50%)', width: 10, height: 10, border: '2px solid white', borderRadius: '50%', boxShadow: '0 0 0 1px rgba(0,0,0,0.6)', pointerEvents: 'none' }} />
+            <div style={{ position: 'absolute', bottom: 4, right: 4, background: 'rgba(0,0,0,0.45)', color: 'white', fontSize: 9, padding: '1px 4px', borderRadius: 2, pointerEvents: 'none', userSelect: 'none' }}>drag · click to change</div>
+          </>
+        ) : (
+          <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-1">
+            <span className="text-lg">+</span>
+            <span className="text-[10px]">Add image</span>
+          </div>
+        )}
+      </div>
+      {url && (
+        <div className="flex items-center gap-1.5 pt-0.5">
+          <span className="text-[10px] uppercase tracking-widest text-gray-400 mr-1">Zoom</span>
+          <button onClick={() => onAdjust({ ...adj, zoom: Math.max(0.1, Math.round((adj.zoom - 0.1) * 10) / 10) })} className="w-5 h-5 flex items-center justify-center border border-gray-200 text-gray-500 hover:border-black transition-colors text-xs leading-none">−</button>
+          <input
+            type="number"
+            step="0.01"
+            min="0.1"
+            max="3"
+            value={adj.zoom.toFixed(2)}
+            onChange={e => {
+              const v = parseFloat(e.target.value)
+              if (!isNaN(v)) onAdjust({ ...adj, zoom: Math.min(3, Math.max(0.1, Math.round(v * 100) / 100)) })
+            }}
+            onBlur={e => {
+              const v = parseFloat(e.target.value)
+              if (isNaN(v)) onAdjust({ ...adj, zoom: 1 })
+            }}
+            onKeyDown={e => { if (e.key === 'Enter') e.currentTarget.blur() }}
+            className="w-12 text-[10px] text-gray-500 text-center tabular-nums border border-gray-200 rounded px-1 py-0.5 focus:outline-none focus:border-black"
+          />
+          <button onClick={() => onAdjust({ ...adj, zoom: Math.min(3, Math.round((adj.zoom + 0.1) * 10) / 10) })} className="w-5 h-5 flex items-center justify-center border border-gray-200 text-gray-500 hover:border-black transition-colors text-xs leading-none">+</button>
+          {(adj.x !== 50 || adj.y !== 50 || adj.zoom !== 1) && (
+            <button onClick={() => onAdjust({ x: 50, y: 50, zoom: 1 })} className="ml-auto text-[10px] text-gray-300 hover:text-gray-600 transition-colors">reset</button>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function SectionAccordion({
-  index, patternCount, patterns, isOpen, sData, onToggle, onImagePick, onFieldChange, onRemove,
+  index, patternCount, patterns, isOpen, sData, onToggle, onImagePick, onAdjustChange, onFieldChange, onRemove,
 }: {
   index: number
   patternCount: number
@@ -19,6 +135,7 @@ function SectionAccordion({
   sData: Partial<Section>
   onToggle: () => void
   onImagePick: (field: string) => void
+  onAdjustChange: (field: string, adj: ImageAdjust) => void
   onFieldChange: (field: string, value: string) => void
   onRemove: () => void
 }) {
@@ -48,31 +165,19 @@ function SectionAccordion({
       {isOpen && (
         <div className="pb-4 space-y-4">
           {pat.images.map(img => {
-            const id = sData[img.field]
-            const url = id && cloudName ? `https://res.cloudinary.com/${cloudName}/image/upload/w_240,q_auto,f_auto/${id}` : ''
+            const id = sData[img.field] as string | undefined
+            const adjField = (img.field + 'Adjust') as keyof Section
+            const adj = (sData[adjField] as ImageAdjust | undefined) ?? DEFAULT_ADJUST
             return (
-              <div key={img.field} className="space-y-1">
-                <label className="text-[10px] uppercase tracking-widest text-gray-400">{img.label}</label>
-                <button
-                  onClick={() => onImagePick(img.field)}
-                  className="w-full relative group overflow-hidden border border-dashed border-gray-200 hover:border-gray-400 transition-colors bg-gray-50"
-                  style={{ aspectRatio: '16/9' }}
-                >
-                  {url ? (
-                    <>
-                      <img src={url} alt="" className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs transition-opacity">
-                        Change Image
-                      </div>
-                    </>
-                  ) : (
-                    <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-1">
-                      <span className="text-lg">+</span>
-                      <span className="text-[10px]">Add image</span>
-                    </div>
-                  )}
-                </button>
-              </div>
+              <ImageAdjustControl
+                key={img.field}
+                cloudName={cloudName ?? ''}
+                imageId={id}
+                label={img.label}
+                adj={adj}
+                onPick={() => onImagePick(img.field)}
+                onAdjust={a => onAdjustChange(img.field + 'Adjust', a)}
+              />
             )
           })}
 
@@ -120,9 +225,10 @@ type Props = {
   patterns: Pattern[]
   Layout: ComponentType<LayoutProps>
   showTitleLight?: boolean
+  homepageSlot?: { w: number; h: number } | null
 }
 
-export default function TemplateEditor({ project, patterns, Layout, showTitleLight }: Props) {
+export default function TemplateEditor({ project, patterns, Layout, showTitleLight, homepageSlot }: Props) {
   const patternCount = patterns.length
 
   const [title, setTitle] = useState(project.title)
@@ -171,7 +277,7 @@ export default function TemplateEditor({ project, patterns, Layout, showTitleLig
 
   const sections = templateData.sections ?? []
 
-  function setSection(index: number, field: string, value: string) {
+  function setSection(index: number, field: string, value: unknown) {
     setTemplateData(prev => {
       const secs = [...(prev.sections ?? [])]
       secs[index] = { ...(secs[index] ?? {}), [field]: value }
@@ -196,7 +302,7 @@ export default function TemplateEditor({ project, patterns, Layout, showTitleLig
     setOpenSection(null)
   }
 
-  function setMeta(field: keyof TemplateData, value: string) {
+  function setMeta(field: keyof TemplateData, value: unknown) {
     setTemplateData(prev => ({ ...prev, [field]: value }))
   }
 
@@ -340,24 +446,59 @@ export default function TemplateEditor({ project, patterns, Layout, showTitleLig
                   <label className="text-[10px] uppercase tracking-widest text-gray-400">Camera</label>
                   <input value={(templateData.camera as string) || ''} onChange={e => setMeta('camera', e.target.value)} className={inputCls} placeholder="Camera model" />
                 </div>
-                <div className="space-y-1">
-                  <label className="text-[10px] uppercase tracking-widest text-gray-400">Hero Image (1352×671)</label>
-                  <button onClick={() => openPicker('hero', 'heroImage')}
-                    className="w-full relative group overflow-hidden border border-dashed border-gray-200 hover:border-gray-400 transition-colors bg-gray-50"
-                    style={{ aspectRatio: '2/1' }}>
-                    {templateData.heroImage ? (
-                      <>
-                        <img src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/w_280,q_auto,f_auto/${templateData.heroImage}`} alt="" className="w-full h-full object-cover" />
-                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs transition-opacity">Change Image</div>
-                      </>
-                    ) : (
-                      <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-1">
-                        <span className="text-lg">+</span>
-                        <span className="text-[10px]">Add hero image</span>
-                      </div>
-                    )}
-                  </button>
+                <div className="space-y-2">
+                  <label className="text-[10px] uppercase tracking-widest text-gray-400">Podcast Episodes (Spotify)</label>
+                  {((templateData.podcastSpotifyUrls as string[]) || []).map((url, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <input
+                        value={url}
+                        onChange={e => {
+                          const urls = [...((templateData.podcastSpotifyUrls as string[]) || [])]
+                          urls[i] = e.target.value
+                          setMeta('podcastSpotifyUrls', urls)
+                        }}
+                        className={inputCls}
+                        placeholder="https://open.spotify.com/episode/..."
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const urls = [...((templateData.podcastSpotifyUrls as string[]) || [])]
+                          urls.splice(i, 1)
+                          setMeta('podcastSpotifyUrls', urls)
+                        }}
+                        className="text-gray-300 hover:text-red-500 transition-colors text-sm flex-shrink-0"
+                      >×</button>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const urls = [...((templateData.podcastSpotifyUrls as string[]) || []), '']
+                      setMeta('podcastSpotifyUrls', urls)
+                    }}
+                    className="text-[10px] text-gray-400 hover:text-black uppercase tracking-widest transition-colors"
+                  >+ Add podcast link</button>
                 </div>
+                <ImageAdjustControl
+                  cloudName={process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ?? ''}
+                  imageId={templateData.heroImage}
+                  label="Hero Image (1352×671)"
+                  adj={(templateData.heroImageAdjust as ImageAdjust | undefined) ?? DEFAULT_ADJUST}
+                  onPick={() => openPicker('hero', 'heroImage')}
+                  onAdjust={a => setMeta('heroImageAdjust', a)}
+                />
+                {templateData.heroImage && (
+                  <ImageAdjustControl
+                    cloudName={process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ?? ''}
+                    imageId={templateData.heroImage}
+                    label="Homepage Canvas Crop"
+                    adj={(templateData.homepageHeroAdjust as ImageAdjust | undefined) ?? DEFAULT_ADJUST}
+                    onPick={() => openPicker('hero', 'heroImage')}
+                    onAdjust={a => setMeta('homepageHeroAdjust', a)}
+                    cropSlots={homepageSlot ? [homepageSlot] : undefined}
+                  />
+                )}
               </div>
             )}
           </div>
@@ -373,6 +514,7 @@ export default function TemplateEditor({ project, patterns, Layout, showTitleLig
               sData={sections[i] ?? {}}
               onToggle={() => setOpenSection(openSection === `section-${i}` ? null : `section-${i}`)}
               onImagePick={field => openPicker(String(i), field)}
+              onAdjustChange={(field, adj) => setSection(i, field, adj)}
               onFieldChange={(field, value) => setSection(i, field, value)}
               onRemove={() => removeSection(i)}
             />

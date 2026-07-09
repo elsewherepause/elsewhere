@@ -20,7 +20,7 @@ export default function AdminNav() {
     <aside className="w-52 flex-shrink-0 bg-[var(--color-admin-sidebar)] text-[var(--color-admin-sidebar-text)] flex flex-col">
       <div className="px-5 py-6 border-b border-white/10">
         <Link
-          href="/"
+          href="/home"
           target="_blank"
           className="text-white text-sm font-medium tracking-tight hover:opacity-70 transition-opacity"
           style={{ fontFamily: 'var(--font-heading)' }}

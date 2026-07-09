@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import { Montserrat, DM_Sans } from 'next/font/google'
+import { MusicPlayerProvider } from '@/components/public/MusicPlayerProvider'
+import GlobalMusicPlayer from '@/components/public/GlobalMusicPlayer'
 import './globals.css'
 
 const montserrat = Montserrat({
@@ -32,7 +34,12 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`h-full antialiased ${montserrat.variable} ${dmSans.variable}`}>
-      <body className="min-h-full">{children}</body>
+      <body className="min-h-full">
+        <MusicPlayerProvider>
+          {children}
+          <GlobalMusicPlayer />
+        </MusicPlayerProvider>
+      </body>
     </html>
   )
 }

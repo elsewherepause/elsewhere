@@ -11,20 +11,32 @@ type Props = {
   onClose: () => void
 }
 
+const PAGE_SIZE = 32
+
 export default function MediaPicker({ onSelect, onClose }: Props) {
   const [assets, setAssets] = useState<MediaAsset[]>([])
   const [search, setSearch] = useState('')
+  const [page, setPage] = useState(1)
+  const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
 
-  async function load() {
+  const totalPages = Math.ceil(total / PAGE_SIZE)
+
+  async function load(p: number, q: string) {
     setLoading(true)
-    const res = await fetch(`/api/admin/media?search=${encodeURIComponent(search)}`)
+    const res = await fetch(`/api/admin/media?search=${encodeURIComponent(q)}&page=${p}`)
     const data = await res.json()
     setAssets(data.assets)
+    setTotal(data.total)
     setLoading(false)
   }
 
-  useEffect(() => { load() }, [search])
+  useEffect(() => { load(page, search) }, [page, search])
+
+  function handleSearch(q: string) {
+    setSearch(q)
+    setPage(1)
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" onClick={onClose}>
@@ -45,7 +57,7 @@ export default function MediaPicker({ onSelect, onClose }: Props) {
             type="search"
             placeholder="Search by alt text…"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => handleSearch(e.target.value)}
             className="w-full text-sm border border-[var(--color-border)] px-3 py-2 focus:outline-none focus:border-[var(--color-ink)]"
           />
         </div>
@@ -78,6 +90,28 @@ export default function MediaPicker({ onSelect, onClose }: Props) {
             </div>
           )}
         </div>
+
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between px-5 py-3 border-t border-[var(--color-border)]">
+            <button
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="text-sm text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              ← Prev
+            </button>
+            <span className="text-xs text-[var(--color-ink-muted)]">
+              {page} / {totalPages} &nbsp;·&nbsp; {total} images
+            </span>
+            <button
+              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              className="text-sm text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              Next →
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )

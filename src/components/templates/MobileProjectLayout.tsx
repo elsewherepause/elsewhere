@@ -5,6 +5,7 @@ import type { Section, TemplateData, Pattern } from '@/components/admin/template
 import { renderInlineMarkdown } from '@/lib/utils/inline-markdown'
 import CanvasPhotosView from './CanvasPhotosView'
 import SiteFooter from '@/components/public/SiteFooter'
+import PodcastSection from './PodcastSection'
 
 type Props = {
   data: Partial<TemplateData>
@@ -212,6 +213,10 @@ export default function MobileProjectLayout({ data, patterns, nextProject, desti
                 </div>
               )}
             </div>
+          )}
+
+          {Array.isArray(data.podcastSpotifyUrls) && data.podcastSpotifyUrls.length > 0 && (
+            <PodcastSection urls={data.podcastSpotifyUrls} compact />
           )}
 
           <SiteFooter nextProject={nextProject} destinations={destinations} />

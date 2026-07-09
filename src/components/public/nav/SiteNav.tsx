@@ -70,7 +70,7 @@ export default function SiteNav() {
     <>
       <header className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-6 md:px-10 py-5 pointer-events-none">
         <Link
-          href="/"
+          href="/home"
           className={`pointer-events-auto hover:opacity-60 transition-opacity ${menuOpen ? 'invisible' : ''}`}
         >
           <img src="/t1-wordmark.svg" alt=".elsewhere" className="h-[14px] md:h-[18px] w-auto block" />

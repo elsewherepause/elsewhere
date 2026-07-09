@@ -1,8 +1,16 @@
+export type ImageAdjust = { x: number; y: number; zoom: number }
+
+export const DEFAULT_ADJUST: ImageAdjust = { x: 50, y: 50, zoom: 1 }
+
 export type Section = {
   image1?: string
+  image1Adjust?: ImageAdjust
   image2?: string
+  image2Adjust?: ImageAdjust
   image3?: string
+  image3Adjust?: ImageAdjust
   image4?: string
+  image4Adjust?: ImageAdjust
   caption1?: string
   caption2?: string
   caption3?: string
@@ -26,9 +34,12 @@ export type TemplateData = {
   coordinates?: string
   camera?: string
   heroImage?: string
+  heroImageAdjust?: ImageAdjust
+  homepageHeroAdjust?: ImageAdjust
   sections: Section[]
   nextProjectTitle?: string
   nextProjectSlug?: string
+  podcastSpotifyUrls?: string[]
 }
 
 export type Pattern = {

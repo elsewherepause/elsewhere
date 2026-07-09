@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
 
   const search = req.nextUrl.searchParams.get('search') ?? ''
   const page = parseInt(req.nextUrl.searchParams.get('page') ?? '1')
-  const take = 100
+  const take = 32
   const skip = (page - 1) * take
 
   const where = search

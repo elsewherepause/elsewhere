@@ -4,11 +4,13 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 // ─── Data type ────────────────────────────────────────────────────────────────
 
-import { hasContent, type Section, type TemplateData } from '@/components/admin/template-editor/shared'
+import { hasContent, type ImageAdjust, type Section, type TemplateData } from '@/components/admin/template-editor/shared'
 import { renderInlineMarkdown } from '@/lib/utils/inline-markdown'
 import CanvasFooter from './CanvasFooter'
 import CanvasPhotosView from './CanvasPhotosView'
 import CanvasSidebar from './CanvasSidebar'
+import PodcastSection from './PodcastSection'
+import StickyViewNav from './StickyViewNav'
 export type Template3Data = TemplateData
 
 const FIELD_MAPS: Record<string, string>[] = [
@@ -28,7 +30,7 @@ function sectionsToFlat(sections: Section[]): Record<string, string | undefined>
     const map = FIELD_MAPS[i % FIELD_MAPS.length]
     for (const [sectionKey, flatKey] of Object.entries(map)) {
       const val = s[sectionKey as keyof Section]
-      if (val) flat[flatKey] = val
+      if (typeof val === 'string') flat[flatKey] = val
     }
   }
   return flat
@@ -50,9 +52,6 @@ const CONTENT_TOP = 1009
 // Bottom of the deepest element in each pattern at offset=0
 const SECTION_CONTENT_BOTTOMS = [1570, 2220, 3630, 4250, 4700, 5370, 6100]
 
-const F_NAV    = 0
-const F_MARK   = 200
-const FOOTER_HEIGHT = 560
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -76,6 +75,7 @@ export default function Template3Layout({
   const [activeIdx, setActiveIdx] = useState(0)
   const [sidebarVisible, setSidebarVisible] = useState(false)
   const [viewMode, setViewMode] = useState<'story' | 'photos'>('story')
+  const [stickyNav, setStickyNav] = useState(false)
   const wrapperRef = useRef<HTMLDivElement>(null)
 
   // Cumulative Y offset per section index
@@ -97,15 +97,25 @@ export default function Template3Layout({
 
   const HEADER_END = 996
   const storyFooterY = lastContentBottom + 60
-  const storyCanvasH = storyFooterY + FOOTER_HEIGHT
+  const storyCanvasH = storyFooterY
   const canvasH = viewMode === 'photos' ? HEADER_END : storyCanvasH
-  const footerY = storyFooterY
 
   const sidebarSections = activeSections.map((s, i) => {
     let cumH = 0
     for (let j = 0; j < i; j++) cumH += SECTION_HEIGHTS[j % 7]
     return { scrollY: CONTENT_TOP + cumH, headline: s.headline }
   })
+
+  useEffect(() => {
+    if (isEditing) return
+    const onScroll = () => {
+      if (!wrapperRef.current) return
+      setStickyNav(wrapperRef.current.getBoundingClientRect().top + HEADER_END * scale < 60)
+    }
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [scale, isEditing])
 
   const handleScrollTo = useCallback((y: number) => {
     if (!wrapperRef.current) return
@@ -150,21 +160,24 @@ export default function Template3Layout({
   const imgUrl = (id?: string) =>
     id && cloudName ? `https://res.cloudinary.com/${cloudName}/image/upload/q_auto,f_auto/${id}` : ''
 
-  function ImgBox({ id, si, field, l, t, w, h, cap }: {
-    id?: string; si: string; field: string; l: number; t: number; w: number; h: number; cap?: string
+  function ImgBox({ id, si, field, l, t, w, h, cap, adj }: {
+    id?: string; si: string; field: string; l: number; t: number; w: number; h: number; cap?: string; adj?: ImageAdjust
   }) {
     const url = imgUrl(id)
+    const x = adj?.x ?? 50
+    const y = adj?.y ?? 50
+    const zoom = adj?.zoom ?? 1
     return (
       <>
         <div
           style={{
             position: 'absolute', left: l, top: t, width: w, height: h,
-            overflow: 'hidden', background: id ? undefined : '#e8e8e8',
+            overflow: 'hidden', background: id ? undefined : isEditing ? '#e8e8e8' : '#fff',
             cursor: isEditing ? 'pointer' : undefined,
           }}
           onClick={isEditing ? () => onImageSelect?.(si, field) : undefined}
         >
-          {url && <img src={url} alt={cap || ''} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />}
+          {url && <img src={url} alt={cap || ''} style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: `${x}% ${y}%`, transform: zoom !== 1 ? `scale(${zoom})` : undefined, transformOrigin: `${x}% ${y}%`, display: 'block' }} />}
           {isEditing && (
             <div
               style={{
@@ -248,7 +261,7 @@ export default function Template3Layout({
           </div>
 
           {/* ━━ HERO IMAGE ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-          <ImgBox id={data.heroImage} si="hero" field="heroImage" l={80} t={197} w={1352} h={671} />
+          <ImgBox id={data.heroImage} si="hero" field="heroImage" l={80} t={197} w={1352} h={671} adj={rawData.heroImageAdjust} />
 
           {/* ━━ METADATA BAR ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
           <div style={{
@@ -270,7 +283,7 @@ export default function Template3Layout({
           {/* ━━ SECONDARY NAV ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
           <div style={{
             position: 'absolute', left: 0, top: 921, width: W,
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, height: 75,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, height: 75, opacity: stickyNav ? 0 : 1,
           }}>
             <span onClick={() => setViewMode('photos')} style={{ fontFamily: 'var(--font-sans, Montserrat)', fontWeight: 800, fontSize: 14, textTransform: 'uppercase', color: viewMode === 'photos' ? '#1c1c1c' : '#ccc', cursor: 'pointer' }}>Photos</span>
             <div style={{ height: 31, width: 1, background: '#1c1c1c' }} />
@@ -287,7 +300,7 @@ export default function Template3Layout({
                 switch (pat) {
                   case 0: return (
                     <React.Fragment key={i}>
-                      <ImgBox id={s.image1} si={sk} field="image1" l={250} t={1009 + off} w={590} h={540} />
+                      <ImgBox id={s.image1} si={sk} field="image1" l={250} t={1009 + off} w={590} h={540} adj={s.image1Adjust} />
                       <SecNum n={num} l={1400} t={1009 + off} />
                       <H2 l={880} t={1050 + off} w={550}>{s.headline}</H2>
                       <P l={880} t={1180 + off} w={550}>{s.quote}</P>
@@ -299,7 +312,7 @@ export default function Template3Layout({
                   case 1: return (
                     <React.Fragment key={i}>
                       <SecNum n={num} l={770} t={1720 + off} />
-                      <ImgBox id={s.image1} si={sk} field="image1" l={820} t={1640 + off} w={560} h={480} />
+                      <ImgBox id={s.image1} si={sk} field="image1" l={820} t={1640 + off} w={560} h={480} adj={s.image1Adjust} />
                       <H2 l={254} t={1760 + off} w={450}>{s.headline}</H2>
                       <P l={254} t={1880 + off} w={220}>{s.body1}</P>
                       <P l={503} t={1880 + off} w={220}>{s.body2}</P>
@@ -309,7 +322,7 @@ export default function Template3Layout({
                   )
                   case 2: return (
                     <React.Fragment key={i}>
-                      <ImgBox id={s.image1} si={sk} field="image1" l={254} t={2773 + off} w={1126} h={500} />
+                      <ImgBox id={s.image1} si={sk} field="image1" l={254} t={2773 + off} w={1126} h={500} adj={s.image1Adjust} />
                       <SecNum n={num} l={1350} t={3320 + off} />
                       <H2 l={810} t={3360 + off} w={500}>{s.headline}</H2>
                       <P l={810} t={3480 + off} w={220}>{s.body1}</P>
@@ -318,7 +331,7 @@ export default function Template3Layout({
                   )
                   case 3: return (
                     <React.Fragment key={i}>
-                      <ImgBox id={s.image1} si={sk} field="image1" l={254} t={3387 + off} w={520} h={620} />
+                      <ImgBox id={s.image1} si={sk} field="image1" l={254} t={3387 + off} w={520} h={620} adj={s.image1Adjust} />
                       <SecNum n={num} l={1350} t={3800 + off} />
                       <H2 l={810} t={3840 + off} w={500}>{s.headline}</H2>
                       <P l={810} t={3950 + off} w={458}>{s.quote}</P>
@@ -328,7 +341,7 @@ export default function Template3Layout({
                   )
                   case 4: return (
                     <React.Fragment key={i}>
-                      <ImgBox id={s.image2} si={sk} field="image2" l={620} t={4042 + off} w={760} h={480} />
+                      <ImgBox id={s.image2} si={sk} field="image2" l={620} t={4042 + off} w={760} h={480} adj={s.image2Adjust} />
                       <SecNum n={num} l={500} t={4150 + off} />
                       <H2 l={260} t={4190 + off} w={340}>{s.headline}</H2>
                       <P l={260} t={4370 + off} w={340}>{s.quote}</P>
@@ -338,7 +351,7 @@ export default function Template3Layout({
                   )
                   case 5: return (
                     <React.Fragment key={i}>
-                      <ImgBox id={s.image1} si={sk} field="image1" l={254} t={4687 + off} w={620} h={480} />
+                      <ImgBox id={s.image1} si={sk} field="image1" l={254} t={4687 + off} w={620} h={480} adj={s.image1Adjust} />
                       <SecNum n={num} l={1350} t={4800 + off} />
                       <H2 l={910} t={4840 + off} w={460}>{s.headline}</H2>
                       <P l={910} t={4970 + off} w={460}>{s.quote}</P>
@@ -350,7 +363,7 @@ export default function Template3Layout({
                   case 6: return (
                     <React.Fragment key={i}>
                       <SecNum n={num} l={700} t={5341 + off} />
-                      <ImgBox id={s.image1} si={sk} field="image1" l={780} t={5341 + off} w={600} h={450} />
+                      <ImgBox id={s.image1} si={sk} field="image1" l={780} t={5341 + off} w={600} h={450} adj={s.image1Adjust} />
                       <H2 l={254} t={5380 + off} w={500}>{s.headline}</H2>
                       <P l={254} t={5520 + off} w={220}>{s.body1}</P>
                       <P l={504} t={5520 + off} w={220}>{s.body2}</P>
@@ -360,24 +373,33 @@ export default function Template3Layout({
                 }
               })}
 
-              <CanvasFooter
-                footerY={footerY + F_NAV}
-                markOffset={F_MARK}
-                canvasWidth={W}
-                nextProjectSlug={data.nextProjectSlug}
-                destinations={(rawData as Record<string, unknown>).destinations as { slug: string }[] ?? []}
-              />
             </>
           )}
 
         </div>
       </div>
 
+      {viewMode === 'story' && (
+        <>
+          {Array.isArray(data.podcastSpotifyUrls) && data.podcastSpotifyUrls.length > 0 && (
+            <PodcastSection urls={data.podcastSpotifyUrls} />
+          )}
+          <CanvasFooter
+            nextProjectSlug={data.nextProjectSlug}
+            destinations={(rawData as Record<string, unknown>).destinations as { slug: string }[] ?? []}
+          />
+        </>
+      )}
+
       {viewMode === 'photos' && (
         <CanvasPhotosView imageIds={allImageIds} nextProject={data.nextProjectSlug ? { slug: data.nextProjectSlug, title: '' } : null} destinations={(rawData as Record<string, unknown>).destinations as { slug: string }[] ?? []} />
       )}
 
       {/* ━━ SIDEBAR ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      {!isEditing && stickyNav && (
+        <StickyViewNav viewMode={viewMode} onViewMode={setViewMode} />
+      )}
+
       {!isEditing && viewMode === 'story' && (
         <CanvasSidebar
           visible={sidebarVisible}
