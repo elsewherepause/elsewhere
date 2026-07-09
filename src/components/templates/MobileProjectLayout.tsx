@@ -114,7 +114,7 @@ export default function MobileProjectLayout({ data, patterns, nextProject, desti
               const pat = patterns[i % patternCount]
               const num = String(i + 1).padStart(2, '0')
               const images = pat.images
-                .map(img => ({ id: s[img.field], label: img.label }))
+                .map(img => ({ id: s[img.field] as string | undefined, label: img.label }))
                 .filter(img => img.id)
               const headline = s.headline
               const texts = pat.texts
@@ -145,7 +145,7 @@ export default function MobileProjectLayout({ data, patterns, nextProject, desti
                           fontFamily: 'var(--font-sans, Montserrat)', fontWeight: 800,
                           fontSize: 11, color: '#1c1c1c', textTransform: 'uppercase',
                           marginTop: 4,
-                        }}>{s[`caption${j + 1}` as keyof Section]}</p>
+                        }}>{s[`caption${j + 1}` as keyof Section] as string | undefined}</p>
                       )}
                     </div>
                   ))}

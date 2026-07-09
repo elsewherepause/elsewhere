@@ -47,7 +47,7 @@ export default function MediaPicker({ onSelect, onClose }: Props) {
         <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--color-border)]">
           <h2 className="text-sm font-medium">Select Image</h2>
           <div className="flex items-center gap-3">
-            <MediaUploader onUploaded={() => load()} />
+            <MediaUploader onUploaded={() => load(page, search)} />
             <button onClick={onClose} className="text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] text-xl leading-none">×</button>
           </div>
         </div>
