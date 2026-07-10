@@ -6,10 +6,11 @@ export async function POST(req: NextRequest) {
   const session = await auth()
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { folder = 'elsewhere' } = await req.json().catch(() => ({}))
+  const { folder = 'elsewhere', format } = await req.json().catch(() => ({}))
 
   const timestamp = Math.round(Date.now() / 1000)
   const paramsToSign: Record<string, string | number> = { folder, timestamp }
+  if (format) paramsToSign.format = format
 
   const signature = cloudinary.utils.api_sign_request(
     paramsToSign,
@@ -20,6 +21,7 @@ export async function POST(req: NextRequest) {
     signature,
     timestamp,
     folder,
+    format,
     cloudName: process.env.CLOUDINARY_CLOUD_NAME,
     apiKey: process.env.CLOUDINARY_API_KEY,
   })

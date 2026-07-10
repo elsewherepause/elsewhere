@@ -26,13 +26,15 @@ export default function MediaUploader({ onUploaded }: Props) {
       const isVideo = isVideoFile(file)
       const resourceType = isVideo ? 'video' : 'image'
       const folder = isVideo ? 'elsewhere/videos' : 'elsewhere/photos'
+      // Convert every uploaded image to webp at upload time; videos are left as-is.
+      const format = isVideo ? undefined : 'webp'
 
       const sigRes = await fetch('/api/cloudinary/sign', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ folder }),
+        body: JSON.stringify({ folder, format }),
       })
-      const { signature, timestamp, folder: signedFolder, cloudName, apiKey } = await sigRes.json()
+      const { signature, timestamp, folder: signedFolder, format: signedFormat, cloudName, apiKey } = await sigRes.json()
 
       const form = new FormData()
       form.append('file', file)
@@ -40,6 +42,7 @@ export default function MediaUploader({ onUploaded }: Props) {
       form.append('timestamp', String(timestamp))
       form.append('signature', signature)
       form.append('folder', signedFolder)
+      if (signedFormat) form.append('format', signedFormat)
 
       const uploadRes = await fetch(
         `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`,

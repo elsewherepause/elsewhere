@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
+import { useMusicPlayer } from '@/components/public/MusicPlayerProvider';
 
 const playlist = [
   {
@@ -161,6 +162,14 @@ export default function MusicPlayer({ style }: { style?: React.CSSProperties }) 
   const audioRef = useRef<HTMLAudioElement>(null);
   const isFirstTrackEffect = useRef(true);
   const autoplayPending = useRef(false);
+  const { pauseSignal } = useMusicPlayer();
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio || audio.paused) return;
+    audio.pause();
+    setIsPlaying(false);
+  }, [pauseSignal]);
 
   useEffect(() => {
     autoplayPending.current = true;

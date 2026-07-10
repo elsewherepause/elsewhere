@@ -36,18 +36,8 @@ function ArticleNote({ note, align = "left" }: { note?: Note; align?: "left" | "
     )
   }
 
-  // Placeholder Note (for visual layout and matching template)
-  return (
-    <div className={`flex flex-col gap-1.5 ${align === "right" ? "items-end" : "items-start"}`}>
-      <div className={`flex items-center gap-1.5 ${align === "right" ? "flex-row-reverse" : ""}`}>
-        <span className="font-sans text-sm md:text-base font-normal text-[var(--color-ink)]">Notes |</span>
-        <span className="font-sans text-sm md:text-base font-normal text-[#848484] uppercase">2 min read</span>
-      </div>
-      <p className={`font-heading text-xl md:text-[28px] font-medium uppercase underline underline-offset-2 leading-tight ${align === "right" ? "text-right" : "text-left"}`}>
-        The story was quite clear, to me
-      </p>
-    </div>
-  )
+  // No note yet — render nothing until one is published in /admin/notes
+  return null
 }
 
 function EditorialTitle({ children, align = "left" }: { children: React.ReactNode; align?: "left" | "right" }) {
@@ -222,6 +212,13 @@ function GalleryGroup({
               <ArticleNote note={note2} align="right" />
               <div className="mt-4">
                 {renderImage(img5, 'aspect-[288/395]', onOpen)}
+              </div>
+              <div className="mt-4">
+                <EditorialText
+                  title={img5.caption}
+                  desc={img5.description}
+                  align="right"
+                />
               </div>
             </div>
           )}

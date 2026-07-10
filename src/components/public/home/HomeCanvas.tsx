@@ -40,7 +40,7 @@ export default function HomeCanvas({ projects, destinations = [] }: { projects: 
   const scrollRef = useRef<HTMLDivElement>(null)
   const [scale, setScale] = useState(1)
   const [filterOpen, setFilterOpen] = useState(false)
-  const [activeFilters, setActiveFilters] = useState<Set<Category>>(new Set())
+  const [activeFilter, setActiveFilter] = useState<Category | null>(null)
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null)
 
   useEffect(() => {
@@ -67,18 +67,13 @@ export default function HomeCanvas({ projects, destinations = [] }: { projects: 
   }, [handleWheel])
 
   function toggleFilter(cat: Category) {
-    setActiveFilters(prev => {
-      const next = new Set(prev)
-      if (next.has(cat)) next.delete(cat)
-      else next.add(cat)
-      return next
-    })
+    setActiveFilter(prev => (prev === cat ? null : cat))
   }
 
   const filtered = useMemo(() => {
-    if (activeFilters.size === 0) return projects
-    return projects.filter(p => p.category && activeFilters.has(p.category))
-  }, [projects, activeFilters])
+    if (!activeFilter) return projects
+    return projects.filter(p => p.category === activeFilter)
+  }, [projects, activeFilter])
 
   const slots = useMemo(() => buildSlots(filtered.length), [filtered.length])
   const canvasW = useMemo(() => computeCanvasWidth(slots), [slots])
@@ -94,8 +89,8 @@ export default function HomeCanvas({ projects, destinations = [] }: { projects: 
       <div style={{
         width: canvasW * scale,
         height: CANVAS_H * scale,
-        marginLeft: 24 - (80 * scale),
-        marginTop: -45 * scale,
+        marginLeft: 36 - (80 * scale),
+        marginTop: -20 * scale,
       }}>
         <div style={{
           width: canvasW,
@@ -175,7 +170,7 @@ export default function HomeCanvas({ projects, destinations = [] }: { projects: 
       </div>
 
       {/* ── Filter bar (fixed) ── */}
-      <div style={{ position: 'fixed', left: 24, top: 80 * scale, display: 'flex', alignItems: 'center', gap: 24, zIndex: 10 }}>
+      <div className="left-6 md:left-[36px]" style={{ position: 'fixed', top: 80 * scale, display: 'flex', alignItems: 'center', gap: 24, zIndex: 10 }}>
         <p
           onClick={() => setFilterOpen(v => !v)}
           style={{
@@ -192,7 +187,7 @@ export default function HomeCanvas({ projects, destinations = [] }: { projects: 
         {filterOpen && (
           <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
             {CATEGORIES.map(cat => {
-              const isActive = activeFilters.has(cat)
+              const isActive = activeFilter === cat
               return (
                 <p
                   key={cat}

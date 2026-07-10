@@ -56,7 +56,7 @@ export default function AboutCanvas() {
 
         {/* ── Intro paragraph ── */}
         <p style={{ position: 'absolute', left: 984, top: 220, width: 448, color: '#505050', fontSize: 16, fontWeight: 400, textAlign: 'justify', lineHeight: '1.6', margin: 0, ...mont }}>
-          I work at the intersection of movement, culture, and human experience. Slowly, staying long enough for a place to reveal itself.
+          I work where movement, culture, and human experience meet. I go slowly, and I stay long enough for a place to reveal what it is.
         </p>
 
         {/* ── Large portrait ── */}
@@ -71,7 +71,7 @@ export default function AboutCanvas() {
 
         {/* ── Bio text 1 ── */}
         <p style={{ position: 'absolute', left: 730, top: 706, width: 502, color: '#505050', fontSize: 16, fontWeight: 400, textAlign: 'justify', lineHeight: '1.6', margin: 0, ...mont }}>
-          {`For over fifteen years, I've used photography, film, sound, and writing to follow people whose lives are closely tied to land, craft, and the quiet rituals that hold things together. People in India's hinterlands, and beyond — those whose knowledge lives in hands, in engines, in the dust of a road, in the weave of a fabric.`}
+          {`For two decades, I have used photography, film, sound, and writing to follow people whose lives are tied to land, craft, and the quiet rituals that hold things together. People in India’s hinterlands, and beyond. People whose knowledge lives in their hands, in the engines they fix, in the dust of the road, and in the weave of a fabric.`}
         </p>
 
         {/* ── Arjun sitting image ── */}
@@ -81,7 +81,7 @@ export default function AboutCanvas() {
 
         {/* ── Bio text 2 ── */}
         <p style={{ position: 'absolute', left: 613, top: 1350, width: 285, color: '#505050', fontSize: 16, fontWeight: 400, textAlign: 'justify', lineHeight: '1.6', margin: 0, ...mont }}>
-          {`I find myself drawn to stories of risk, repair, and survival. The kind that rarely travel far from where they were made. Stories that live in local governance, in biodiversity, in the oral traditions passed between generations in languages that don't always have a written form. Everywhere I go, I am humbled by the trust placed in me — to listen carefully enough, and to carry what I hear without breaking it.`}
+          {`I am drawn to stories of risk, repair, and survival, the kind that rarely travel far from where they were made. Stories that live in local governance, biodiversity, and oral traditions passed between generations, often in languages that were never written down. Wherever I go, I am humbled by the trust people place in me, to listen carefully and to carry what I hear with care.`}
         </p>
 
         {/* ── River scene image ── */}
@@ -108,11 +108,11 @@ export default function AboutCanvas() {
         <div style={{ position: 'absolute', left: 80, top: 2300, width: 373, color: '#505050', fontSize: 16 }}>
           <p style={{ fontWeight: 700, lineHeight: 'normal', margin: 0, marginBottom: 12, ...mont }}>Elsewhere</p>
           <p style={{ fontWeight: 400, lineHeight: 1.6, textAlign: 'justify', margin: 0, ...mont }}>
-            Elsewhere sits at the intersection of culture, movement, and human experience. It began as a question: what happens when you stay in a place long enough for it to stop performing for you?
+            Elsewhere began as a question: what happens when you stay somewhere long enough for it to stop performing for you?
           </p>
           <br />
           <p style={{ fontWeight: 400, lineHeight: 1.6, textAlign: 'justify', margin: 0, ...mont }}>
-            What you find there — in the margins, in the repetition, in the things people reach for without thinking — is where the real stories live.
+            The real stories are never in the headline moment. They live in the margins, in what repeats, in the things people reach for without thinking. That is where Elsewhere looks.
           </p>
         </div>
 
@@ -127,24 +127,23 @@ export default function AboutCanvas() {
         </div>
 
         <div style={{ position: 'absolute', left: 580, top: 2900, width: 550, color: '#505050', fontSize: 16, lineHeight: 1.6, ...mont }}>
-          <p style={{ fontWeight: 700, lineHeight: 'normal', margin: 0, marginBottom: 12, color: '#000' }}>Consulting</p>
+          <p style={{ fontWeight: 700, lineHeight: 'normal', margin: 0, marginBottom: 12, color: '#000' }}>For Brands and Institutions</p>
           <p style={{ fontWeight: 400, textAlign: 'justify', margin: 0 }}>
-            Cultural intelligence and narrative strategy for organizations navigating complex terrain. We help foundations, corporations, and institutions tell stories that respect nuance, honor context, and resist simplification.
+            Elsewhere works with brands, institutions, and cultural ventures that need more than content. The practice is concerned with how stories are found, shaped, and carried across image, language, experience, and form.
           </p>
           <br />
-          <p style={{ fontWeight: 400, textAlign: 'justify', margin: 0 }}>
-            This includes: cultural research, narrative development, brand storytelling that&apos;s rooted in place and practice, and strategic guidance for organizations working across cultures or entering new markets.
-          </p>
         </div>
 
         {/* ── Shaped by Time Section (Text + Portrait) ── */}
-        <div style={{ position: 'absolute', left: 580, top: 3350, width: 520, color: '#505050', fontSize: 16, lineHeight: 1.6, ...mont }}>
+        <div style={{ position: 'absolute', left: 580, top: 3150, width: 520, color: '#505050', fontSize: 16, lineHeight: 1.6, ...mont }}>
+          <p style={{ fontWeight: 700, lineHeight: 'normal', margin: 0, marginBottom: 12, color: '#000' }}>Narrative Research</p>
           <p style={{ fontWeight: 400, textAlign: 'justify', margin: 0 }}>
-            Shaped by time on the ground — through travel, observation, and making. Working across film, photography, writing, and sound. The work that comes out of it is not designed to explain or persuade. It is made to remain present as the world shifts around it.
+            Field-grounded inquiry into people, place, material culture, and lived context. This roots a brand, publication, or institution in real understanding before it begins to speak.
           </p>
           <br />
+          <p style={{ fontWeight: 700, lineHeight: 'normal', margin: 0, marginBottom: 12, color: '#000' }}>Story Strategy</p>
           <p style={{ fontWeight: 400, textAlign: 'justify', margin: 0 }}>
-            Elsewhere works with organisations and individuals who understand what that means.
+            Narrative direction for campaigns, brand worlds, editorial platforms, and cultural initiatives. This covers theme, language, structure, and the shape a story needs to take.
           </p>
         </div>
 

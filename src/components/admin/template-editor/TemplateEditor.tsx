@@ -257,7 +257,7 @@ export default function TemplateEditor({ project, patterns, Layout, showTitleLig
   function wrapSelection(marker: string) {
     const el = lastFocusedRef.current
     if (!el) return
-    if (!(el instanceof HTMLTextAreaElement) && !el.dataset.formattable) return
+    if (!(el instanceof HTMLTextAreaElement) && el.dataset.formattable === undefined) return
     const start = el.selectionStart ?? 0
     const end = el.selectionEnd ?? 0
     const val = el.value
