@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import Link from 'next/link'
 import TakeMeElsewhere from '@/components/public/TakeMeElsewhere'
+import CroppedImage from '@/components/shared/CroppedImage'
 import { SLOT_PATTERN } from '@/lib/homepage-slots'
 
 const CANVAS_H = 900
@@ -108,9 +109,6 @@ export default function HomeCanvas({ projects, destinations = [] }: { projects: 
 
             const imgId = project.heroImageId
             const adj = project.homepageHeroAdjust
-            const x = adj?.x ?? 50
-            const y = adj?.y ?? 50
-            const zoom = adj?.zoom ?? 1
             const maxDim = Math.max(slot.w, slot.h) * 2
             const url = imgId && CLOUD
               ? `https://res.cloudinary.com/${CLOUD}/image/upload/w_${maxDim},q_auto,f_auto/${imgId}`
@@ -144,20 +142,9 @@ export default function HomeCanvas({ projects, destinations = [] }: { projects: 
                 }}>
                   {project.title}
                 </p>
-                <div style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
+                <div style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden' }}>
                   {url ? (
-                    <img
-                      src={url}
-                      alt={project.title}
-                      style={{
-                        width: '100%', height: '100%',
-                        objectFit: 'cover',
-                        objectPosition: `${x}% ${y}%`,
-                        transform: zoom !== 1 ? `scale(${zoom})` : undefined,
-                        transformOrigin: `${x}% ${y}%`,
-                        display: 'block',
-                      }}
-                    />
+                    <CroppedImage src={url} alt={project.title} adj={adj ?? undefined} aspect={slot.w / slot.h} />
                   ) : (
                     <div style={{ width: '100%', height: '100%' }} />
                   )}

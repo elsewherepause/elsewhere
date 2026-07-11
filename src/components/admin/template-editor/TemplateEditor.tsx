@@ -6,12 +6,21 @@ import { updateProject, publishProject, unpublishProject } from '@/actions/proje
 import MediaPicker from '@/components/admin/media/MediaPicker'
 import { SLOT_PATTERN } from '@/lib/homepage-slots'
 import type { Project, MediaAsset } from '@prisma/client'
+import CroppedImage from '@/components/shared/CroppedImage'
 import { inputCls, textareaCls, hasContent, type ImageAdjust, type Section, type TemplateData, type Pattern, DEFAULT_ADJUST } from './shared'
 
 type FullProject = Project & { heroImage: MediaAsset | null; ogImage: MediaAsset | null }
 
+// Pulls the real target aspect ratio out of labels like "Main image (691x520)" —
+// the preview box must match it, since object-fit:cover crops differently per aspect ratio.
+function aspectFromLabel(label: string): number | undefined {
+  const m = label.match(/(\d+)\s*[x×]\s*(\d+)/i)
+  if (!m) return undefined
+  return parseInt(m[1], 10) / parseInt(m[2], 10)
+}
+
 function ImageAdjustControl({
-  cloudName, imageId, label, adj, onPick, onAdjust, cropSlots,
+  cloudName, imageId, label, adj, onPick, onAdjust, aspect = 16 / 9,
 }: {
   cloudName: string
   imageId?: string
@@ -19,7 +28,7 @@ function ImageAdjustControl({
   adj: ImageAdjust
   onPick: () => void
   onAdjust: (adj: ImageAdjust) => void
-  cropSlots?: { w: number; h: number }[]
+  aspect?: number
 }) {
   const thumbRef = useRef<HTMLDivElement>(null)
   const url = imageId ? `https://res.cloudinary.com/${cloudName}/image/upload/w_240,q_auto,f_auto/${imageId}` : ''
@@ -53,37 +62,19 @@ function ImageAdjustControl({
       <div
         ref={thumbRef}
         className="w-full relative overflow-hidden border border-dashed border-gray-200 bg-gray-50"
-        style={{ aspectRatio: '16/9', cursor: url ? 'crosshair' : 'pointer' }}
+        style={{ aspectRatio: aspect, cursor: url ? 'crosshair' : 'pointer' }}
         onMouseDown={url ? handleMouseDown : undefined}
         onClick={!url ? onPick : undefined}
       >
         {url ? (
           <>
-            <img
-              src={url} alt=""
+            <CroppedImage
+              src={url}
+              adj={adj}
+              aspect={aspect}
               draggable={false}
-              style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: `${adj.x}% ${adj.y}%`, display: 'block', userSelect: 'none', pointerEvents: 'none' }}
+              style={{ userSelect: 'none', pointerEvents: 'none' }}
             />
-            {cropSlots && (() => {
-              const T = 16 / 9
-              return cropSlots.map((slot, idx) => {
-                const R = slot.w / slot.h
-                const cropW = R >= T ? 100 : (R / T) * 100
-                const cropH = R >= T ? (T / R) * 100 : 100
-                return (
-                  <div key={idx} style={{
-                    position: 'absolute',
-                    left: `${adj.x - cropW / 2}%`,
-                    top: `${adj.y - cropH / 2}%`,
-                    width: `${cropW}%`,
-                    height: `${cropH}%`,
-                    border: '1px dashed rgba(255,255,255,0.55)',
-                    boxShadow: 'inset 0 0 0 0.5px rgba(0,0,0,0.3), 0 0 0 0.5px rgba(0,0,0,0.3)',
-                    pointerEvents: 'none',
-                  }} />
-                )
-              })
-            })()}
             <div style={{ position: 'absolute', left: `${adj.x}%`, top: `${adj.y}%`, transform: 'translate(-50%,-50%)', width: 10, height: 10, border: '2px solid white', borderRadius: '50%', boxShadow: '0 0 0 1px rgba(0,0,0,0.6)', pointerEvents: 'none' }} />
             <div style={{ position: 'absolute', bottom: 4, right: 4, background: 'rgba(0,0,0,0.45)', color: 'white', fontSize: 9, padding: '1px 4px', borderRadius: 2, pointerEvents: 'none', userSelect: 'none' }}>drag · click to change</div>
           </>
@@ -177,6 +168,7 @@ function SectionAccordion({
                 adj={adj}
                 onPick={() => onImagePick(img.field)}
                 onAdjust={a => onAdjustChange(img.field + 'Adjust', a)}
+                aspect={aspectFromLabel(img.label)}
               />
             )
           })}
@@ -487,6 +479,7 @@ export default function TemplateEditor({ project, patterns, Layout, showTitleLig
                   adj={(templateData.heroImageAdjust as ImageAdjust | undefined) ?? DEFAULT_ADJUST}
                   onPick={() => openPicker('hero', 'heroImage')}
                   onAdjust={a => setMeta('heroImageAdjust', a)}
+                  aspect={1352 / 671}
                 />
                 {templateData.heroImage && (
                   <ImageAdjustControl
@@ -496,7 +489,7 @@ export default function TemplateEditor({ project, patterns, Layout, showTitleLig
                     adj={(templateData.homepageHeroAdjust as ImageAdjust | undefined) ?? DEFAULT_ADJUST}
                     onPick={() => openPicker('hero', 'heroImage')}
                     onAdjust={a => setMeta('homepageHeroAdjust', a)}
-                    cropSlots={homepageSlot ? [homepageSlot] : undefined}
+                    aspect={homepageSlot ? homepageSlot.w / homepageSlot.h : undefined}
                   />
                 )}
               </div>
