@@ -7,6 +7,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { hasContent, type ImageAdjust, type Section, type TemplateData } from '@/components/admin/template-editor/shared'
 import { renderInlineMarkdown } from '@/lib/utils/inline-markdown'
 import CanvasFooter from './CanvasFooter'
+import CanvasHeader from './CanvasHeader'
 import CanvasPhotosView from './CanvasPhotosView'
 import CanvasSidebar from './CanvasSidebar'
 import PodcastSection from './PodcastSection'
@@ -46,8 +47,9 @@ const SECTION_STARTS = [1009, 1568, 2773, 3387, 4042, 4687, 5341]
 // Vertical slot height of each pattern
 const SECTION_HEIGHTS = [561, 900, 857, 1100, 658, 900, 600]
 
-// Where content starts (top of first pattern's slot)
-const CONTENT_TOP = 1009
+// Where content starts (top of first pattern's slot) — shifted up 50px from the
+// original 1009 to tighten the whitespace between the header and the title/hero
+const CONTENT_TOP = 959
 
 // Bottom of the deepest element in each pattern at offset=0
 const SECTION_CONTENT_BOTTOMS = [1570, 2220, 3630, 4250, 4700, 5370, 6100]
@@ -95,7 +97,7 @@ export default function Template3Layout({
     [s.image1, s.image2, s.image3, s.image4].filter((id): id is string => !!id)
   )
 
-  const HEADER_END = 996
+  const HEADER_END = 946
   const storyFooterY = lastContentBottom + 60
   const storyCanvasH = storyFooterY
   const canvasH = viewMode === 'photos' ? HEADER_END : storyCanvasH
@@ -251,44 +253,21 @@ export default function Template3Layout({
           fontFamily: 'var(--font-sans, Montserrat)',
         }}>
 
-          {/* ━━ TITLE ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-          <div style={{
-            position: 'absolute', left: 80, top: 139,
-            fontFamily: 'var(--font-serif, DM Sans)', fontWeight: 400, fontSize: 40,
-            color: '#000', textTransform: 'uppercase', lineHeight: 1.15, whiteSpace: 'nowrap',
-          }}>
-            {renderInlineMarkdown(data.titleBold || 'Project Title')}
-          </div>
-
-          {/* ━━ HERO IMAGE ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-          <ImgBox id={data.heroImage} si="hero" field="heroImage" l={80} t={197} w={1352} h={671} adj={rawData.heroImageAdjust} />
-
-          {/* ━━ METADATA BAR ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-          <div style={{
-            position: 'absolute', left: 80, top: 879, width: 795,
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            fontFamily: 'var(--font-sans, Montserrat)', fontWeight: 400, fontSize: 16,
-          }}>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <span style={{ color: '#ccc' }}>Location:</span>
-              <span style={{ color: '#000' }}>{data.location || ''}</span>
-            </div>
-            <span style={{ color: '#ccc' }}>{data.coordinates || ''}</span>
-            <div style={{ display: 'flex', gap: 11 }}>
-              <span style={{ color: '#ccc' }}>Camera -</span>
-              <span style={{ color: '#000' }}>{data.camera || ''}</span>
-            </div>
-          </div>
-
-          {/* ━━ SECONDARY NAV ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-          <div style={{
-            position: 'absolute', left: 0, top: 921, width: W,
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, height: 75, opacity: stickyNav ? 0 : 1,
-          }}>
-            <span onClick={() => setViewMode('photos')} style={{ fontFamily: 'var(--font-sans, Montserrat)', fontWeight: 800, fontSize: 14, textTransform: 'uppercase', color: viewMode === 'photos' ? '#1c1c1c' : '#ccc', cursor: 'pointer' }}>Photos</span>
-            <div style={{ height: 31, width: 1, background: '#1c1c1c' }} />
-            <span onClick={() => setViewMode('story')} style={{ fontFamily: 'var(--font-sans, Montserrat)', fontWeight: 800, fontSize: 14, textTransform: 'uppercase', color: viewMode === 'story' ? '#1c1c1c' : '#ccc', cursor: 'pointer' }}>Story</span>
-          </div>
+          <CanvasHeader
+            W={W}
+            titleBold={data.titleBold}
+            heroImage={data.heroImage}
+            heroImageAdjust={rawData.heroImageAdjust}
+            location={data.location}
+            coordinates={data.coordinates}
+            camera={data.camera}
+            viewMode={viewMode}
+            setViewMode={setViewMode}
+            stickyNav={stickyNav}
+            isEditing={isEditing}
+            onImageSelect={onImageSelect}
+            cloudName={cloudName}
+          />
 
           {viewMode === 'story' && (
             <>
@@ -382,11 +361,12 @@ export default function Template3Layout({
       {viewMode === 'story' && (
         <>
           {Array.isArray(data.podcastSpotifyUrls) && data.podcastSpotifyUrls.length > 0 && (
-            <PodcastSection urls={data.podcastSpotifyUrls} />
+            <PodcastSection urls={data.podcastSpotifyUrls} scale={scale} />
           )}
           <CanvasFooter
             nextProjectSlug={data.nextProjectSlug}
             destinations={(rawData as Record<string, unknown>).destinations as { slug: string }[] ?? []}
+            scale={scale}
           />
         </>
       )}

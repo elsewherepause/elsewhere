@@ -5,7 +5,7 @@ import ContactForm from './ContactForm'
 import FooterBase from '@/components/public/FooterBase'
 
 const W = 1512
-const H = 5080
+const H = 6471
 
 const mont: React.CSSProperties = { fontFamily: 'Montserrat, sans-serif' }
 const dm: React.CSSProperties = { fontFamily: "'DM Sans', sans-serif", fontVariationSettings: "'opsz' 14" }
@@ -106,7 +106,7 @@ export default function AboutCanvas() {
 
         {/* ── Elsewhere section ── */}
         <div style={{ position: 'absolute', left: 80, top: 2300, width: 373, color: '#505050', fontSize: 16 }}>
-          <p style={{ fontWeight: 700, lineHeight: 'normal', margin: 0, marginBottom: 12, ...mont }}>Elsewhere</p>
+          <p style={{ fontWeight: 700, lineHeight: 'normal', marginTop: 0, marginRight: 0, marginBottom: 12, marginLeft: 0, ...mont }}>Elsewhere</p>
           <p style={{ fontWeight: 400, lineHeight: 1.6, textAlign: 'justify', margin: 0, ...mont }}>
             Elsewhere began as a question: what happens when you stay somewhere long enough for it to stop performing for you?
           </p>
@@ -127,7 +127,7 @@ export default function AboutCanvas() {
         </div>
 
         <div style={{ position: 'absolute', left: 580, top: 2900, width: 550, color: '#505050', fontSize: 16, lineHeight: 1.6, ...mont }}>
-          <p style={{ fontWeight: 700, lineHeight: 'normal', margin: 0, marginBottom: 12, color: '#000' }}>For Brands and Institutions</p>
+          <p style={{ fontWeight: 700, lineHeight: 'normal', marginTop: 0, marginRight: 0, marginBottom: 12, marginLeft: 0, color: '#000' }}>For Brands and Institutions</p>
           <p style={{ fontWeight: 400, textAlign: 'justify', margin: 0 }}>
             Elsewhere works with brands, institutions, and cultural ventures that need more than content. The practice is concerned with how stories are found, shaped, and carried across image, language, experience, and form.
           </p>
@@ -136,12 +136,11 @@ export default function AboutCanvas() {
 
         {/* ── Shaped by Time Section (Text + Portrait) ── */}
         <div style={{ position: 'absolute', left: 580, top: 3150, width: 520, color: '#505050', fontSize: 16, lineHeight: 1.6, ...mont }}>
-          <p style={{ fontWeight: 700, lineHeight: 'normal', margin: 0, marginBottom: 12, color: '#000' }}>Narrative Research</p>
-          <p style={{ fontWeight: 400, textAlign: 'justify', margin: 0 }}>
+          <p style={{ fontWeight: 700, lineHeight: 'normal', marginTop: 0, marginRight: 0, marginBottom: 12, marginLeft: 0, color: '#000' }}>Narrative Research</p>
+          <p style={{ fontWeight: 400, textAlign: 'justify', marginTop: 0, marginRight: 0, marginBottom: 24, marginLeft: 0 }}>
             Field-grounded inquiry into people, place, material culture, and lived context. This roots a brand, publication, or institution in real understanding before it begins to speak.
           </p>
-          <br />
-          <p style={{ fontWeight: 700, lineHeight: 'normal', margin: 0, marginBottom: 12, color: '#000' }}>Story Strategy</p>
+          <p style={{ fontWeight: 700, lineHeight: 'normal', marginTop: 0, marginRight: 0, marginBottom: 12, marginLeft: 0, color: '#000' }}>Story Strategy</p>
           <p style={{ fontWeight: 400, textAlign: 'justify', margin: 0 }}>
             Narrative direction for campaigns, brand worlds, editorial platforms, and cultural initiatives. This covers theme, language, structure, and the shape a story needs to take.
           </p>
@@ -151,8 +150,62 @@ export default function AboutCanvas() {
           <img alt="Elderly Woman" style={{ position: 'absolute', inset: 0, maxWidth: 'none', objectFit: 'cover', width: '100%', height: '100%' }} src="/images/elderly-woman.png" />
         </div>
 
+        {/* ── Editorial and Documentary Commissions (Image + Text) ── */}
+        <div style={{ position: 'absolute', height: 320, left: 80, top: 3550, width: 450, overflow: 'hidden' }}>
+          <img alt="Editorial and documentary commission" style={{ position: 'absolute', inset: 0, maxWidth: 'none', objectFit: 'cover', width: '100%', height: '100%' }} src="/images/rebuilding-tsunami.png" />
+        </div>
+
+        <div style={{ position: 'absolute', left: 580, top: 3550, width: 550, color: '#505050', fontSize: 16, lineHeight: 1.6, ...mont }}>
+          <p style={{ fontWeight: 700, lineHeight: 'normal', marginTop: 0, marginRight: 0, marginBottom: 12, marginLeft: 0, color: '#000' }}>Editorial and Documentary Commissions</p>
+          <p style={{ fontWeight: 400, textAlign: 'justify', margin: 0 }}>
+            Work made through time spent close to the subject, taking the form of photography, film, sound, writing, printed matter, digital formats, or whatever form the story asks for.
+          </p>
+        </div>
+
+        {/* ── Cultural Advisory (Text + Image) ── */}
+        <div style={{ position: 'absolute', left: 580, top: 3800, width: 520, color: '#505050', fontSize: 16, lineHeight: 1.6, ...mont }}>
+          <p style={{ fontWeight: 700, lineHeight: 'normal', marginTop: 0, marginRight: 0, marginBottom: 12, marginLeft: 0, color: '#000' }}>Cultural Advisory</p>
+          <p style={{ fontWeight: 400, textAlign: 'justify', margin: 0 }}>
+            Selective work with brands and founders in mobility, craft, heritage, and lifestyle, helping them locate what is distinctive and what will resonate.
+          </p>
+        </div>
+
+        <div style={{ position: 'absolute', height: 420, left: 1150, top: 3850, width: 280, overflow: 'hidden' }}>
+          <img alt="Cultural advisory work" style={{ position: 'absolute', inset: 0, maxWidth: 'none', objectFit: 'cover', width: '100%', height: '100%' }} src="/images/mandur-trees.png" />
+        </div>
+
+        {/* ── Engagements transitional line ── */}
+        <p style={{ position: 'absolute', left: 306, top: 4370, width: 900, color: '#000', fontSize: 24, fontWeight: 500, textAlign: 'center', lineHeight: 1.5, margin: 0, ...dm }}>
+          Engagements may begin with a conversation, a field visit, a commission, or a single question that needs patient looking. If something here has slowed you down, and this way of working feels familiar, I would like to hear what you are building.
+        </p>
+
+        {/* ── Framework section ── */}
+        <div style={{ position: 'absolute', left: 80, top: 4614, width: 700 }}>
+          <p style={{ fontWeight: 700, fontSize: 24, color: '#000', lineHeight: 'normal', marginTop: 0, marginRight: 0, marginBottom: 16, marginLeft: 0, ...mont }}>Framework</p>
+          <p style={{ fontWeight: 400, fontSize: 16, color: '#505050', lineHeight: 1.6, textAlign: 'justify', margin: 0, ...mont }}>
+            The work at Elsewhere follows a simple movement: look closely, find what holds, then give it form. Each project takes a different shape, but the method stays the same.
+          </p>
+        </div>
+
+        {[
+          { step: '01', title: 'Look closely', body: 'Begin in the field, with unhurried attention, listening for what sits beneath the surface.' },
+          { step: '02', title: 'Find what holds', body: 'Identify the pattern beneath what is visible, the memory, the ritual, the thing a person reaches for without being asked.' },
+          { step: '03', title: 'Give it form', body: 'Shape what was found into the form it asks for: photography, film, sound, writing, printed matter, graphics, games, digital experiences, or the language a brand carries forward.' },
+        ].map((item, i) => (
+          <div key={item.step} style={{ position: 'absolute', left: 80 + i * 464, top: 4794, width: 424, borderTop: '1px solid #ddd', paddingTop: 20 }}>
+            <p style={{ fontWeight: 500, fontSize: 13, color: '#505050', textTransform: 'uppercase', letterSpacing: 1, marginTop: 0, marginRight: 0, marginBottom: 10, marginLeft: 0, ...mont }}>Step {item.step}</p>
+            <p style={{ fontWeight: 700, fontSize: 20, color: '#000', marginTop: 0, marginRight: 0, marginBottom: 12, marginLeft: 0, ...mont }}>{item.title}</p>
+            <p style={{ fontWeight: 400, fontSize: 15, color: '#505050', lineHeight: 1.6, textAlign: 'justify', margin: 0, ...mont }}>{item.body}</p>
+          </div>
+        ))}
+
+        {/* ── Closing line ── */}
+        <p style={{ position: 'absolute', left: 80, top: 5044, width: 700, color: '#000', fontStyle: 'italic', fontSize: 18, fontWeight: 500, lineHeight: 1.5, margin: 0, ...dm }}>
+          What changes from project to project is the medium. What stays constant is the looking.
+        </p>
+
         {/* ── Contact CTA ── */}
-        <div style={{ position: 'absolute', left: 80, top: 3750, display: 'flex', flexDirection: 'column', gap: 40 }}>
+        <div style={{ position: 'absolute', left: 80, top: 5194, display: 'flex', flexDirection: 'column', gap: 40 }}>
           <p style={{ fontWeight: 500, fontSize: 28, color: '#000', width: 796, margin: 0, lineHeight: 1.4, ...dm }}>
             If something here has slowed you down, if you recognise the kind of work this is and it resonates with you- write to us.
           </p>
@@ -175,7 +228,7 @@ export default function AboutCanvas() {
         </div>
 
         {/* ── Photo + Contact form ── */}
-        <div style={{ position: 'absolute', left: 80, top: 4000, display: 'flex', gap: 118, alignItems: 'flex-start' }}>
+        <div style={{ position: 'absolute', left: 80, top: 5444, display: 'flex', gap: 118, alignItems: 'flex-start' }}>
           <div style={{ height: 565, width: 469, flexShrink: 0, position: 'relative', overflow: 'hidden' }}>
             <img alt="" style={{ position: 'absolute', inset: 0, maxWidth: 'none', objectFit: 'cover', width: '100%', height: '100%' }} src="/images/neeruganti-landscape.png" />
           </div>
@@ -183,8 +236,8 @@ export default function AboutCanvas() {
         </div>
 
         {/* ── .elsewhere footer wordmark ── */}
-        <div style={{ position: 'absolute', left: 0, top: 4700, width: W, paddingBottom: 52 }}>
-          <FooterBase rowStyle={{ marginTop: 48, paddingLeft: 88, paddingRight: 88 }} />
+        <div style={{ position: 'absolute', left: 0, top: 6144, width: W }}>
+          <FooterBase />
         </div>
 
       </div>
@@ -260,14 +313,14 @@ function MobileLayout() {
             {`My heart rests somewhere between a slab of cold stone and a hot cup of tea, listening to a story of how one spell of hard rain changed the course of three generations, or how a root, a leaf, and a mushroom once saved a man's life.`}
           </p>
         </div>
-        <p style={{ fontWeight: 400, fontSize: 14, color: '#505050', lineHeight: 'normal', margin: 0, marginTop: 24, ...mont }}>
+        <p style={{ fontWeight: 400, fontSize: 14, color: '#505050', lineHeight: 'normal', marginTop: 24, marginRight: 0, marginBottom: 0, marginLeft: 0, ...mont }}>
           That, to me, is home.
         </p>
       </div>
 
       {/* ── Elsewhere section ── */}
       <div style={{ padding: `${gap}px ${px}px 0` }}>
-        <p style={{ fontWeight: 700, fontSize: 16, lineHeight: 'normal', margin: 0, marginBottom: 12, color: '#000', ...mont }}>Elsewhere</p>
+        <p style={{ fontWeight: 700, fontSize: 16, lineHeight: 'normal', marginTop: 0, marginRight: 0, marginBottom: 12, marginLeft: 0, color: '#000', ...mont }}>Elsewhere</p>
         <p style={{ fontWeight: 400, fontSize: 14, lineHeight: 1.6, color: '#505050', margin: 0, ...mont }}>
           Elsewhere sits at the intersection of culture, movement, and human experience. It began as a question: what happens when you stay in a place long enough for it to stop performing for you?
         </p>
@@ -293,7 +346,7 @@ function MobileLayout() {
 
       {/* ── Consulting ── */}
       <div style={{ padding: `24px ${px}px 0`, paddingLeft: px + 20 }}>
-        <p style={{ fontWeight: 700, fontSize: 16, lineHeight: 'normal', margin: 0, marginBottom: 12, color: '#000', ...mont }}>Consulting</p>
+        <p style={{ fontWeight: 700, fontSize: 16, lineHeight: 'normal', marginTop: 0, marginRight: 0, marginBottom: 12, marginLeft: 0, color: '#000', ...mont }}>Consulting</p>
         <p style={{ fontWeight: 400, fontSize: 14, lineHeight: 1.6, color: '#505050', margin: 0, ...mont }}>
           Cultural intelligence and narrative strategy for organizations navigating complex terrain. We help foundations, corporations, and institutions tell stories that respect nuance, honor context, and resist simplification.
         </p>
@@ -318,6 +371,72 @@ function MobileLayout() {
         <br />
         <p style={{ fontWeight: 400, fontSize: 14, lineHeight: 1.6, color: '#505050', margin: 0, ...mont }}>
           Elsewhere works with organisations and individuals who understand what that means.
+        </p>
+      </div>
+
+      {/* ── Editorial and Documentary Commissions ── */}
+      <div style={{ padding: `${gap}px ${px}px 0`, paddingLeft: px + 20 }}>
+        <p style={{ fontWeight: 700, fontSize: 16, lineHeight: 'normal', marginTop: 0, marginRight: 0, marginBottom: 12, marginLeft: 0, color: '#000', ...mont }}>Editorial and Documentary Commissions</p>
+        <p style={{ fontWeight: 400, fontSize: 14, lineHeight: 1.6, color: '#505050', margin: 0, ...mont }}>
+          Work made through time spent close to the subject, taking the form of photography, film, sound, writing, printed matter, digital formats, or whatever form the story asks for.
+        </p>
+      </div>
+
+      {/* ── Bhoota Kola photo ── */}
+      <div style={{ marginTop: gap, display: 'flex', justifyContent: 'flex-end' }}>
+        <div style={{ width: '60%', aspectRatio: '3/4', position: 'relative', overflow: 'hidden' }}>
+          <img alt="Editorial and documentary commission" style={{ position: 'absolute', inset: 0, objectFit: 'cover', width: '100%', height: '100%' }} src="/images/bhoota-kola.png" />
+        </div>
+      </div>
+
+      {/* ── Cultural Advisory ── */}
+      <div style={{ padding: `24px ${px}px 0`, paddingLeft: px + 20 }}>
+        <p style={{ fontWeight: 700, fontSize: 16, lineHeight: 'normal', marginTop: 0, marginRight: 0, marginBottom: 12, marginLeft: 0, color: '#000', ...mont }}>Cultural Advisory</p>
+        <p style={{ fontWeight: 400, fontSize: 14, lineHeight: 1.6, color: '#505050', margin: 0, ...mont }}>
+          Selective work with brands and founders in mobility, craft, heritage, and lifestyle, helping them locate what is distinctive and what will resonate.
+        </p>
+      </div>
+
+      {/* ── Mandur trees image ── */}
+      <div style={{ marginTop: gap, padding: `0 ${px}px` }}>
+        <div style={{ width: '70%', aspectRatio: '4/3', position: 'relative', overflow: 'hidden' }}>
+          <img alt="Cultural advisory work" style={{ position: 'absolute', inset: 0, objectFit: 'cover', width: '100%', height: '100%' }} src="/images/mandur-trees.png" />
+        </div>
+      </div>
+
+      {/* ── Engagements transitional line ── */}
+      <div style={{ padding: `${gap}px ${px}px 0` }}>
+        <p style={{ fontWeight: 500, fontSize: 18, color: '#000', lineHeight: 1.5, margin: 0, ...dm }}>
+          Engagements may begin with a conversation, a field visit, a commission, or a single question that needs patient looking. If something here has slowed you down, and this way of working feels familiar, I would like to hear what you are building.
+        </p>
+      </div>
+
+      {/* ── Framework ── */}
+      <div style={{ padding: `${gap}px ${px}px 0` }}>
+        <p style={{ fontWeight: 700, fontSize: 20, lineHeight: 'normal', marginTop: 0, marginRight: 0, marginBottom: 14, marginLeft: 0, color: '#000', ...mont }}>Framework</p>
+        <p style={{ fontWeight: 400, fontSize: 14, lineHeight: 1.6, color: '#505050', margin: 0, ...mont }}>
+          The work at Elsewhere follows a simple movement: look closely, find what holds, then give it form. Each project takes a different shape, but the method stays the same.
+        </p>
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 28, padding: `28px ${px}px 0` }}>
+        {[
+          { step: '01', title: 'Look closely', body: 'Begin in the field, with unhurried attention, listening for what sits beneath the surface.' },
+          { step: '02', title: 'Find what holds', body: 'Identify the pattern beneath what is visible, the memory, the ritual, the thing a person reaches for without being asked.' },
+          { step: '03', title: 'Give it form', body: 'Shape what was found into the form it asks for: photography, film, sound, writing, printed matter, graphics, games, digital experiences, or the language a brand carries forward.' },
+        ].map((item) => (
+          <div key={item.step} style={{ borderTop: '1px solid #ddd', paddingTop: 16 }}>
+            <p style={{ fontWeight: 500, fontSize: 11, color: '#505050', textTransform: 'uppercase', letterSpacing: 1, marginTop: 0, marginRight: 0, marginBottom: 8, marginLeft: 0, ...mont }}>Step {item.step}</p>
+            <p style={{ fontWeight: 700, fontSize: 16, color: '#000', marginTop: 0, marginRight: 0, marginBottom: 10, marginLeft: 0, ...mont }}>{item.title}</p>
+            <p style={{ fontWeight: 400, fontSize: 14, color: '#505050', lineHeight: 1.6, margin: 0, ...mont }}>{item.body}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* ── Closing line ── */}
+      <div style={{ padding: `${gap}px ${px}px 0` }}>
+        <p style={{ fontWeight: 500, fontStyle: 'italic', fontSize: 15, color: '#000', lineHeight: 1.5, margin: 0, ...dm }}>
+          What changes from project to project is the medium. What stays constant is the looking.
         </p>
       </div>
 
@@ -359,8 +478,8 @@ function MobileLayout() {
       </div>
 
       {/* ── Footer wordmark ── */}
-      <div style={{ marginTop: gap + 16, paddingBottom: 32 }}>
-        <FooterBase rowStyle={{ marginTop: 24, paddingLeft: px, paddingRight: px }} />
+      <div style={{ marginTop: gap + 16 }}>
+        <FooterBase paddingBottom={32} rowStyle={{ marginTop: 24, paddingLeft: px, paddingRight: px }} />
       </div>
 
     </div>

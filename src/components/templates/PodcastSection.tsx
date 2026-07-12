@@ -6,6 +6,11 @@ import { useMusicPlayer } from '@/components/public/MusicPlayerProvider'
 type Props = {
   urls: string[]
   compact?: boolean
+  // Canvas scale factor (viewport width / 1512 design width). This section renders
+  // outside the scaled canvas, in real pixels, but the fixed sidebar (CanvasSidebar)
+  // it must clear positions itself at `80 * scale` from the left edge — so the left
+  // padding here is tied to the same scale to guarantee clearance at any viewport width.
+  scale?: number
 }
 
 type SpotifyPlaybackUpdate = { data: { isPaused: boolean; isBuffering: boolean } }
@@ -82,13 +87,22 @@ function PodcastEmbed({ url, marginTop, onPlay }: { url: string; marginTop: numb
   return <div ref={containerRef} style={{ marginTop }} />
 }
 
-export default function PodcastSection({ urls, compact }: Props) {
+export default function PodcastSection({ urls, compact, scale = 1 }: Props) {
   const valid = urls.filter(Boolean)
   const { requestPause } = useMusicPlayer()
   if (valid.length === 0) return null
 
+  // The sidebar's right edge grows ~155.6px per unit of scale (measured empirically:
+  // its `left: Math.max(12, 80*scale)` position plus its proportionally-sized label
+  // text). This left padding must grow at least as fast, or clearance shrinks to zero
+  // and reverses at large scale (verified: the old flat-ish `170 + 80*scale` formula
+  // went negative above scale ~2.25, i.e. viewports wider than ~3400px).
+  const padding = compact
+    ? '32px 24px'
+    : `${48 * scale}px ${88 * scale}px ${48 * scale}px ${90 + 160 * scale}px`
+
   return (
-    <div style={{ background: '#fff', padding: compact ? '32px 24px' : '48px 88px 48px 250px' }}>
+    <div style={{ background: '#fff', padding }}>
       {valid.map((url, i) => (
         <PodcastEmbed key={url} url={url} marginTop={i > 0 ? 16 : 0} onPlay={requestPause} />
       ))}

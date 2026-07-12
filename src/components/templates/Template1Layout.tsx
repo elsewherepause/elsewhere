@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { hasContent, type ImageAdjust, type Section, type TemplateData } from '@/components/admin/template-editor/shared'
 import { renderInlineMarkdown } from '@/lib/utils/inline-markdown'
 import CanvasFooter from './CanvasFooter'
+import CanvasHeader from './CanvasHeader'
 import CanvasSidebar from './CanvasSidebar'
 import CanvasPhotosView from './CanvasPhotosView'
 import PodcastSection from './PodcastSection'
@@ -22,8 +23,9 @@ const SECTION_STARTS = [1012, 1587, 2702, 3280, 3923, 4548, 5193, 6038, 6471, 71
 // Vertical slot height of each pattern (start[i+1] - start[i]; last pattern ends at footer y=8357)
 const SECTION_HEIGHTS = [575, 1100, 660, 643, 625, 779, 845, 433, 681, 671, 534]
 
-// Where content starts (top of first pattern's slot)
-const CONTENT_TOP = 1012
+// Where content starts (top of first pattern's slot) — shifted up 50px from the
+// original 1012 to tighten the whitespace between the header and the title/hero
+const CONTENT_TOP = 962
 
 // Bottom of the deepest element (image + caption, or text) in each pattern at offset=0
 // Used to place the footer below the actual last element, not just the slot boundary
@@ -89,7 +91,7 @@ export default function Template1Layout({ data, isEditing, onImageSelect }: Prop
     [s.image1, s.image2, s.image3, s.image4].filter((id): id is string => !!id)
   )
 
-  const HEADER_END = 996
+  const HEADER_END = 946
   const storyFooterY = lastContentBottom + 60
   const storyCanvasH = storyFooterY
   const canvasH = viewMode === 'photos' ? HEADER_END : storyCanvasH
@@ -372,62 +374,21 @@ export default function Template1Layout({ data, isEditing, onImageSelect }: Prop
         fontFamily: 'var(--font-sans, Montserrat)',
       }}>
 
-        {/* ━━━ TITLE ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-        <div style={{
-          position: 'absolute', left: 80, top: 139,
-          fontFamily: 'var(--font-serif, DM Sans)', fontWeight: 400, fontSize: 40,
-          color: '#000', textTransform: 'uppercase', lineHeight: 1.15,
-          whiteSpace: 'nowrap',
-        }}>
-          {renderInlineMarkdown(d?.titleBold || 'Project Title')}
-        </div>
-
-        {/* ━━━ HERO IMAGE — 1352 × 671 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-        <ImgBox id={d?.heroImage} sk="hero" field="heroImage" l={80} t={197} w={1352} h={671} adj={d?.heroImageAdjust} />
-
-        {/* ━━━ METADATA BAR ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-        <div style={{
-          position: 'absolute', left: 80, top: 879,
-          width: 795, display: 'flex', alignItems: 'center',
-          justifyContent: 'space-between',
-          fontFamily: 'var(--font-sans, Montserrat)', fontWeight: 400, fontSize: 16,
-          lineHeight: 'normal',
-        }}>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <span style={{ color: '#ccc' }}>Location:</span>
-            <span style={{ color: '#000' }}>{d?.location || '—'}</span>
-          </div>
-          <span style={{ color: '#ccc' }}>{d?.coordinates || '—'}</span>
-          <div style={{ display: 'flex', gap: 11, alignItems: 'center' }}>
-            <span style={{ color: '#ccc' }}>Camera -</span>
-            <span style={{ color: '#000' }}>{d?.camera || '—'}</span>
-          </div>
-        </div>
-
-        {/* ━━━ SECONDARY NAV (Photos / Story) ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-        <div style={{
-          position: 'absolute', left: 0, top: 921, width: W,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          gap: 16, height: 75, opacity: stickyNav ? 0 : 1,
-        }}>
-          <span
-            onClick={() => setViewMode('photos')}
-            style={{
-              fontFamily: 'var(--font-sans, Montserrat)', fontWeight: 800, fontSize: 14,
-              textTransform: 'uppercase', cursor: 'pointer',
-              color: viewMode === 'photos' ? '#1c1c1c' : '#ccc',
-            }}
-          >Photos</span>
-          <div style={{ height: 31, width: 1, background: '#1c1c1c' }} />
-          <span
-            onClick={() => setViewMode('story')}
-            style={{
-              fontFamily: 'var(--font-sans, Montserrat)', fontWeight: 800, fontSize: 14,
-              textTransform: 'uppercase', cursor: 'pointer',
-              color: viewMode === 'story' ? '#1c1c1c' : '#ccc',
-            }}
-          >Story</span>
-        </div>
+        <CanvasHeader
+          W={W}
+          titleBold={d?.titleBold}
+          heroImage={d?.heroImage}
+          heroImageAdjust={d?.heroImageAdjust}
+          location={d?.location}
+          coordinates={d?.coordinates}
+          camera={d?.camera}
+          viewMode={viewMode}
+          setViewMode={setViewMode}
+          stickyNav={stickyNav}
+          isEditing={isEditing}
+          onImageSelect={onImageSelect}
+          cloudName={cloudName}
+        />
 
         {/* ━━━ STORY CONTENT ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
         {viewMode === 'story' && activeSections.map((s, i) => renderSection(s, i))}
@@ -438,11 +399,12 @@ export default function Template1Layout({ data, isEditing, onImageSelect }: Prop
     {viewMode === 'story' && (
       <>
         {Array.isArray(d?.podcastSpotifyUrls) && d!.podcastSpotifyUrls!.length > 0 && (
-          <PodcastSection urls={d!.podcastSpotifyUrls!} />
+          <PodcastSection urls={d!.podcastSpotifyUrls!} scale={scale} />
         )}
         <CanvasFooter
           nextProjectSlug={d?.nextProjectSlug}
           destinations={(d as Record<string, unknown>)?.destinations as { slug: string }[] ?? []}
+          scale={scale}
         />
       </>
     )}
