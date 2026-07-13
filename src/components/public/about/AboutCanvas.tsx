@@ -344,15 +344,11 @@ function MobileLayout() {
         </div>
       </div>
 
-      {/* ── Consulting ── */}
+      {/* ── For Brands and Institutions ── */}
       <div style={{ padding: `24px ${px}px 0`, paddingLeft: px + 20 }}>
-        <p style={{ fontWeight: 700, fontSize: 16, lineHeight: 'normal', marginTop: 0, marginRight: 0, marginBottom: 12, marginLeft: 0, color: '#000', ...mont }}>Consulting</p>
+        <p style={{ fontWeight: 700, fontSize: 16, lineHeight: 'normal', marginTop: 0, marginRight: 0, marginBottom: 12, marginLeft: 0, color: '#000', ...mont }}>For Brands and Institutions</p>
         <p style={{ fontWeight: 400, fontSize: 14, lineHeight: 1.6, color: '#505050', margin: 0, ...mont }}>
-          Cultural intelligence and narrative strategy for organizations navigating complex terrain. We help foundations, corporations, and institutions tell stories that respect nuance, honor context, and resist simplification.
-        </p>
-        <br />
-        <p style={{ fontWeight: 400, fontSize: 14, lineHeight: 1.6, color: '#505050', margin: 0, ...mont }}>
-          This includes: cultural research, narrative development, brand storytelling that&apos;s rooted in place and practice, and strategic guidance for organizations working across cultures or entering new markets.
+          Elsewhere works with brands, institutions, and cultural ventures that need more than content. The practice is concerned with how stories are found, shaped, and carried across image, language, experience, and form.
         </p>
       </div>
 
@@ -363,14 +359,15 @@ function MobileLayout() {
         </div>
       </div>
 
-      {/* ── Shaped by time ── */}
-      <div style={{ padding: `24px ${px}px 0` }}>
-        <p style={{ fontWeight: 400, fontSize: 14, lineHeight: 1.6, color: '#505050', margin: 0, ...mont }}>
-          Shaped by time on the ground — through travel, observation, and making. Working across film, photography, writing, and sound. The work that comes out of it is not designed to explain or persuade. It is made to remain present as the world shifts around it.
+      {/* ── Narrative Research / Story Strategy ── */}
+      <div style={{ padding: `24px ${px}px 0`, paddingLeft: px + 20 }}>
+        <p style={{ fontWeight: 700, fontSize: 16, lineHeight: 'normal', marginTop: 0, marginRight: 0, marginBottom: 12, marginLeft: 0, color: '#000', ...mont }}>Narrative Research</p>
+        <p style={{ fontWeight: 400, fontSize: 14, lineHeight: 1.6, color: '#505050', marginTop: 0, marginRight: 0, marginBottom: 24, marginLeft: 0, ...mont }}>
+          Field-grounded inquiry into people, place, material culture, and lived context. This roots a brand, publication, or institution in real understanding before it begins to speak.
         </p>
-        <br />
+        <p style={{ fontWeight: 700, fontSize: 16, lineHeight: 'normal', marginTop: 0, marginRight: 0, marginBottom: 12, marginLeft: 0, color: '#000', ...mont }}>Story Strategy</p>
         <p style={{ fontWeight: 400, fontSize: 14, lineHeight: 1.6, color: '#505050', margin: 0, ...mont }}>
-          Elsewhere works with organisations and individuals who understand what that means.
+          Narrative direction for campaigns, brand worlds, editorial platforms, and cultural initiatives. This covers theme, language, structure, and the shape a story needs to take.
         </p>
       </div>
 
@@ -382,10 +379,10 @@ function MobileLayout() {
         </p>
       </div>
 
-      {/* ── Bhoota Kola photo ── */}
+      {/* ── Editorial commission photo ── */}
       <div style={{ marginTop: gap, display: 'flex', justifyContent: 'flex-end' }}>
         <div style={{ width: '60%', aspectRatio: '3/4', position: 'relative', overflow: 'hidden' }}>
-          <img alt="Editorial and documentary commission" style={{ position: 'absolute', inset: 0, objectFit: 'cover', width: '100%', height: '100%' }} src="/images/bhoota-kola.png" />
+          <img alt="Editorial and documentary commission" style={{ position: 'absolute', inset: 0, objectFit: 'cover', width: '100%', height: '100%' }} src="/images/rebuilding-tsunami.png" />
         </div>
       </div>
 
