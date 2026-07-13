@@ -132,10 +132,10 @@ function GalleryGroup({
   const img7 = groupItems[7]
 
   return (
-    <div className="space-y-16 md:space-y-24 lg:space-y-36">
+    <div className="space-y-20 md:space-y-24 lg:space-y-36">
       {/* Row 1: Article note + center portrait + text right */}
       {img0 && (
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
           <div className="col-span-12 md:col-span-3 md:col-start-1 md:pt-4">
             <ArticleNote note={note1} align={flip ? 'right' : 'left'} />
           </div>
@@ -154,7 +154,7 @@ function GalleryGroup({
 
       {/* Row 2: image | text | text | image */}
       {(img1 || img2) && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-8 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 items-start">
           {img1 && (
             <div>
               {renderImage(img1, 'aspect-[288/395]', onOpen)}
@@ -165,13 +165,13 @@ function GalleryGroup({
               <EditorialText title={img1.caption} desc={img1.description} align="left" />
             </div>
           )}
-          <div>
+          <div className="order-2 md:order-none">
             {img2 && (
               <EditorialText title={img2.caption} desc={img2.description} align="left" />
             )}
           </div>
           {img2 && (
-            <div>
+            <div className="order-1 md:order-none">
               {renderImage(img2, 'aspect-[288/395]', onOpen)}
             </div>
           )}
@@ -180,11 +180,11 @@ function GalleryGroup({
 
       {/* Row 4: Caption left (adjacent) + landscape right */}
       {img3 && (
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-center">
-          <div className="col-span-12 md:col-span-3 md:col-start-4">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+          <div className="col-span-12 md:col-span-3 md:col-start-4 order-2 md:order-none">
             <EditorialText title={img3.caption} desc={img3.description} align="right" />
           </div>
-          <div className="col-span-12 md:col-span-6 md:col-start-7">
+          <div className="col-span-12 md:col-span-6 md:col-start-7 order-1 md:order-none">
             {renderImage(img3, 'aspect-[520/298]', onOpen)}
           </div>
         </div>
@@ -192,7 +192,7 @@ function GalleryGroup({
 
       {/* Row 5: Landscape left + title+desc + article note right + portrait right */}
       {(img4 || img5) && (
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
           {img4 && (
             <div className="col-span-12 md:col-span-5 md:col-start-1">
               {renderImage(img4, 'aspect-[520/298]', onOpen)}
@@ -227,7 +227,7 @@ function GalleryGroup({
 
       {/* Row 6: Text+landscape left, title right+landscape right */}
       {(img6 || img7) && (
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
           {img6 && (
             <div className="col-span-12 md:col-span-5 md:col-start-1 flex flex-col gap-6">
               {renderImage(img6, 'aspect-[469/240]', onOpen)}
@@ -243,9 +243,9 @@ function GalleryGroup({
           {img7 && (
             <div className="col-span-12 md:col-span-5 md:col-start-8 md:mt-20">
               {img7.caption && (
-                <EditorialTitle align="left">
-                  {img7.caption}
-                </EditorialTitle>
+                <div className="hidden md:block">
+                  <EditorialTitle align="left">{img7.caption}</EditorialTitle>
+                </div>
               )}
               <div className="mt-4">
                 {renderImage(img7, 'aspect-[520/298]', onOpen)}
@@ -257,6 +257,11 @@ function GalleryGroup({
                     desc={img7.description}
                     align="right"
                   />
+                </div>
+              )}
+              {!img7.description && img7.caption && (
+                <div className="mt-4 flex justify-end md:hidden">
+                  <EditorialText title={img7.caption} align="right" />
                 </div>
               )}
             </div>
