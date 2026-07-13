@@ -29,7 +29,6 @@ export type Section = {
 
 export type TemplateData = {
   titleBold?: string
-  titleLight?: string
   location?: string
   coordinates?: string
   camera?: string

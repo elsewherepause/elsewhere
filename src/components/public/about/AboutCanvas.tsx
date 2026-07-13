@@ -476,7 +476,7 @@ function MobileLayout() {
 
       {/* ── Footer wordmark ── */}
       <div style={{ marginTop: gap + 16 }}>
-        <FooterBase paddingBottom={32} rowStyle={{ marginTop: 24, paddingLeft: px, paddingRight: px }} />
+        <FooterBase />
       </div>
 
     </div>

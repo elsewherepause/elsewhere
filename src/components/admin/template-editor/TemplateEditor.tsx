@@ -6,7 +6,7 @@ import { updateProject, publishProject, unpublishProject } from '@/actions/proje
 import MediaPicker from '@/components/admin/media/MediaPicker'
 import { SLOT_PATTERN } from '@/lib/homepage-slots'
 import type { Project, MediaAsset } from '@prisma/client'
-import CroppedImage from '@/components/shared/CroppedImage'
+import ImageAdjustControl from '@/components/admin/shared/ImageAdjustControl'
 import { inputCls, textareaCls, hasContent, type ImageAdjust, type Section, type TemplateData, type Pattern, DEFAULT_ADJUST } from './shared'
 
 type FullProject = Project & { heroImage: MediaAsset | null; ogImage: MediaAsset | null }
@@ -19,105 +19,8 @@ function aspectFromLabel(label: string): number | undefined {
   return parseInt(m[1], 10) / parseInt(m[2], 10)
 }
 
-function ImageAdjustControl({
-  cloudName, imageId, label, adj, onPick, onAdjust, aspect = 16 / 9,
-}: {
-  cloudName: string
-  imageId?: string
-  label: string
-  adj: ImageAdjust
-  onPick: () => void
-  onAdjust: (adj: ImageAdjust) => void
-  aspect?: number
-}) {
-  const thumbRef = useRef<HTMLDivElement>(null)
-  const url = imageId ? `https://res.cloudinary.com/${cloudName}/image/upload/w_240,q_auto,f_auto/${imageId}` : ''
-
-  function handleMouseDown(e: React.MouseEvent) {
-    e.preventDefault()
-    const startX = e.clientX, startY = e.clientY
-    let moved = false
-
-    function onMove(me: MouseEvent) {
-      if (!moved && (Math.abs(me.clientX - startX) > 4 || Math.abs(me.clientY - startY) > 4)) moved = true
-      if (moved && thumbRef.current) {
-        const rect = thumbRef.current.getBoundingClientRect()
-        const x = Math.round(Math.max(0, Math.min(100, ((me.clientX - rect.left) / rect.width) * 100)))
-        const y = Math.round(Math.max(0, Math.min(100, ((me.clientY - rect.top) / rect.height) * 100)))
-        onAdjust({ ...adj, x, y })
-      }
-    }
-    function onUp() {
-      if (!moved) onPick()
-      document.removeEventListener('mousemove', onMove)
-      document.removeEventListener('mouseup', onUp)
-    }
-    document.addEventListener('mousemove', onMove)
-    document.addEventListener('mouseup', onUp)
-  }
-
-  return (
-    <div className="space-y-1">
-      <label className="text-[10px] uppercase tracking-widest text-gray-400">{label}</label>
-      <div
-        ref={thumbRef}
-        className="w-full relative overflow-hidden border border-dashed border-gray-200 bg-gray-50"
-        style={{ aspectRatio: aspect, cursor: url ? 'crosshair' : 'pointer' }}
-        onMouseDown={url ? handleMouseDown : undefined}
-        onClick={!url ? onPick : undefined}
-      >
-        {url ? (
-          <>
-            <CroppedImage
-              src={url}
-              adj={adj}
-              aspect={aspect}
-              draggable={false}
-              style={{ userSelect: 'none', pointerEvents: 'none' }}
-            />
-            <div style={{ position: 'absolute', left: `${adj.x}%`, top: `${adj.y}%`, transform: 'translate(-50%,-50%)', width: 10, height: 10, border: '2px solid white', borderRadius: '50%', boxShadow: '0 0 0 1px rgba(0,0,0,0.6)', pointerEvents: 'none' }} />
-            <div style={{ position: 'absolute', bottom: 4, right: 4, background: 'rgba(0,0,0,0.45)', color: 'white', fontSize: 9, padding: '1px 4px', borderRadius: 2, pointerEvents: 'none', userSelect: 'none' }}>drag · click to change</div>
-          </>
-        ) : (
-          <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-1">
-            <span className="text-lg">+</span>
-            <span className="text-[10px]">Add image</span>
-          </div>
-        )}
-      </div>
-      {url && (
-        <div className="flex items-center gap-1.5 pt-0.5">
-          <span className="text-[10px] uppercase tracking-widest text-gray-400 mr-1">Zoom</span>
-          <button onClick={() => onAdjust({ ...adj, zoom: Math.max(0.1, Math.round((adj.zoom - 0.1) * 10) / 10) })} className="w-5 h-5 flex items-center justify-center border border-gray-200 text-gray-500 hover:border-black transition-colors text-xs leading-none">−</button>
-          <input
-            type="number"
-            step="0.01"
-            min="0.1"
-            max="3"
-            value={adj.zoom.toFixed(2)}
-            onChange={e => {
-              const v = parseFloat(e.target.value)
-              if (!isNaN(v)) onAdjust({ ...adj, zoom: Math.min(3, Math.max(0.1, Math.round(v * 100) / 100)) })
-            }}
-            onBlur={e => {
-              const v = parseFloat(e.target.value)
-              if (isNaN(v)) onAdjust({ ...adj, zoom: 1 })
-            }}
-            onKeyDown={e => { if (e.key === 'Enter') e.currentTarget.blur() }}
-            className="w-12 text-[10px] text-gray-500 text-center tabular-nums border border-gray-200 rounded px-1 py-0.5 focus:outline-none focus:border-black"
-          />
-          <button onClick={() => onAdjust({ ...adj, zoom: Math.min(3, Math.round((adj.zoom + 0.1) * 10) / 10) })} className="w-5 h-5 flex items-center justify-center border border-gray-200 text-gray-500 hover:border-black transition-colors text-xs leading-none">+</button>
-          {(adj.x !== 50 || adj.y !== 50 || adj.zoom !== 1) && (
-            <button onClick={() => onAdjust({ x: 50, y: 50, zoom: 1 })} className="ml-auto text-[10px] text-gray-300 hover:text-gray-600 transition-colors">reset</button>
-          )}
-        </div>
-      )}
-    </div>
-  )
-}
-
 function SectionAccordion({
-  index, patternCount, patterns, isOpen, sData, onToggle, onImagePick, onAdjustChange, onFieldChange, onRemove,
+  index, patternCount, patterns, isOpen, sData, onToggle, onImagePick, onImageRemove, onAdjustChange, onFieldChange, onRemove,
 }: {
   index: number
   patternCount: number
@@ -126,6 +29,7 @@ function SectionAccordion({
   sData: Partial<Section>
   onToggle: () => void
   onImagePick: (field: string) => void
+  onImageRemove: (field: string) => void
   onAdjustChange: (field: string, adj: ImageAdjust) => void
   onFieldChange: (field: string, value: string) => void
   onRemove: () => void
@@ -168,6 +72,7 @@ function SectionAccordion({
                 adj={adj}
                 onPick={() => onImagePick(img.field)}
                 onAdjust={a => onAdjustChange(img.field + 'Adjust', a)}
+                onRemove={id ? () => onImageRemove(img.field) : undefined}
                 aspect={aspectFromLabel(img.label)}
               />
             )
@@ -216,11 +121,10 @@ type Props = {
   project: FullProject
   patterns: Pattern[]
   Layout: ComponentType<LayoutProps>
-  showTitleLight?: boolean
   homepageSlot?: { w: number; h: number } | null
 }
 
-export default function TemplateEditor({ project, patterns, Layout, showTitleLight, homepageSlot }: Props) {
+export default function TemplateEditor({ project, patterns, Layout, homepageSlot }: Props) {
   const patternCount = patterns.length
 
   const [title, setTitle] = useState(project.title)
@@ -416,12 +320,6 @@ export default function TemplateEditor({ project, patterns, Layout, showTitleLig
                     <option value="ADVENTURE">Adventure</option>
                   </select>
                 </div>
-                {showTitleLight && (
-                  <div className="space-y-1">
-                    <label className="text-[10px] uppercase tracking-widest text-gray-400">Title — light part</label>
-                    <input value={(templateData.titleLight as string) || ''} onChange={e => setMeta('titleLight', e.target.value)} className={inputCls} placeholder="The Culture in " />
-                  </div>
-                )}
                 <div className="space-y-1">
                   <label className="text-[10px] uppercase tracking-widest text-gray-400">Title</label>
                   <input data-formattable="" value={(templateData.titleBold as string) || ''} onChange={e => setMeta('titleBold', e.target.value)} className={inputCls} placeholder="Project Title" />
@@ -438,7 +336,7 @@ export default function TemplateEditor({ project, patterns, Layout, showTitleLig
                   <label className="text-[10px] uppercase tracking-widest text-gray-400">Camera</label>
                   <input value={(templateData.camera as string) || ''} onChange={e => setMeta('camera', e.target.value)} className={inputCls} placeholder="Camera model" />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <label className="text-[10px] uppercase tracking-widest text-gray-400">Podcast Episodes (Spotify)</label>
                   {((templateData.podcastSpotifyUrls as string[]) || []).map((url, i) => (
                     <div key={i} className="flex items-center gap-2">
@@ -479,6 +377,7 @@ export default function TemplateEditor({ project, patterns, Layout, showTitleLig
                   adj={(templateData.heroImageAdjust as ImageAdjust | undefined) ?? DEFAULT_ADJUST}
                   onPick={() => openPicker('hero', 'heroImage')}
                   onAdjust={a => setMeta('heroImageAdjust', a)}
+                  onRemove={templateData.heroImage ? () => setMeta('heroImage', undefined) : undefined}
                   aspect={1352 / 671}
                 />
                 {templateData.heroImage && (
@@ -489,6 +388,7 @@ export default function TemplateEditor({ project, patterns, Layout, showTitleLig
                     adj={(templateData.homepageHeroAdjust as ImageAdjust | undefined) ?? DEFAULT_ADJUST}
                     onPick={() => openPicker('hero', 'heroImage')}
                     onAdjust={a => setMeta('homepageHeroAdjust', a)}
+                    onRemove={() => setMeta('heroImage', undefined)}
                     aspect={homepageSlot ? homepageSlot.w / homepageSlot.h : undefined}
                   />
                 )}
@@ -507,6 +407,7 @@ export default function TemplateEditor({ project, patterns, Layout, showTitleLig
               sData={sections[i] ?? {}}
               onToggle={() => setOpenSection(openSection === `section-${i}` ? null : `section-${i}`)}
               onImagePick={field => openPicker(String(i), field)}
+              onImageRemove={field => setSection(i, field, undefined)}
               onAdjustChange={(field, adj) => setSection(i, field, adj)}
               onFieldChange={(field, value) => setSection(i, field, value)}
               onRemove={() => removeSection(i)}

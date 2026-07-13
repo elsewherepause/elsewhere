@@ -6,7 +6,10 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { deleteGalleryImage, updateGalleryImage } from '@/actions/gallery.actions'
 import { cloudinaryUrl, cloudinaryVideoThumbnail } from '@/lib/utils/cloudinary-url'
+import ImageAdjustControl, { DEFAULT_ADJUST, type ImageAdjust } from '@/components/admin/shared/ImageAdjustControl'
 import type { GalleryImage, MediaAsset } from '@prisma/client'
+
+const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ?? ''
 
 type Item = GalleryImage & { image: MediaAsset }
 
@@ -26,6 +29,7 @@ export default function SortableGalleryItem({ item, onDeleted, onUpdated }: Prop
     category: item.category ?? '',
     mediaType: item.mediaType,
     published: item.published,
+    imageAdjust: (item.imageAdjust as ImageAdjust | null) ?? DEFAULT_ADJUST,
   })
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -106,6 +110,20 @@ export default function SortableGalleryItem({ item, onDeleted, onUpdated }: Prop
 
       {expanded && (
         <div className="border-t border-[var(--color-border)] p-4 space-y-4">
+          {form.mediaType === 'PHOTO' && (
+            <div className="max-w-[240px]">
+              <ImageAdjustControl
+                cloudName={CLOUD_NAME}
+                imageId={item.image.cloudinaryId}
+                label="Crop"
+                adj={form.imageAdjust}
+                onPick={() => {}}
+                onAdjust={(adj) => setForm((f) => ({ ...f, imageAdjust: adj }))}
+                aspect={item.image.width / item.image.height}
+              />
+            </div>
+          )}
+
           <div className="space-y-1">
             <label className="block text-xs uppercase tracking-widest text-[var(--color-ink-muted)]">
               Title

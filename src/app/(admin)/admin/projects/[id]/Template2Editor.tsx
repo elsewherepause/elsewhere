@@ -9,5 +9,5 @@ type FullProject = Project & { heroImage: MediaAsset | null; ogImage: MediaAsset
 type Slot = { w: number; h: number }
 
 export default function Template2Editor({ project, homepageSlot }: { project: FullProject; homepageSlot?: Slot | null }) {
-  return <TemplateEditor project={project} patterns={PATTERNS} Layout={Template2Layout} showTitleLight homepageSlot={homepageSlot} />
+  return <TemplateEditor project={project} patterns={PATTERNS} Layout={Template2Layout} homepageSlot={homepageSlot} />
 }

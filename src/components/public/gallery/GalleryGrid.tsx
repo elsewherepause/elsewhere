@@ -1,9 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { cloudinaryUrl, cloudinaryVideoUrl, cloudinaryVideoThumbnail } from '@/lib/utils/cloudinary-url'
+import CroppedImage, { type ImageAdjust } from '@/components/shared/CroppedImage'
 import type { GalleryMediaType } from '@prisma/client'
 import type { Note } from '@/actions/note.actions'
 import GalleryLightbox from './GalleryLightbox'
@@ -15,7 +15,14 @@ export type GalleryItemData = {
   description: string | null
   mediaType: GalleryMediaType
   category: string | null
+  imageAdjust?: ImageAdjust | null
   image: { cloudinaryId: string; width: number; height: number }
+}
+
+// Pulls the numeric aspect ratio out of a Tailwind class like "aspect-[288/395]".
+function parseAspect(aspectClass: string): number {
+  const m = aspectClass.match(/\[(\d+)\/(\d+)\]/)
+  return m ? parseInt(m[1], 10) / parseInt(m[2], 10) : 1
 }
 
 function ArticleNote({ note, align = "left" }: { note?: Note; align?: "left" | "right" }) {
@@ -94,15 +101,14 @@ function renderImage(item: GalleryItemData, aspectClass: string, onOpen: (item: 
 
   return (
     <div
-      className={`relative w-full ${aspectClass} cursor-pointer`}
+      className={`relative w-full overflow-hidden ${aspectClass} cursor-pointer`}
       onClick={() => onOpen(item)}
     >
-      <Image
-        src={cloudinaryUrl(item.image.cloudinaryId, { width: 1200, crop: 'fill' })}
+      <CroppedImage
+        src={cloudinaryUrl(item.image.cloudinaryId, { width: 1400, crop: '' })}
         alt={item.altText || ''}
-        fill
-        className="object-cover"
-        sizes="(max-width: 768px) 100vw, 50vw"
+        adj={item.imageAdjust ?? undefined}
+        aspect={parseAspect(aspectClass)}
       />
     </div>
   )
@@ -167,7 +173,7 @@ function GalleryGroup({
           )}
           <div className="order-2 md:order-none">
             {img2 && (
-              <EditorialText title={img2.caption} desc={img2.description} align="left" />
+              <EditorialText title={img2.caption} desc={img2.description} align="right" />
             )}
           </div>
           {img2 && (
@@ -198,7 +204,7 @@ function GalleryGroup({
               {renderImage(img4, 'aspect-[520/298]', onOpen)}
             </div>
           )}
-          <div className="col-span-12 md:col-span-3 md:col-start-7 md:pt-2">
+          <div className="col-span-12 md:col-span-3 md:col-start-6 md:pt-2">
             {img4 && (
               <EditorialText
                 title={img4.caption}

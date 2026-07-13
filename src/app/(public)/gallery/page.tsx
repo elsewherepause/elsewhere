@@ -4,6 +4,7 @@ import SiteNav from '@/components/public/nav/SiteNav'
 import GalleryClient from '@/components/public/gallery/GalleryClient'
 import { getNextProject } from '@/lib/utils/next-project'
 import { getAllDestinations } from '@/lib/utils/random-destination'
+import type { ImageAdjust } from '@/components/shared/CroppedImage'
 
 export const revalidate = 60
 
@@ -13,13 +14,18 @@ export const metadata: Metadata = {
 }
 
 export default async function GalleryPage() {
-  const images = await prisma.galleryImage
+  const rawImages = await prisma.galleryImage
     .findMany({
       where: { published: true },
       include: { image: true },
       orderBy: { order: 'asc' },
     })
     .catch(() => [])
+
+  const images = rawImages.map((i) => ({
+    ...i,
+    imageAdjust: i.imageAdjust as ImageAdjust | null,
+  }))
 
   const notes = await prisma.note
     .findMany({

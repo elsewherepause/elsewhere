@@ -34,11 +34,30 @@ declare global {
 
 const SPOTIFY_API_SRC = 'https://open.spotify.com/embed/iframe-api/v1'
 
+// Spotify's script calls `window.onSpotifyIframeApiReady` exactly once, ever,
+// per page session — so it can't just be re-registered per embed. Once it has
+// fired, later embeds (mounted after that point, e.g. on a project page
+// reached via client-side nav after another podcast already loaded) would
+// register a handler that never gets called again, and silently never render.
+// Caching the resolved API and queuing callbacks until then fixes that.
+let spotifyApi: SpotifyIFrameAPI | null = null
+let pendingReady: ((api: SpotifyIFrameAPI) => void)[] = []
+
 function loadSpotifyIframeApi(onReady: (api: SpotifyIFrameAPI) => void) {
-  const prevReady = window.onSpotifyIframeApiReady
-  window.onSpotifyIframeApiReady = (api) => {
-    prevReady?.(api)
-    onReady(api)
+  if (spotifyApi) {
+    onReady(spotifyApi)
+    return
+  }
+
+  pendingReady.push(onReady)
+
+  if (!window.onSpotifyIframeApiReady) {
+    window.onSpotifyIframeApiReady = (api) => {
+      spotifyApi = api
+      const callbacks = pendingReady
+      pendingReady = []
+      callbacks.forEach((cb) => cb(api))
+    }
   }
 
   if (document.querySelector(`script[src="${SPOTIFY_API_SRC}"]`)) return
@@ -84,7 +103,15 @@ function PodcastEmbed({ url, marginTop, onPlay }: { url: string; marginTop: numb
     }
   }, [url, onPlay])
 
-  return <div ref={containerRef} style={{ marginTop }} />
+  // Spotify's IFrame API replaces the mount element outright with its own
+  // <iframe>, discarding any styling on it — so marginTop has to live on a
+  // wrapper that isn't handed to createController, or spacing collapses once
+  // the embed loads.
+  return (
+    <div style={{ marginTop }}>
+      <div ref={containerRef} />
+    </div>
+  )
 }
 
 export default function PodcastSection({ urls, compact, scale = 1 }: Props) {
@@ -104,7 +131,7 @@ export default function PodcastSection({ urls, compact, scale = 1 }: Props) {
   return (
     <div style={{ background: '#fff', padding }}>
       {valid.map((url, i) => (
-        <PodcastEmbed key={url} url={url} marginTop={i > 0 ? 16 : 0} onPlay={requestPause} />
+        <PodcastEmbed key={i} url={url} marginTop={i > 0 ? 24 : 0} onPlay={requestPause} />
       ))}
     </div>
   )

@@ -10,7 +10,7 @@ export default function SiteFooter({ nextProject, destinations = [] }: Props) {
   return (
     <footer className="pt-24 pb-10">
       <FooterNav nextProject={nextProject} destinations={destinations} />
-      <FooterBase rowClassName="flex items-center justify-between px-6 md:px-20 mt-16" />
+      <FooterBase />
     </footer>
   )
 }

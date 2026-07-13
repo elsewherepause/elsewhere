@@ -41,7 +41,7 @@ export default function GalleryClient({
 
   return (
     <div className="pt-28 md:pt-32">
-      <div className="max-w-[1440px] mx-auto px-6 md:px-20">
+      <div className="max-w-[clamp(1440px,90vw,2200px)] mx-auto px-6 md:px-20">
         {/* Filter bar */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 pb-16">
           <div className="flex flex-wrap items-center gap-6 md:gap-12">

@@ -6,6 +6,12 @@ import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import type { GalleryMediaType } from '@prisma/client'
 
+const ImageAdjustSchema = z.object({
+  x: z.number(),
+  y: z.number(),
+  zoom: z.number(),
+})
+
 const GalleryImageSchema = z.object({
   altText: z.string().optional().nullable(),
   caption: z.string().optional().nullable(),
@@ -13,6 +19,7 @@ const GalleryImageSchema = z.object({
   category: z.string().optional().nullable(),
   mediaType: z.enum(['PHOTO', 'VIDEO']),
   published: z.boolean(),
+  imageAdjust: ImageAdjustSchema.optional().nullable(),
 })
 
 export type GalleryImageInput = z.infer<typeof GalleryImageSchema>
@@ -60,6 +67,7 @@ export async function updateGalleryImage(id: string, data: GalleryImageInput) {
       category: parsed.category?.trim() || null,
       mediaType: parsed.mediaType as GalleryMediaType,
       published: parsed.published,
+      imageAdjust: parsed.imageAdjust ?? undefined,
     },
   })
 
