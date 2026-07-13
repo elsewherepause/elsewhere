@@ -137,10 +137,10 @@ export default function AboutCanvas() {
         {/* ── Shaped by Time Section (Text + Portrait) ── */}
         <div style={{ position: 'absolute', left: 580, top: 3150, width: 520, color: '#505050', fontSize: 16, lineHeight: 1.6, ...mont }}>
           <p style={{ fontWeight: 700, lineHeight: 'normal', marginTop: 0, marginRight: 0, marginBottom: 12, marginLeft: 0, color: '#000' }}>Narrative Research</p>
-          <p style={{ fontWeight: 400, textAlign: 'justify', marginTop: 0, marginRight: 0, marginBottom: 24, marginLeft: 0 }}>
+          <p style={{ fontWeight: 400, textAlign: 'justify', marginTop: 0, marginRight: 0, marginBottom: 40, marginLeft: 0 }}>
             Field-grounded inquiry into people, place, material culture, and lived context. This roots a brand, publication, or institution in real understanding before it begins to speak.
           </p>
-          <p style={{ fontWeight: 700, lineHeight: 'normal', marginTop: 0, marginRight: 0, marginBottom: 12, marginLeft: 0, color: '#000' }}>Story Strategy</p>
+          <p style={{ fontWeight: 700, lineHeight: 'normal', marginTop: 100, marginRight: 0, marginBottom: 12, marginLeft: 0, color: '#000' }}>Story Strategy</p>
           <p style={{ fontWeight: 400, textAlign: 'justify', margin: 0 }}>
             Narrative direction for campaigns, brand worlds, editorial platforms, and cultural initiatives. This covers theme, language, structure, and the shape a story needs to take.
           </p>
@@ -155,7 +155,7 @@ export default function AboutCanvas() {
           <img alt="Editorial and documentary commission" style={{ position: 'absolute', inset: 0, maxWidth: 'none', objectFit: 'cover', width: '100%', height: '100%' }} src="/images/rebuilding-tsunami.png" />
         </div>
 
-        <div style={{ position: 'absolute', left: 580, top: 3550, width: 550, color: '#505050', fontSize: 16, lineHeight: 1.6, ...mont }}>
+        <div style={{ position: 'absolute', left: 580, top: 3570, width: 550, color: '#505050', fontSize: 16, lineHeight: 1.6, ...mont }}>
           <p style={{ fontWeight: 700, lineHeight: 'normal', marginTop: 0, marginRight: 0, marginBottom: 12, marginLeft: 0, color: '#000' }}>Editorial and Documentary Commissions</p>
           <p style={{ fontWeight: 400, textAlign: 'justify', margin: 0 }}>
             Work made through time spent close to the subject, taking the form of photography, film, sound, writing, printed matter, digital formats, or whatever form the story asks for.
