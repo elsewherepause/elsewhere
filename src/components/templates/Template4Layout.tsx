@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 import { hasContent, type ImageAdjust, type Section, type TemplateData } from '@/components/admin/template-editor/shared'
 import { renderInlineMarkdown } from '@/lib/utils/inline-markdown'
@@ -218,15 +218,43 @@ export default function Template4Layout({
     )
   }
 
-  function H2({ children, l, t, w = 421 }: { children?: string; l: number; t: number; w?: number }) {
-    if (!children) return null
+  // Standardized gap from the bottom of the heading's last rendered line to
+  // the body text. Headline line count depends on how the text actually
+  // wraps at render width, so the body position is measured off the
+  // heading's real rendered height rather than a fixed offset.
+  const HEADING_BODY_GAP = 10
+
+  function HeadingRow({ headline, hl, ht, hw = 421, bodies }: {
+    headline?: string; hl: number; ht: number; hw?: number
+    bodies: { text?: string; l: number; w?: number }[]
+  }) {
+    const ref = useRef<HTMLDivElement>(null)
+    const [headingHeight, setHeadingHeight] = useState(0)
+
+    useLayoutEffect(() => {
+      const el = ref.current
+      if (!el) return
+      const update = () => setHeadingHeight(el.offsetHeight)
+      update()
+      const ro = new ResizeObserver(update)
+      ro.observe(el)
+      return () => ro.disconnect()
+    }, [headline, hw])
+
+    const bodyTop = ht + headingHeight + HEADING_BODY_GAP
+
     return (
-      <div style={{
-        position: 'absolute', left: l, top: t, width: w,
-        fontFamily: 'var(--font-serif, DM Sans)', fontWeight: 500, fontSize: 22,
-        color: '#1c1c1c', textTransform: 'uppercase', lineHeight: 'normal',
-        whiteSpace: 'pre-wrap',
-      }}>{children}</div>
+      <>
+        <div ref={ref} style={{
+          position: 'absolute', left: hl, top: ht, width: hw,
+          fontFamily: 'var(--font-serif, DM Sans)', fontWeight: 500, fontSize: 22,
+          color: '#1c1c1c', textTransform: 'uppercase', lineHeight: 'normal',
+          whiteSpace: 'pre-wrap',
+        }}>{headline}</div>
+        {bodies.map((b, idx) => (
+          <P key={idx} l={b.l} t={bodyTop} w={b.w}>{b.text}</P>
+        ))}
+      </>
     )
   }
 
@@ -269,18 +297,14 @@ export default function Template4Layout({
         <React.Fragment key={i}>
           <ImgBox id={s.image1} si={sk} field="image1" l={254} t={1012 + off} w={691} h={554} adj={s.image1Adjust} />
           <SecNum n={num} l={1332} t={1009 + off} />
-          <H2 l={964} t={1239 + off} w={399}>{s.headline}</H2>
-          <P l={964} t={1364 + off} w={220}>{s.body1}</P>
-          <P l={1212} t={1364 + off} w={220}>{s.body2}</P>
+          <HeadingRow headline={s.headline} hl={964} ht={1239 + off} hw={399} bodies={[{ text: s.body1, l: 964 }, { text: s.body2, l: 1212 }]} />
         </React.Fragment>
       )
       case 1: return (
         <React.Fragment key={i}>
           <ImgBox id={s.image1} si={sk} field="image1" l={252} t={1676 + off} w={463} h={454} adj={s.image1Adjust} />
           <SecNum n={num} l={1320} t={1676 + off} />
-          <H2 l={730} t={1740 + off} w={466}>{s.headline}</H2>
-          <P l={730} t={1840 + off} w={300}>{s.body1}</P>
-          <P l={1050} t={1840 + off} w={300}>{s.body2}</P>
+          <HeadingRow headline={s.headline} hl={730} ht={1740 + off} hw={466} bodies={[{ text: s.body1, l: 730, w: 300 }, { text: s.body2, l: 1050, w: 300 }]} />
           <ImgBox id={s.image3} si={sk} field="image3" l={1213} t={2025 + off} w={223} h={115} adj={s.image3Adjust} />
           <ImgBox id={s.image2} si={sk} field="image2" l={733} t={2160 + off} w={462} h={317} adj={s.image2Adjust} />
           <P l={1213} t={2170 + off} w={223}>{s.body3}</P>
@@ -290,10 +314,8 @@ export default function Template4Layout({
         <React.Fragment key={i}>
           <ImgBox id={s.image1} si={sk} field="image1" l={254} t={2556 + off} w={331} h={671} adj={s.image1Adjust} />
           <SecNum n={num} l={1051} t={2567 + off} />
-          <H2 l={621} t={2617 + off} w={453}>{s.headline}</H2>
-          <P l={621} t={2758 + off} w={224}>{s.body1}</P>
+          <HeadingRow headline={s.headline} hl={621} ht={2617 + off} hw={453} bodies={[{ text: s.body1, l: 621, w: 224 }, { text: s.body3, l: 862, w: 224 }]} />
           <ImgBox id={s.image2} si={sk} field="image2" l={1140} t={2758 + off} w={250} h={300} adj={s.image2Adjust} />
-          <P l={862} t={2758 + off} w={224}>{s.body3}</P>
           <P l={1140} t={3070 + off} w={250}>{s.body5}</P>
         </React.Fragment>
       )
@@ -301,9 +323,7 @@ export default function Template4Layout({
         <React.Fragment key={i}>
           <ImgBox id={s.image1} si={sk} field="image1" l={254} t={3797 + off} w={400} h={380} adj={s.image1Adjust} />
           <SecNum n={num} l={1100} t={3797 + off} />
-          <H2 l={700} t={3840 + off} w={480}>{s.headline}</H2>
-          <P l={700} t={4000 + off} w={220}>{s.body1}</P>
-          <P l={950} t={4000 + off} w={220}>{s.body2}</P>
+          <HeadingRow headline={s.headline} hl={700} ht={3840 + off} hw={480} bodies={[{ text: s.body1, l: 700 }, { text: s.body2, l: 950 }]} />
           <ImgBox id={s.image2} si={sk} field="image2" l={960} t={4200 + off} w={300} h={200} adj={s.image2Adjust} />
           <ImgBox id={s.image3} si={sk} field="image3" l={254} t={4280 + off} w={420} h={200} adj={s.image3Adjust} />
           <P l={960} t={4420 + off} w={250}>{s.body3}</P>
@@ -313,9 +333,7 @@ export default function Template4Layout({
         <React.Fragment key={i}>
           <ImgBox id={s.image1} si={sk} field="image1" l={254} t={5478 + off} w={300} h={550} adj={s.image1Adjust} />
           <SecNum n={num} l={1020} t={5520 + off} />
-          <H2 l={580} t={5520 + off} w={400}>{s.headline}</H2>
-          <P l={580} t={5650 + off} w={220}>{s.body1}</P>
-          <P l={820} t={5650 + off} w={220}>{s.body2}</P>
+          <HeadingRow headline={s.headline} hl={580} ht={5520 + off} hw={400} bodies={[{ text: s.body1, l: 580 }, { text: s.body2, l: 820 }]} />
           <ImgBox id={s.image2} si={sk} field="image2" l={1100} t={5780 + off} w={280} h={500} adj={s.image2Adjust} />
         </React.Fragment>
       )
@@ -323,9 +341,7 @@ export default function Template4Layout({
         <React.Fragment key={i}>
           <ImgBox id={s.image1} si={sk} field="image1" l={254} t={6277 + off} w={450} h={400} adj={s.image1Adjust} />
           <SecNum n={num} l={1200} t={6277 + off} />
-          <H2 l={740} t={6320 + off} w={500}>{s.headline}</H2>
-          <P l={740} t={6460 + off} w={220}>{s.body1}</P>
-          <P l={990} t={6460 + off} w={220}>{s.body2}</P>
+          <HeadingRow headline={s.headline} hl={740} ht={6320 + off} hw={500} bodies={[{ text: s.body1, l: 740 }, { text: s.body2, l: 990 }]} />
           <ImgBox id={s.image2} si={sk} field="image2" l={740} t={6750 + off} w={500} h={280} adj={s.image2Adjust} />
         </React.Fragment>
       )
@@ -333,18 +349,14 @@ export default function Template4Layout({
         <React.Fragment key={i}>
           <ImgBox id={s.image1} si={sk} field="image1" l={254} t={6749 + off} w={530} h={380} adj={s.image1Adjust} />
           <SecNum n={num} l={1200} t={6749 + off} />
-          <H2 l={820} t={6790 + off} w={500}>{s.headline}</H2>
-          <P l={820} t={6930 + off} w={220}>{s.body1}</P>
-          <P l={1070} t={6930 + off} w={220}>{s.body2}</P>
+          <HeadingRow headline={s.headline} hl={820} ht={6790 + off} hw={500} bodies={[{ text: s.body1, l: 820 }, { text: s.body2, l: 1070 }]} />
         </React.Fragment>
       )
       case 7: return (
         <React.Fragment key={i}>
           <ImgBox id={s.image1} si={sk} field="image1" l={650} t={8500 + off} w={730} h={380} adj={s.image1Adjust} />
           <SecNum n={num} l={560} t={8510 + off} />
-          <H2 l={254} t={8550 + off} w={380}>{s.headline}</H2>
-          <P l={254} t={8700 + off} w={180}>{s.body1}</P>
-          <P l={460} t={8700 + off} w={180}>{s.body2}</P>
+          <HeadingRow headline={s.headline} hl={254} ht={8550 + off} hw={380} bodies={[{ text: s.body1, l: 254, w: 180 }, { text: s.body2, l: 460, w: 180 }]} />
           <ImgBox id={s.image2} si={sk} field="image2" l={254} t={8950 + off} w={200} h={300} adj={s.image2Adjust} />
           <P l={480} t={8960 + off} w={200}>{s.body3}</P>
           <ImgBox id={s.image3} si={sk} field="image3" l={680} t={9100 + off} w={460} h={260} adj={s.image3Adjust} />
@@ -355,9 +367,7 @@ export default function Template4Layout({
         <React.Fragment key={i}>
           <ImgBox id={s.image1} si={sk} field="image1" l={254} t={9800 + off} w={400} h={500} adj={s.image1Adjust} />
           <SecNum n={num} l={1200} t={9800 + off} />
-          <H2 l={690} t={9840 + off} w={500}>{s.headline}</H2>
-          <P l={690} t={10000 + off} w={220}>{s.body1}</P>
-          <P l={940} t={10000 + off} w={220}>{s.body2}</P>
+          <HeadingRow headline={s.headline} hl={690} ht={9840 + off} hw={500} bodies={[{ text: s.body1, l: 690 }, { text: s.body2, l: 940 }]} />
           <ImgBox id={s.image2} si={sk} field="image2" l={820} t={10350 + off} w={300} h={250} adj={s.image2Adjust} />
           <P l={1140} t={10350 + off} w={200}>{s.body3}</P>
         </React.Fragment>
@@ -366,9 +376,7 @@ export default function Template4Layout({
         <React.Fragment key={i}>
           <ImgBox id={s.image1} si={sk} field="image1" l={254} t={10800 + off} w={400} h={550} adj={s.image1Adjust} />
           <SecNum n={num} l={1200} t={10800 + off} />
-          <H2 l={690} t={10840 + off} w={550}>{s.headline}</H2>
-          <P l={690} t={11000 + off} w={220}>{s.body1}</P>
-          <P l={940} t={11000 + off} w={220}>{s.body2}</P>
+          <HeadingRow headline={s.headline} hl={690} ht={10840 + off} hw={550} bodies={[{ text: s.body1, l: 690 }, { text: s.body2, l: 940 }]} />
           <ImgBox id={s.image2} si={sk} field="image2" l={800} t={11350 + off} w={500} h={300} adj={s.image2Adjust} />
         </React.Fragment>
       )

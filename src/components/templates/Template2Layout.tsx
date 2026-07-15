@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { hasContent, type ImageAdjust, type Section, type TemplateData } from '@/components/admin/template-editor/shared'
 import { renderInlineMarkdown } from '@/lib/utils/inline-markdown'
 import CanvasFooter from './CanvasFooter'
@@ -208,19 +208,6 @@ export default function Template2Layout({
     )
   }
 
-  function H2({ children, l, t, w = 421, size = 22 }: { children?: string; l?: number; t?: number; w?: number; size?: number }) {
-    if (!children) return null
-    return (
-      <div style={{
-        ...(l !== undefined && t !== undefined ? { position: 'absolute', left: l, top: t } : { position: 'relative' }),
-        width: w,
-        fontFamily: 'var(--font-serif, DM Sans)', fontWeight: 500, fontSize: size,
-        color: '#1c1c1c', textTransform: 'uppercase', lineHeight: 'normal',
-        whiteSpace: 'pre-wrap',
-      }}>{children}</div>
-    )
-  }
-
   function P({ children, l, t, w = 220, size = 14 }: { children?: string; l?: number; t?: number; w?: number; size?: number }) {
     if (!children) return null
     return (
@@ -249,6 +236,91 @@ export default function Template2Layout({
           color: '#505050', lineHeight: 'normal', textAlign: 'justify',
         }}>{children}</div>
       </div>
+    )
+  }
+
+  // Standardized gap from the bottom of the heading's last rendered line to
+  // the body text. Headline line count depends on how the text actually
+  // wraps at render width, so the body position is measured off the
+  // heading's real rendered height rather than a fixed offset.
+  const HEADING_BODY_GAP = 10
+
+  // A column is a vertical stack of paragraphs below the heading. Each
+  // paragraph after the first is positioned off the real rendered height of
+  // the one above it (same GAP logic as the heading), so a short body1 no
+  // longer leaves an oversized gap before body3/body4 below it.
+  function HeadingRow({ headline, hl, ht, hw = 421, size = 22, columns }: {
+    headline?: string; hl: number; ht: number; hw?: number; size?: number
+    columns: { l: number; w?: number; items: { text?: string; w?: number }[] }[]
+  }) {
+    const ref = useRef<HTMLDivElement>(null)
+    const [headingHeight, setHeadingHeight] = useState(0)
+
+    useLayoutEffect(() => {
+      const el = ref.current
+      if (!el) return
+      const update = () => setHeadingHeight(el.offsetHeight)
+      update()
+      const ro = new ResizeObserver(update)
+      ro.observe(el)
+      return () => ro.disconnect()
+    }, [headline, hw])
+
+    const bodyTop = ht + headingHeight + HEADING_BODY_GAP
+
+    return (
+      <>
+        <div ref={ref} style={{
+          position: 'absolute', left: hl, top: ht, width: hw,
+          fontFamily: 'var(--font-serif, DM Sans)', fontWeight: 500, fontSize: size,
+          color: '#1c1c1c', textTransform: 'uppercase', lineHeight: 'normal',
+          whiteSpace: 'pre-wrap',
+        }}>{headline}</div>
+        {columns.map((col, ci) => (
+          <TextStack key={ci} l={col.l} w={col.w} top={bodyTop} items={col.items} />
+        ))}
+      </>
+    )
+  }
+
+  function TextStack({ l, w, top, items }: {
+    l: number; w?: number; top: number; items: { text?: string; w?: number }[]
+  }) {
+    const refs = useRef<(HTMLDivElement | null)[]>([])
+    const [heights, setHeights] = useState<number[]>(() => items.map(() => 0))
+
+    useLayoutEffect(() => {
+      const update = () => setHeights(refs.current.map(el => el?.offsetHeight ?? 0))
+      update()
+      const observers = refs.current.map(el => {
+        if (!el) return undefined
+        const ro = new ResizeObserver(update)
+        ro.observe(el)
+        return ro
+      })
+      return () => observers.forEach(ro => ro?.disconnect())
+    }, [items.map(it => it.text).join(' '), w])
+
+    let cursor = top
+    return (
+      <>
+        {items.map((item, idx) => {
+          const thisTop = cursor
+          cursor += (heights[idx] ?? 0) + HEADING_BODY_GAP
+          return (
+            <div
+              key={idx}
+              ref={el => { refs.current[idx] = el }}
+              style={{
+                position: 'absolute', left: l, top: thisTop, width: item.w ?? w ?? 220,
+                fontFamily: 'var(--font-sans, Montserrat)', fontWeight: 400, fontSize: 14,
+                color: '#505050', textAlign: 'justify', lineHeight: 'normal',
+                whiteSpace: 'pre-wrap', overflowWrap: 'break-word',
+              }}
+            >{renderInlineMarkdown(item.text || '')}</div>
+          )
+        })}
+      </>
     )
   }
 
@@ -292,21 +364,14 @@ export default function Template2Layout({
                     <React.Fragment key={i}>
                       <ImgBox id={s.image1} si={sk} field="image1" l={259} t={1009 + off} w={648} h={416} adj={s.image1Adjust} />
                       <SecNum n={num} l={1359} t={1009 + off} />
-                      <div style={{ position: 'absolute', left: 928, top: 1050 + off, width: 432, display: 'flex', flexDirection: 'column', gap: 24 }}>
-                        <H2 w={432}>{s.headline}</H2>
-                        <P w={432}>{s.body1}</P>
-                      </div>
-                      <div style={{ position: 'absolute', left: 928, top: 1425 + off, width: 220 }}>
-                        <P w={220}>{s.body3}</P>
-                      </div>
+                      <HeadingRow headline={s.headline} hl={928} ht={1050 + off} hw={432} columns={[{ l: 928, items: [{ text: s.body1, w: 432 }, { text: s.body3, w: 220 }] }]} />
                     </React.Fragment>
                   )
                   case 1: return (
                     <React.Fragment key={i}>
                       <ImgBox id={s.image1} si={sk} field="image1" l={253} t={1569 + off} w={695} h={492} adj={s.image1Adjust} />
                       <SecNum n={num} l={1350} t={1560 + off} />
-                      <H2 l={961} t={1697 + off} w={215}>{s.headline}</H2>
-                      <P l={961} t={1766 + off} w={220}>{s.body1}</P>
+                      <HeadingRow headline={s.headline} hl={961} ht={1697 + off} hw={215} columns={[{ l: 961, items: [{ text: s.body1 }] }]} />
                       <ImgBox id={s.image3} si={sk} field="image3" l={1234} t={1962 + off} w={193} h={354} adj={s.image3Adjust} />
                       <P l={963} t={1962 + off} w={220}>{s.body2}</P>
                       <ImgBox id={s.image2} si={sk} field="image2" l={253} t={2108 + off} w={487} h={575} adj={s.image2Adjust} />
@@ -317,11 +382,7 @@ export default function Template2Layout({
                   case 2: return (
                     <React.Fragment key={i}>
                       <SecNum n={num} l={683} t={2885 + off} />
-                      <H2 l={253} t={2940 + off} w={448}>{s.headline}</H2>
-                      <P l={253} t={3018 + off} w={220}>{s.body1}</P>
-                      <div style={{ position: 'absolute', left: 253, top: 3111 + off, width: 432 }}>
-                        <P w={432}>{s.body2}</P>
-                      </div>
+                      <HeadingRow headline={s.headline} hl={253} ht={2940 + off} hw={448} columns={[{ l: 253, items: [{ text: s.body1 }, { text: s.body2, w: 432 }] }]} />
                       <P l={463} t={3262 + off} w={220}>{s.body3}</P>
                       <ImgBox id={s.image1} si={sk} field="image1" l={745} t={2773 + off} w={684} h={520} adj={s.image1Adjust} />
                     </React.Fragment>
@@ -329,20 +390,17 @@ export default function Template2Layout({
                   case 3: return (
                     <React.Fragment key={i}>
                       <ImgBox id={s.image1} si={sk} field="image1" l={248} t={3387 + off} w={499} h={616} adj={s.image1Adjust} />
-                      <H2 l={763} t={3438 + off} w={308}>{s.headline}</H2>
+                      <HeadingRow headline={s.headline} hl={763} ht={3438 + off} hw={308} columns={[
+                        { l: 763, items: [{ text: s.body1 }, { text: s.body3, w: 458 }] },
+                        { l: 1012, items: [{ text: s.body2 }, { text: s.body4 }] },
+                      ]} />
                       <SecNum n={num} l={1181} t={3438 + off} />
-                      <P l={763} t={3513 + off} w={220}>{s.body1}</P>
-                      <P l={1012} t={3513 + off} w={220}>{s.body2}</P>
-                      <P l={763} t={3723 + off} w={458}>{s.body3}</P>
-                      <P l={1012} t={3859 + off} w={220}>{s.body4}</P>
                     </React.Fragment>
                   )
                   case 4: return (
                     <React.Fragment key={i}>
                       <SecNum n={num} l={679} t={4264 + off} />
-                      <H2 l={259} t={4299 + off} w={347}>{s.headline}</H2>
-                      <P l={259} t={4375 + off} w={220}>{s.body1}</P>
-                      <P l={498} t={4375 + off} w={220}>{s.body2}</P>
+                      <HeadingRow headline={s.headline} hl={259} ht={4299 + off} hw={347} columns={[{ l: 259, items: [{ text: s.body1 }] }, { l: 498, items: [{ text: s.body2 }] }]} />
                       <ImgBox id={s.image1} si={sk} field="image1" l={744} t={4042 + off} w={685} h={589} adj={s.image1Adjust} />
                       <ImgBox id={s.image2} si={sk} field="image2" l={259} t={4687 + off} w={469} h={334} adj={s.image2Adjust} />
                     </React.Fragment>
@@ -351,8 +409,7 @@ export default function Template2Layout({
                     <React.Fragment key={i}>
                       <ImgBox id={s.image1} si={sk} field="image1" l={1132} t={5063 + off} w={293} h={456} adj={s.image1Adjust} />
                       <SecNum n={num} l={1075} t={5063 + off} />
-                      <H2 l={884} t={5111 + off} w={220}>{s.headline}</H2>
-                      <P l={884} t={5182 + off} w={220}>{s.body1}</P>
+                      <HeadingRow headline={s.headline} hl={884} ht={5111 + off} hw={220} columns={[{ l: 884, items: [{ text: s.body1 }] }]} />
                       <ImgBox id={s.image2} si={sk} field="image2" l={1132} t={5616 + off} w={293} h={262} adj={s.image2Adjust} />
                     </React.Fragment>
                   )
@@ -360,18 +417,14 @@ export default function Template2Layout({
                     <React.Fragment key={i}>
                       <ImgBox id={s.image1} si={sk} field="image1" l={259} t={5341 + off} w={469} h={178} adj={s.image1Adjust} />
                       <SecNum n={num} l={689} t={5535 + off} />
-                      <H2 l={259} t={5574 + off} w={467}>{s.headline}</H2>
-                      <P l={259} t={5616 + off} w={220}>{s.body1}</P>
-                      <P l={498} t={5616 + off} w={220}>{s.body2}</P>
+                      <HeadingRow headline={s.headline} hl={259} ht={5574 + off} hw={467} columns={[{ l: 259, items: [{ text: s.body1 }] }, { l: 498, items: [{ text: s.body2 }] }]} />
                     </React.Fragment>
                   )
                   case 7: return (
                     <React.Fragment key={i}>
                       <ImgBox id={s.image1} si={sk} field="image1" l={259} t={5965 + off} w={688} h={589} adj={s.image1Adjust} />
                       <SecNum n={num} l={1388} t={6115 + off} />
-                      <H2 l={958} t={6158 + off} w={421}>{s.headline}</H2>
-                      <P l={958} t={6244 + off} w={220}>{s.body1}</P>
-                      <P l={1201} t={6244 + off} w={220}>{s.body3}</P>
+                      <HeadingRow headline={s.headline} hl={958} ht={6158 + off} hw={421} columns={[{ l: 958, items: [{ text: s.body1 }] }, { l: 1201, items: [{ text: s.body3 }] }]} />
                     </React.Fragment>
                   )
                   default: return null

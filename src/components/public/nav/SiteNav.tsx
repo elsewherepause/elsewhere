@@ -127,9 +127,9 @@ export default function SiteNav() {
                     margin: 0,
                   }}>Stories</h2>
 
-                  <div className="flex gap-6 text-[11px] uppercase tracking-[0.1em] font-sans items-baseline" style={{ paddingLeft: 80 }}>
-                    <Link href="/gallery" onClick={() => setMenuOpen(false)} className="cursor-pointer hover:opacity-70 transition-opacity no-underline text-[var(--color-ink-muted)] font-medium">Open Rolls</Link>
-                    <Link href="/about" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 cursor-pointer hover:opacity-70 transition-opacity no-underline" style={{ color: isAbout ? 'var(--color-ink)' : 'var(--color-ink-muted)', fontWeight: isAbout ? 700 : 500 }}>
+                  <div className="flex gap-6 uppercase items-baseline" style={{ paddingLeft: 80, fontFamily: 'var(--font-sans)', fontSize: 14, letterSpacing: '0.01em' }}>
+                    <Link href="/gallery" onClick={() => setMenuOpen(false)} className="cursor-pointer hover:opacity-70 transition-opacity no-underline" style={{ color: 'var(--color-ink)', fontWeight: 500 }}>Open Rolls</Link>
+                    <Link href="/about" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 cursor-pointer hover:opacity-70 transition-opacity no-underline" style={{ color: 'var(--color-ink)', fontWeight: isAbout ? 700 : 500 }}>
                       The Author <span className="w-1.5 h-1.5 bg-current"></span>
                     </Link>
                   </div>
@@ -151,12 +151,10 @@ export default function SiteNav() {
                         key={story.slug}
                         href={`/${story.slug}`}
                         onClick={() => setMenuOpen(false)}
-                        className="hover:opacity-50 transition-opacity group flex items-center gap-3 text-lg"
+                        className="text-[var(--color-ink-muted)] font-normal hover:text-[var(--color-ink)] hover:font-bold transition-colors group flex items-center gap-3 text-lg"
                         style={{
                           fontFamily: 'var(--font-sans)',
-                          color: 'var(--color-ink-muted)',
                           textDecoration: 'none',
-                          fontWeight: 400,
                         }}
                       >
                         <span className="w-2 h-2 border border-current flex-shrink-0 group-hover:bg-current transition-colors"></span>
@@ -184,9 +182,9 @@ export default function SiteNav() {
                   margin: 0,
                 }}>Stories</h2>
 
-                <div className="flex gap-4 text-[10px] uppercase tracking-[0.1em] font-sans items-center">
-                  <Link href="/gallery" onClick={() => setMenuOpen(false)} className="cursor-pointer hover:opacity-70 transition-opacity no-underline text-[var(--color-ink-muted)] font-medium">Open Rolls</Link>
-                  <Link href="/about" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 cursor-pointer hover:opacity-70 transition-opacity no-underline" style={{ color: isAbout ? 'var(--color-ink)' : 'var(--color-ink-muted)', fontWeight: isAbout ? 700 : 500 }}>
+                <div className="flex gap-4 uppercase items-center" style={{ fontFamily: 'var(--font-sans)', fontSize: 14, letterSpacing: '0.01em' }}>
+                  <Link href="/gallery" onClick={() => setMenuOpen(false)} className="cursor-pointer hover:opacity-70 transition-opacity no-underline" style={{ color: 'var(--color-ink)', fontWeight: 500 }}>Open Rolls</Link>
+                  <Link href="/about" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 cursor-pointer hover:opacity-70 transition-opacity no-underline" style={{ color: 'var(--color-ink)', fontWeight: isAbout ? 700 : 500 }}>
                     The Author <span className="w-1.5 h-1.5 bg-current"></span>
                   </Link>
                 </div>
@@ -207,12 +205,10 @@ export default function SiteNav() {
                       key={story.slug}
                       href={`/${story.slug}`}
                       onClick={() => setMenuOpen(false)}
-                      className="hover:opacity-50 transition-opacity group flex items-center gap-3 text-base"
+                      className="text-[var(--color-ink-muted)] font-normal hover:text-[var(--color-ink)] hover:font-bold transition-colors group flex items-center gap-3 text-base"
                       style={{
                         fontFamily: 'var(--font-sans)',
-                        color: 'var(--color-ink-muted)',
                         textDecoration: 'none',
-                        fontWeight: 400,
                       }}
                     >
                       <span className="w-2 h-2 border border-current flex-shrink-0 group-hover:bg-current transition-colors"></span>

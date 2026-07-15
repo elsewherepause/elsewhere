@@ -47,7 +47,7 @@ export default function CanvasHeader({
       {/* ━━━ HERO IMAGE — 1352 × 671 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
       <div
         style={{
-          position: 'absolute', left: 80, top: 147, width: 1352, height: 671,
+          position: 'absolute', left: 80, top: 135, width: 1352, height: 671,
           overflow: 'hidden', background: heroImage ? undefined : isEditing ? '#e8e8e8' : '#fff',
           cursor: isEditing ? 'pointer' : undefined,
         }}

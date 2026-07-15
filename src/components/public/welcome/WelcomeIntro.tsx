@@ -12,6 +12,7 @@ export default function WelcomeIntro() {
   const router = useRouter()
   const videoRef = useRef<HTMLVideoElement>(null)
   const [ended, setEnded] = useState(false)
+  const [ctaHovered, setCtaHovered] = useState(false)
   const { start: startMusic } = useMusicPlayer()
 
   useEffect(() => {
@@ -72,14 +73,16 @@ export default function WelcomeIntro() {
 
             <span
               onClick={() => router.push('/home')}
-              className="hover:opacity-60 transition-opacity"
+              onMouseEnter={() => setCtaHovered(true)}
+              onMouseLeave={() => setCtaHovered(false)}
               style={{
                 fontFamily: 'var(--font-sans)',
                 fontSize: 16,
                 fontWeight: 700,
                 textTransform: 'uppercase',
-                color: '#ccc',
+                color: ctaHovered ? '#000' : '#ccc',
                 cursor: 'pointer',
+                transition: 'color 0.2s',
               }}
             >
               Take me elsewhere

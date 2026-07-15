@@ -131,7 +131,7 @@ export default function HomeCanvas({ projects, destinations = [] }: { projects: 
               >
                 <p style={{
                   position: 'absolute', left: 0, bottom: '100%', width: '100%',
-                  margin: 0, marginBottom: 8, padding: 0,
+                  margin: 0, marginBottom: 0, padding: 0,
                   fontFamily: font, fontSize: 14, fontWeight: 700, lineHeight: 1.2,
                   textTransform: 'uppercase', color: '#1c1c1c',
                   whiteSpace: 'normal', overflowWrap: 'break-word',

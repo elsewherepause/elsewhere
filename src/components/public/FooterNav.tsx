@@ -14,7 +14,7 @@ export default function FooterNav({ nextProject, destinations = [] }: Props) {
         className="flex flex-col items-center gap-3 mb-16 px-6 md:hidden"
         style={{ fontFamily: 'var(--font-sans, Montserrat)', fontWeight: 700, fontSize: 14, color: '#ccc', textTransform: 'uppercase' }}
       >
-        <TakeMeElsewhere destinations={destinations} className="hover:opacity-60 transition-opacity" />
+        <TakeMeElsewhere destinations={destinations} />
         {nextProject && (
           <Link
             href={`/${nextProject.slug}`}
@@ -30,7 +30,7 @@ export default function FooterNav({ nextProject, destinations = [] }: Props) {
       <div className="relative mb-16 px-20 hidden md:block" style={{ height: 20 }}>
         <TakeMeElsewhere
           destinations={destinations}
-          className="absolute left-1/2 -translate-x-1/2 top-0 hover:opacity-60 transition-opacity"
+          className="absolute left-1/2 -translate-x-1/2 top-0"
           style={{ fontFamily: 'var(--font-sans, Montserrat)', fontWeight: 700, fontSize: 16, color: '#ccc', textTransform: 'uppercase' }}
         />
         {nextProject && (

@@ -25,7 +25,7 @@ export default function ProjectHero({ project }: Props) {
         <div className="h-40 md:h-64 bg-[var(--color-paper-warm)]" />
       )}
 
-      <div className="px-6 md:px-12 lg:px-20 py-12 md:py-16">
+      <div className="px-6 md:px-12 lg:px-20 pt-6 pb-12 md:pt-8 md:pb-16">
         <h1
           className="text-4xl md:text-6xl lg:text-7xl font-light leading-tight max-w-4xl"
           style={{ fontFamily: 'var(--font-heading)', letterSpacing: '-0.03em' }}

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useRef, useState, useCallback } from 'react'
+import React, { useEffect, useLayoutEffect, useRef, useState, useCallback } from 'react'
 import { hasContent, type ImageAdjust, type Section, type TemplateData } from '@/components/admin/template-editor/shared'
 import { renderInlineMarkdown } from '@/lib/utils/inline-markdown'
 import CanvasFooter from './CanvasFooter'
@@ -218,14 +218,45 @@ export default function Template1Layout({ data, isEditing, onImageSelect }: Prop
     )
   }
 
-  function H2({ children, l, t, w = 421 }: { children?: string; l: number; t: number; w?: number }) {
+  // Standardized gap from the bottom of the heading's last rendered line to
+  // the body text (was inconsistent per pattern, 69-141px).
+  const HEADING_BODY_GAP = 10
+
+  // Headline line count depends on how the text actually wraps at render
+  // width (e.g. a one-line field value can wrap to 2-3 lines on screen), so
+  // the body position is measured off the heading's real rendered height
+  // rather than a fixed offset.
+  function HeadingRow({ headline, hl, ht, hw = 421, bodies }: {
+    headline?: string; hl: number; ht: number; hw?: number
+    bodies: { text?: string; l: number; w?: number }[]
+  }) {
+    const ref = useRef<HTMLDivElement>(null)
+    const [headingHeight, setHeadingHeight] = useState(0)
+
+    useLayoutEffect(() => {
+      const el = ref.current
+      if (!el) return
+      const update = () => setHeadingHeight(el.offsetHeight)
+      update()
+      const ro = new ResizeObserver(update)
+      ro.observe(el)
+      return () => ro.disconnect()
+    }, [headline, hw])
+
+    const bodyTop = ht + headingHeight + HEADING_BODY_GAP
+
     return (
-      <div style={{
-        position: 'absolute', left: l, top: t, width: w,
-        fontFamily: 'var(--font-serif, DM Sans)', fontWeight: 500,
-        fontSize: 22, color: '#1c1c1c', textTransform: 'uppercase', lineHeight: 'normal',
-        whiteSpace: 'pre-wrap',
-      }}>{children}</div>
+      <>
+        <div ref={ref} style={{
+          position: 'absolute', left: hl, top: ht, width: hw,
+          fontFamily: 'var(--font-serif, DM Sans)', fontWeight: 500,
+          fontSize: 22, color: '#1c1c1c', textTransform: 'uppercase', lineHeight: 'normal',
+          whiteSpace: 'pre-wrap',
+        }}>{headline}</div>
+        {bodies.map((b, idx) => (
+          <P key={idx} l={b.l} t={bodyTop} w={b.w}>{b.text}</P>
+        ))}
+      </>
     )
   }
 
@@ -253,9 +284,7 @@ export default function Template1Layout({ data, isEditing, onImageSelect }: Prop
         <React.Fragment key={i}>
           <Num n={num} l={1404} t={1203 + off} />
           <ImgBox id={s.image1} sk={sk} field="image1" l={254} t={1012 + off} w={691} h={520} adj={s.image1Adjust} />
-          <H2 l={964} t={1239 + off} w={399}>{s.headline}</H2>
-          <P l={964} t={1364 + off}>{s.body1}</P>
-          <P l={1212} t={1364 + off}>{s.body2}</P>
+          <HeadingRow headline={s.headline} hl={964} ht={1239 + off} hw={399} bodies={[{ text: s.body1, l: 964 }, { text: s.body2, l: 1212 }]} />
         </React.Fragment>
       )
       case 1: return (
@@ -267,26 +296,21 @@ export default function Template1Layout({ data, isEditing, onImageSelect }: Prop
           <ImgBox id={s.image3} sk={sk} field="image3" l={254} t={2062 + off} w={494} h={575} adj={s.image3Adjust} />
           <P l={766} t={2380 + off}>{s.body2}</P>
           <ImgBox id={s.image4} sk={sk} field="image4" l={996} t={2283 + off} w={193} h={354} adj={s.image4Adjust} />
-          <H2 l={738} t={1651 + off}>{s.headline}</H2>
-          <P l={738} t={1720 + off}>{s.body1}</P>
+          <HeadingRow headline={s.headline} hl={738} ht={1651 + off} bodies={[{ text: s.body1, l: 738 }]} />
         </React.Fragment>
       )
       case 2: return (
         <React.Fragment key={i}>
           <Num n={num} l={686} t={2898 + off} />
           <ImgBox id={s.image1} sk={sk} field="image1" l={748} t={2702 + off} w={684} h={520} adj={s.image1Adjust} />
-          <H2 l={254} t={2953 + off} w={421}>{s.headline}</H2>
-          <P l={254} t={3038 + off}>{s.body1}</P>
-          <P l={503} t={3038 + off}>{s.body2}</P>
+          <HeadingRow headline={s.headline} hl={254} ht={2953 + off} hw={421} bodies={[{ text: s.body1, l: 254 }, { text: s.body2, l: 503 }]} />
         </React.Fragment>
       )
       case 3: return (
         <React.Fragment key={i}>
           <Num n={num} l={1014} t={3416 + off} />
           <ImgBox id={s.image1} sk={sk} field="image1" l={248} t={3280 + off} w={499} h={554} adj={s.image1Adjust} />
-          <H2 l={766} t={3434 + off} w={248}>{s.headline}</H2>
-          <P l={766} t={3519 + off}>{s.body1}</P>
-          <P l={1005} t={3519 + off}>{s.body2}</P>
+          <HeadingRow headline={s.headline} hl={766} ht={3434 + off} hw={248} bodies={[{ text: s.body1, l: 766 }, { text: s.body2, l: 1005 }]} />
         </React.Fragment>
       )
       case 4: return (
@@ -294,8 +318,7 @@ export default function Template1Layout({ data, isEditing, onImageSelect }: Prop
           <Num n={num} l={756} t={3923 + off} />
           <ImgBox id={s.image1} sk={sk} field="image1" l={254} t={3923 + off} w={478} h={575} adj={s.image1Adjust} />
           <ImgBox id={s.image2} sk={sk} field="image2" l={1006} t={4043 + off} w={193} h={354} adj={s.image2Adjust} />
-          <H2 l={756} t={3975 + off} w={220}>{s.headline}</H2>
-          <P l={756} t={4100 + off} w={220}>{s.body1}</P>
+          <HeadingRow headline={s.headline} hl={756} ht={3975 + off} hw={220} bodies={[{ text: s.body1, l: 756, w: 220 }]} />
           <P l={1211} t={4260 + off}>{s.body2}</P>
         </React.Fragment>
       )
@@ -303,9 +326,7 @@ export default function Template1Layout({ data, isEditing, onImageSelect }: Prop
         <React.Fragment key={i}>
           <Num n={num} l={685} t={4732 + off} />
           <ImgBox id={s.image1} sk={sk} field="image1" l={732} t={4548 + off} w={694} h={589} adj={s.image1Adjust} />
-          <H2 l={254} t={4775 + off} w={421}>{s.headline}</H2>
-          <P l={254} t={4881 + off}>{s.body1}</P>
-          <P l={493} t={4881 + off}>{s.body2}</P>
+          <HeadingRow headline={s.headline} hl={254} ht={4775 + off} hw={421} bodies={[{ text: s.body1, l: 254 }, { text: s.body2, l: 493 }]} />
           <ImgBox id={s.image2} sk={sk} field="image2" l={253} t={5193 + off} w={469} h={334} adj={s.image2Adjust} />
           <P l={750} t={5193 + off} w={220}>{s.body3}</P>
         </React.Fragment>
@@ -315,44 +336,35 @@ export default function Template1Layout({ data, isEditing, onImageSelect }: Prop
           <Num n={num} l={1070} t={5578 + off} />
           <ImgBox id={s.image1} sk={sk} field="image1" l={1133} t={5569 + off} w={293} h={456} adj={s.image1Adjust} />
           <ImgBox id={s.image2} sk={sk} field="image2" l={253} t={5847 + off} w={469} h={178} adj={s.image2Adjust} />
-          <H2 l={883} t={5626 + off} w={220}>{s.headline}</H2>
-          <P l={883} t={5720 + off}>{s.body1}</P>
+          <HeadingRow headline={s.headline} hl={883} ht={5626 + off} hw={220} bodies={[{ text: s.body1, l: 883 }]} />
         </React.Fragment>
       )
       case 7: return (
         <React.Fragment key={i}>
           <Num n={num} l={686} t={6038 + off} />
           <ImgBox id={s.image1} sk={sk} field="image1" l={1133} t={6117 + off} w={293} h={262} adj={s.image1Adjust} />
-          <H2 l={254} t={6081 + off} w={467}>{s.headline}</H2>
-          <P l={254} t={6187 + off}>{s.body1}</P>
-          <P l={493} t={6187 + off}>{s.body2}</P>
+          <HeadingRow headline={s.headline} hl={254} ht={6081 + off} hw={467} bodies={[{ text: s.body1, l: 254 }, { text: s.body2, l: 493 }]} />
         </React.Fragment>
       )
       case 8: return (
         <React.Fragment key={i}>
           <Num n={num} l={1388} t={6490 + off} />
           <ImgBox id={s.image1} sk={sk} field="image1" l={254} t={6471 + off} w={688} h={589} adj={s.image1Adjust} />
-          <H2 l={957} t={6533 + off} w={421}>{s.headline}</H2>
-          <P l={957} t={6619 + off}>{s.body1}</P>
-          <P l={1196} t={6619 + off}>{s.body2}</P>
+          <HeadingRow headline={s.headline} hl={957} ht={6533 + off} hw={421} bodies={[{ text: s.body1, l: 957 }, { text: s.body2, l: 1196 }]} />
         </React.Fragment>
       )
       case 9: return (
         <React.Fragment key={i}>
           <Num n={num} l={1229} t={7152 + off} />
           <ImgBox id={s.image1} sk={sk} field="image1" l={254} t={7152 + off} w={484} h={575} adj={s.image1Adjust} />
-          <H2 l={754} t={7210 + off} w={504}>{s.headline}</H2>
-          <P l={754} t={7351 + off}>{s.body1}</P>
-          <P l={998} t={7351 + off}>{s.body2}</P>
+          <HeadingRow headline={s.headline} hl={754} ht={7210 + off} hw={504} bodies={[{ text: s.body1, l: 754 }, { text: s.body2, l: 998 }]} />
         </React.Fragment>
       )
       case 10: return (
         <React.Fragment key={i}>
           <Num n={num} l={1233} t={7830 + off} />
           <ImgBox id={s.image1} sk={sk} field="image1" l={512} t={7823 + off} w={227} h={487} adj={s.image1Adjust} />
-          <H2 l={787} t={7895 + off}>{s.headline}</H2>
-          <P l={787} t={7988 + off}>{s.body1}</P>
-          <P l={1031} t={7988 + off}>{s.body2}</P>
+          <HeadingRow headline={s.headline} hl={787} ht={7895 + off} bodies={[{ text: s.body1, l: 787 }, { text: s.body2, l: 1031 }]} />
         </React.Fragment>
       )
       default: return null
