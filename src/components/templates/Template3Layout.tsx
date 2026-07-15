@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 // ─── Data type ────────────────────────────────────────────────────────────────
 
@@ -16,7 +16,7 @@ export type Template3Data = TemplateData
 
 const FIELD_MAPS: Record<string, string>[] = [
   { image1: 'sec1Image', headline: 'sec1Headline', body1: 'sec1Body1', quote: 'sec1Quote', body2: 'sec1Body2', quote2: 'sec1Quote2', body3: 'sec1Body3' },
-  { image1: 'sec2Image', headline: 'sec2Headline', body1: 'sec2Body1', body2: 'sec2Body2', body3: 'sec2Body3', body4: 'sec2Body4' },
+  { image1: 'sec2Image', headline: 'sec2Headline', body1: 'sec2Body1', body2: 'sec2Body2' },
   { image1: 'sec3Image', headline: 'sec3Headline', body1: 'sec3Body1', body2: 'sec3Body2' },
   { image1: 'sec4ImageTall', headline: 'sec4Headline', quote: 'sec4Quote', body1: 'sec4Body1', body2: 'sec4Body2' },
   { image2: 'sec5ImagePortrait', headline: 'sec5Headline', quote: 'sec5Quote', body3: 'sec5Body3', body4: 'sec5Body4' },
@@ -216,6 +216,96 @@ export default function Template3Layout({
     )
   }
 
+  // Standardized gap from the bottom of the heading's last rendered line to
+  // the body text. Headline line count depends on how the text actually
+  // wraps at render width, so the body position is measured off the
+  // heading's real rendered height rather than a fixed offset.
+  const HEADING_BODY_GAP = 10
+
+  // rows stack vertically below the heading: row 0 sits at the heading's real
+  // measured bottom + GAP (e.g. the "Body intro" quote), and every row after
+  // that sits at the row above it's real measured bottom + GAP — so a short
+  // quote (or short body row) no longer leaves an oversized gap before
+  // whatever comes next.
+  function HeadingRow({ headline, hl, ht, hw = 421, size = 22, rows }: {
+    headline?: string; hl: number; ht: number; hw?: number; size?: number
+    rows: { text?: string; l: number; w?: number }[][]
+  }) {
+    const ref = useRef<HTMLDivElement>(null)
+    const [headingHeight, setHeadingHeight] = useState(0)
+
+    useLayoutEffect(() => {
+      const el = ref.current
+      if (!el) return
+      const update = () => setHeadingHeight(el.offsetHeight)
+      update()
+      const ro = new ResizeObserver(update)
+      ro.observe(el)
+      return () => ro.disconnect()
+    }, [headline, hw])
+
+    const firstRowTop = ht + headingHeight + HEADING_BODY_GAP
+
+    return (
+      <>
+        <div ref={ref} style={{
+          position: 'absolute', left: hl, top: ht, width: hw,
+          fontFamily: 'var(--font-serif, DM Sans)', fontWeight: 500, fontSize: size,
+          color: '#1c1c1c', textTransform: 'uppercase', lineHeight: 'normal',
+          whiteSpace: 'pre-wrap',
+        }}>{headline}</div>
+        <RowStack top={firstRowTop} rows={rows} />
+      </>
+    )
+  }
+
+  function RowStack({ top, rows }: { top: number; rows: { text?: string; l: number; w?: number }[][] }) {
+    const refs = useRef<(HTMLDivElement | null)[]>([])
+    const flatItems = rows.flat()
+    const [heights, setHeights] = useState<number[]>(() => flatItems.map(() => 0))
+
+    useLayoutEffect(() => {
+      const update = () => setHeights(refs.current.map(el => el?.offsetHeight ?? 0))
+      update()
+      const observers = refs.current.map(el => {
+        if (!el) return undefined
+        const ro = new ResizeObserver(update)
+        ro.observe(el)
+        return ro
+      })
+      return () => observers.forEach(ro => ro?.disconnect())
+    }, [flatItems.map(it => it.text).join(' ')])
+
+    const elements: React.ReactNode[] = []
+    let cursor = top
+    let flatIdx = 0
+    rows.forEach(row => {
+      const rowTop = cursor
+      const startIdx = flatIdx
+      row.forEach(item => {
+        const idx = flatIdx
+        elements.push(
+          <div
+            key={idx}
+            ref={el => { refs.current[idx] = el }}
+            style={{
+              position: 'absolute', left: item.l, top: rowTop, width: item.w ?? 220,
+              fontFamily: 'var(--font-sans, Montserrat)', fontWeight: 400, fontSize: 14,
+              color: '#505050', textAlign: 'justify', lineHeight: 'normal',
+              whiteSpace: 'pre-wrap', overflowWrap: 'break-word',
+            }}
+          >{renderInlineMarkdown(item.text || '')}</div>
+        )
+        flatIdx++
+      })
+      const rowHeights = heights.slice(startIdx, flatIdx)
+      const maxH = rowHeights.length ? Math.max(...rowHeights) : 0
+      cursor = rowTop + maxH + HEADING_BODY_GAP
+    })
+
+    return <>{elements}</>
+  }
+
   function H2({ children, l, t, w = 421, size = 22 }: { children?: string; l: number; t: number; w?: number; size?: number }) {
     if (!children) return null
     return (
@@ -239,7 +329,6 @@ export default function Template3Layout({
       }}>{renderInlineMarkdown(children)}</div>
     )
   }
-
 
   return (
     <>
@@ -281,50 +370,45 @@ export default function Template3Layout({
                     <React.Fragment key={i}>
                       <ImgBox id={s.image1} si={sk} field="image1" l={250} t={1009 + off} w={590} h={540} adj={s.image1Adjust} />
                       <SecNum n={num} l={1400} t={1009 + off} />
-                      <H2 l={880} t={1050 + off} w={550}>{s.headline}</H2>
-                      <P l={880} t={1180 + off} w={550}>{s.quote}</P>
-                      <P l={880} t={1290 + off} w={260}>{s.body1}</P>
-                      <P l={1170} t={1290 + off} w={260}>{s.body2}</P>
-                      <P l={880} t={1450 + off} w={550}>{s.body3}</P>
+                      <HeadingRow headline={s.headline} hl={880} ht={1050 + off} hw={550} rows={[
+                        [{ text: s.quote, l: 880, w: 550 }],
+                        [{ text: s.body1, l: 880, w: 260 }, { text: s.body2, l: 1170, w: 260 }],
+                        [{ text: s.body3, l: 880, w: 550 }],
+                      ]} />
                     </React.Fragment>
                   )
                   case 1: return (
                     <React.Fragment key={i}>
                       <SecNum n={num} l={770} t={1720 + off} />
                       <ImgBox id={s.image1} si={sk} field="image1" l={820} t={1640 + off} w={560} h={480} adj={s.image1Adjust} />
-                      <H2 l={254} t={1760 + off} w={450}>{s.headline}</H2>
-                      <P l={254} t={1880 + off} w={220}>{s.body1}</P>
-                      <P l={503} t={1880 + off} w={220}>{s.body2}</P>
-                      <P l={254} t={2100 + off} w={220}>{s.body3}</P>
-                      <P l={503} t={2100 + off} w={220}>{s.body4}</P>
+                      <HeadingRow headline={s.headline} hl={254} ht={1760 + off} hw={450} rows={[[{ text: s.body1, l: 254 }, { text: s.body2, l: 503 }]]} />
                     </React.Fragment>
                   )
                   case 2: return (
                     <React.Fragment key={i}>
                       <ImgBox id={s.image1} si={sk} field="image1" l={254} t={2773 + off} w={1126} h={500} adj={s.image1Adjust} />
                       <SecNum n={num} l={1350} t={3320 + off} />
-                      <H2 l={810} t={3360 + off} w={500}>{s.headline}</H2>
-                      <P l={810} t={3480 + off} w={220}>{s.body1}</P>
-                      <P l={1060} t={3480 + off} w={220}>{s.body2}</P>
+                      <HeadingRow headline={s.headline} hl={810} ht={3360 + off} hw={500} rows={[[{ text: s.body1, l: 810 }, { text: s.body2, l: 1060 }]]} />
                     </React.Fragment>
                   )
                   case 3: return (
                     <React.Fragment key={i}>
                       <ImgBox id={s.image1} si={sk} field="image1" l={254} t={3387 + off} w={520} h={620} adj={s.image1Adjust} />
                       <SecNum n={num} l={1350} t={3800 + off} />
-                      <H2 l={810} t={3840 + off} w={500}>{s.headline}</H2>
-                      <P l={810} t={3950 + off} w={458}>{s.quote}</P>
-                      <P l={810} t={4100 + off} w={220}>{s.body1}</P>
-                      <P l={1060} t={4100 + off} w={220}>{s.body2}</P>
+                      <HeadingRow headline={s.headline} hl={810} ht={3840 + off} hw={500} rows={[
+                        [{ text: s.quote, l: 810, w: 458 }],
+                        [{ text: s.body1, l: 810, w: 220 }, { text: s.body2, l: 1060, w: 220 }],
+                      ]} />
                     </React.Fragment>
                   )
                   case 4: return (
                     <React.Fragment key={i}>
                       <ImgBox id={s.image2} si={sk} field="image2" l={620} t={4042 + off} w={760} h={480} adj={s.image2Adjust} />
                       <SecNum n={num} l={500} t={4150 + off} />
-                      <H2 l={260} t={4190 + off} w={340}>{s.headline}</H2>
-                      <P l={260} t={4370 + off} w={340}>{s.quote}</P>
-                      <P l={260} t={4550 + off} w={220}>{s.body3}</P>
+                      <HeadingRow headline={s.headline} hl={260} ht={4190 + off} hw={340} rows={[
+                        [{ text: s.quote, l: 260, w: 340 }],
+                        [{ text: s.body3, l: 260, w: 220 }],
+                      ]} />
                       <P l={510} t={4550 + off} w={220}>{s.body4}</P>
                     </React.Fragment>
                   )
@@ -343,9 +427,7 @@ export default function Template3Layout({
                     <React.Fragment key={i}>
                       <SecNum n={num} l={700} t={5341 + off} />
                       <ImgBox id={s.image1} si={sk} field="image1" l={780} t={5341 + off} w={600} h={450} adj={s.image1Adjust} />
-                      <H2 l={254} t={5380 + off} w={500}>{s.headline}</H2>
-                      <P l={254} t={5520 + off} w={220}>{s.body1}</P>
-                      <P l={504} t={5520 + off} w={220}>{s.body2}</P>
+                      <HeadingRow headline={s.headline} hl={254} ht={5380 + off} hw={500} rows={[[{ text: s.body1, l: 254 }, { text: s.body2, l: 504 }]]} />
                     </React.Fragment>
                   )
                   default: return null

@@ -21,8 +21,6 @@ export const PATTERNS: Pattern[] = [
       { field: 'headline', label: 'Headline', multiline: true },
       { field: 'body1', label: 'Body 1 — left column', multiline: true },
       { field: 'body2', label: 'Body 2 — right column', multiline: true },
-      { field: 'body3', label: 'Body 3 — left column', multiline: true },
-      { field: 'body4', label: 'Body 4 — right column', multiline: true },
     ],
   },
   {
