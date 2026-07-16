@@ -53,7 +53,8 @@ export default function WelcomeIntro() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="absolute inset-0 flex flex-col items-center justify-center gap-10 px-6 text-center"
+            onClick={() => router.push('/home')}
+            className="absolute inset-0 flex flex-col items-center justify-center gap-10 px-6 text-center cursor-pointer"
           >
             <p
               style={{
@@ -72,7 +73,6 @@ export default function WelcomeIntro() {
             </p>
 
             <span
-              onClick={() => router.push('/home')}
               onMouseEnter={() => setCtaHovered(true)}
               onMouseLeave={() => setCtaHovered(false)}
               style={{
