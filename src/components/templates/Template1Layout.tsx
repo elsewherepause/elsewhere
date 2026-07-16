@@ -21,7 +21,7 @@ const W = 1512
 const SECTION_STARTS = [1012, 1587, 2702, 3280, 3923, 4548, 5193, 6038, 6471, 7152, 7823]
 
 // Vertical slot height of each pattern (start[i+1] - start[i]; last pattern ends at footer y=8357)
-const SECTION_HEIGHTS = [575, 1100, 660, 643, 625, 779, 845, 433, 681, 671, 534]
+const SECTION_HEIGHTS = [575, 1100, 583, 643, 625, 630, 845, 433, 681, 631, 534]
 
 // Where content starts (top of first pattern's slot) — shifted up 50px from the
 // original 1012 to tighten the whitespace between the header and the title/hero
