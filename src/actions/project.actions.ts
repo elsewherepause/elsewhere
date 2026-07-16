@@ -71,6 +71,26 @@ export async function updateProject(id: string, data: {
   revalidatePath(`/admin/projects/${id}`)
 }
 
+const TEMPLATE_VALUES = ['TEMPLATE_1', 'TEMPLATE_2', 'TEMPLATE_3', 'TEMPLATE_4'] as const
+type TemplateValue = (typeof TEMPLATE_VALUES)[number]
+
+export async function changeProjectTemplate(id: string, template: TemplateValue) {
+  await requireAdmin()
+
+  if (!TEMPLATE_VALUES.includes(template)) return { error: 'Invalid template.' }
+
+  const project = await prisma.project.findUnique({ where: { id } })
+  if (!project) return { error: 'Project not found.' }
+
+  const prevData = (project.templateData as Record<string, unknown> | null) ?? {}
+  const templateData = { ...prevData, sections: [] }
+
+  await prisma.project.update({ where: { id }, data: { template, templateData } })
+  revalidatePath('/admin/projects')
+  revalidatePath(`/admin/projects/${id}`)
+  revalidatePath('/')
+}
+
 export async function publishProject(id: string) {
   await requireAdmin()
   const project = await prisma.project.update({

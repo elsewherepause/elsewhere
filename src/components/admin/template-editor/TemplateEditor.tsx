@@ -2,7 +2,8 @@
 
 import { useState, useRef, useTransition, type ComponentType } from 'react'
 import Link from 'next/link'
-import { updateProject, publishProject, unpublishProject } from '@/actions/project.actions'
+import { useRouter } from 'next/navigation'
+import { updateProject, publishProject, unpublishProject, changeProjectTemplate } from '@/actions/project.actions'
 import MediaPicker from '@/components/admin/media/MediaPicker'
 import { SLOT_PATTERN } from '@/lib/homepage-slots'
 import type { Project, MediaAsset } from '@prisma/client'
@@ -111,6 +112,71 @@ function SectionAccordion({
   )
 }
 
+const TEMPLATE_OPTIONS = [
+  { value: 'TEMPLATE_1', label: 'Template 1' },
+  { value: 'TEMPLATE_2', label: 'Template 2' },
+  { value: 'TEMPLATE_3', label: 'Template 3' },
+  { value: 'TEMPLATE_4', label: 'Template 4' },
+] as const
+
+function ChangeTemplateModal({
+  currentTemplate, onCancel, onConfirm, changing, error,
+}: {
+  currentTemplate: string
+  onCancel: () => void
+  onConfirm: (template: string) => void
+  changing: boolean
+  error: string | null
+}) {
+  const others = TEMPLATE_OPTIONS.filter(t => t.value !== currentTemplate)
+  const [selected, setSelected] = useState<string>(others[0]?.value ?? '')
+
+  return (
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+      <div className="bg-white max-w-sm w-full p-6 space-y-4">
+        <h2 className="text-sm font-medium uppercase tracking-widest">Change Template</h2>
+        <p className="text-xs text-gray-500 leading-relaxed">
+          Switching templates will permanently clear all section text and images.
+          The hero image, title, location, and other project info will be kept.
+          This cannot be undone.
+        </p>
+
+        <div className="space-y-1">
+          <label className="text-[10px] uppercase tracking-widest text-gray-400">New Template</label>
+          <select
+            value={selected}
+            onChange={e => setSelected(e.target.value)}
+            className={`${inputCls} bg-transparent`}
+          >
+            {others.map(t => (
+              <option key={t.value} value={t.value}>{t.label}</option>
+            ))}
+          </select>
+        </div>
+
+        {error && <p className="text-[11px] text-red-600 bg-red-50 px-2 py-1 rounded">{error}</p>}
+
+        <div className="flex gap-2 pt-2">
+          <button
+            onClick={onCancel}
+            disabled={changing}
+            className="flex-1 py-2 border border-gray-300 text-[10px] uppercase tracking-widest text-gray-600 hover:border-black hover:text-black transition-colors disabled:opacity-40"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => onConfirm(selected)}
+            disabled={changing || !selected}
+            className="flex-1 py-2 bg-black text-white text-[10px] uppercase tracking-widest hover:bg-gray-800 transition-colors disabled:opacity-40"
+          >
+            {changing ? 'Switching…' : 'Switch Template'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 type LayoutProps = {
   data: Partial<TemplateData>
   isEditing?: boolean
@@ -126,6 +192,7 @@ type Props = {
 
 export default function TemplateEditor({ project, patterns, Layout, homepageSlot }: Props) {
   const patternCount = patterns.length
+  const router = useRouter()
 
   const [title, setTitle] = useState(project.title)
   const [slug, setSlug] = useState(project.slug)
@@ -148,6 +215,9 @@ export default function TemplateEditor({ project, patterns, Layout, homepageSlot
   const [publishing, startPublish] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
+  const [showTemplateModal, setShowTemplateModal] = useState(false)
+  const [changingTemplate, startChangeTemplate] = useTransition()
+  const [templateError, setTemplateError] = useState<string | null>(null)
   const lastFocusedRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null)
 
   function wrapSelection(marker: string) {
@@ -221,6 +291,19 @@ export default function TemplateEditor({ project, patterns, Layout, homepageSlot
     setPickerTarget(`${sectionKey}.${field}`)
   }
 
+  function handleChangeTemplate(template: string) {
+    startChangeTemplate(async () => {
+      const res = await changeProjectTemplate(project.id, template as 'TEMPLATE_1' | 'TEMPLATE_2' | 'TEMPLATE_3' | 'TEMPLATE_4')
+      if (res?.error) {
+        setTemplateError(res.error)
+        return
+      }
+      setShowTemplateModal(false)
+      setTemplateError(null)
+      router.refresh()
+    })
+  }
+
   return (
     <div className="flex h-screen overflow-hidden bg-white">
       <aside className="w-80 flex-shrink-0 border-r border-gray-100 overflow-y-auto flex flex-col">
@@ -259,6 +342,13 @@ export default function TemplateEditor({ project, patterns, Layout, homepageSlot
               View live ↗
             </Link>
           )}
+
+          <button
+            onClick={() => { setTemplateError(null); setShowTemplateModal(true) }}
+            className="mt-2 w-full py-2 border border-gray-300 text-[10px] uppercase tracking-widest text-gray-600 hover:border-black hover:text-black transition-colors"
+          >
+            Change Template
+          </button>
 
           {/* ── Bold / Italic toolbar ── */}
           <div className="flex items-center gap-1 mt-3 pt-3 border-t border-gray-100">
@@ -437,6 +527,16 @@ export default function TemplateEditor({ project, patterns, Layout, homepageSlot
           />
         </div>
       </main>
+
+      {showTemplateModal && (
+        <ChangeTemplateModal
+          currentTemplate={project.template}
+          changing={changingTemplate}
+          error={templateError}
+          onCancel={() => { setShowTemplateModal(false); setTemplateError(null) }}
+          onConfirm={handleChangeTemplate}
+        />
+      )}
 
       {pickerTarget && (
         <MediaPicker
