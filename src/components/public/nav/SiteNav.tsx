@@ -16,7 +16,7 @@ export default function SiteNav() {
   const [stories, setStories] = useState<{slug: string, title: string}[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const pathname = usePathname()
-  const label = PAGE_LABELS[pathname]
+  const label = pathname.startsWith('/notes/') ? 'Open Rolls' : PAGE_LABELS[pathname]
   const isAbout = pathname === '/about'
 
   useEffect(() => {
